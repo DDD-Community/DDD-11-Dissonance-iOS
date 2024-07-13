@@ -28,7 +28,7 @@ public extension Project {
         name: String,
         product: Product,
         settings: Settings,
-        deploymentTarget: DeploymentTargets = .iOS("14.0"),
+        deploymentTarget: DeploymentTargets = .iOS("15.0"),
         dependencies: [TargetDependency] = [],
         sources: SourceFilesList = ["Sources/**"],
         resources: ResourceFileElements? = nil,
