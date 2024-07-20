@@ -13,7 +13,7 @@ import PackageDescription
 #endif
 
 let package = Package(
-    name: "ITIT",
+    name: "MOZIP",
     dependencies: [
         .package(url: "https://github.com/ReactiveX/RxSwift.git", from: "6.7.0"),
         .package(url: "https://github.com/ReactorKit/ReactorKit.git", from: "3.2.0"),

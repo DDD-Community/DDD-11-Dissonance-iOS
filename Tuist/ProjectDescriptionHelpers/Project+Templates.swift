@@ -9,6 +9,7 @@ import ProjectDescription
 
 public extension Project {
     enum Layer: CaseIterable {
+        case core
         case design
         case domain
         case data
@@ -16,6 +17,7 @@ public extension Project {
         
         public var layerName: String {
             switch self {
+            case .core: return "Core"
             case .design: return "DesignSystem"
             case .domain: return "DomainLayer"
             case .data: return "DataLayer"
@@ -63,7 +65,7 @@ public extension Project {
 
         return Project(
             name: name,
-            organizationName: "ITIT",
+            organizationName: "MOZIP",
             settings: settings,
             targets: targets,
             schemes: schemes

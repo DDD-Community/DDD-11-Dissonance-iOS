@@ -43,7 +43,7 @@ private let infoPlist: [String: Plist.Value] = [
 ]
 
 let project = Project.makeProject(
-    name: "ITIT",
+    name: "MOZIP",
     product: .app,
     settings: .settings(
         base: .init().swiftCompilationMode(.wholemodule).automaticCodeSigning(devTeam: "SWPBG3YXG5"),

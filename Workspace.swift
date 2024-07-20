@@ -8,8 +8,8 @@
 import ProjectDescription
 
 let workspace = Workspace(
-    name: "ITIT",
+    name: "MOZIP",
     projects: [
-        "Targets/ITIT"
+        "Targets/MOZIP"
     ]
 )

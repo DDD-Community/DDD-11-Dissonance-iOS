@@ -1,18 +1,18 @@
 //
 //  Project.swift
-//  DDD-11-Dissonance-iOSManifests
+//  Manifests
 //
-//  Created by 한상진 on 2024/07/11.
+//  Created by 한상진 on 2024/07/20.
 //
 
 import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.makeProject(
-    name: Project.Layer.domain.layerName,
+    name: Project.Layer.core.layerName,
     product: .staticFramework,
     settings: .settings(base: .init().swiftCompilationMode(.wholemodule)),
     dependencies: [
-        .project(target: Project.Layer.core.layerName, path: .relativeToRoot("Targets/\(Project.Layer.core.layerName)")),
+        .external(name: "RxSwift")
     ]
 )
