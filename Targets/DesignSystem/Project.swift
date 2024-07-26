@@ -16,5 +16,6 @@ let project = Project.makeProject(
         .project(target: Project.Layer.domain.layerName, path: .relativeToRoot("Targets/\(Project.Layer.domain.layerName)")),
         .external(name: "RxCocoa"),
         .external(name: "RxSwift")
-    ]
+    ],
+    resources: ["Resources/*"]
 )
