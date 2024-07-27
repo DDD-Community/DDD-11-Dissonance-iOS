@@ -49,6 +49,8 @@ final class LoginReactor: Reactor {
     
     switch mutation {
     case .setUserToken(let userToken):
+      
+      //TODO: 추후 예외처리 구현 예정
       guard let accessTokenData = userToken.accessToken.data(using: .utf8),
             let refreshTokenData = userToken.refreshToken.data(using: .utf8)
       else { fatalError() }
