@@ -8,6 +8,12 @@
 
 import UIKit
 
+protocol Coordinatable: AnyObject {
+  associatedtype AssociatedCoordinatorType: CoordinatorType
+
+  var coordinator: AssociatedCoordinatorType? { get }
+}
+
 public protocol CoordinatorType: AnyObject {
 
   // MARK: - Properties
