@@ -12,6 +12,7 @@ public final class MozipLabel: UILabel {
     
     public init(style: MozipLabelStyle, text: String = "") {
         super.init(frame: .zero)
+        self.numberOfLines = 0
         self.font = style.labelSettings.font
         self.textColor = style.labelSettings.color
         self.text = text
@@ -34,18 +35,74 @@ public enum MozipLabelStyle {
     case popup_BTNApprove
     case postList_PostDetailText
     
-    var labelSettings: (font: UIFont?, color: UIColor) {
+    var labelSettings: MozipLabelSetting {
         switch self {
-        case .header_HeaderTitle: return (DesignSystemFontFamily.Pretendard.semiBold.font(size: 18), .mozipColor.gray900)
-        case .toast_ToastMessage: return (DesignSystemFontFamily.Pretendard.medium.font(size: 16), .mozipColor.gray900)
-        case .bottom_BTNMessage: return (DesignSystemFontFamily.Pretendard.semiBold.font(size: 20), .mozipColor.gray900)
-        case .fabButton_FABText: return (DesignSystemFontFamily.Pretendard.bold.font(size: 14), .mozipColor.gray900)
-        case .tag_TagLabel: return (DesignSystemFontFamily.Pretendard.medium.font(size: 14), .mozipColor.gray900)
-        case .popup_PopupTitle: return (DesignSystemFontFamily.Pretendard.semiBold.font(size: 18), .mozipColor.gray900)
-        case .popup_PopupMessage: return (DesignSystemFontFamily.Pretendard.regular.font(size: 16), .mozipColor.gray900)
-        case .popup_BTNDeny: return (DesignSystemFontFamily.Pretendard.semiBold.font(size: 16), .mozipColor.gray900)
-        case .popup_BTNApprove: return (DesignSystemFontFamily.Pretendard.semiBold.font(size: 16), .mozipColor.gray900)
-        case .postList_PostDetailText: return (DesignSystemFontFamily.Pretendard.regular.font(size: 16), .mozipColor.gray900)
+        case .header_HeaderTitle:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.semiBold.font(size: 18),
+                color: .mozipColor.gray900,
+                lineHeightMultiplier: 1
+            )
+        case .toast_ToastMessage:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.medium.font(size: 16),
+                color: .mozipColor.white,
+                lineHeightMultiplier: 1
+            )
+        case .bottom_BTNMessage:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.semiBold.font(size: 20),
+                color: .mozipColor.white,
+                lineHeightMultiplier: 1
+            )
+        case .fabButton_FABText:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.bold.font(size: 14),
+                color: .mozipColor.white,
+                lineHeightMultiplier: 1
+            )
+        case .tag_TagLabel:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.medium.font(size: 14),
+                color: .mozipColor.gray500,
+                lineHeightMultiplier: 1
+            )
+        case .popup_PopupTitle:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.semiBold.font(size: 18),
+                color: .mozipColor.gray800,
+                lineHeightMultiplier: 1
+            )
+        case .popup_PopupMessage:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.regular.font(size: 16),
+                color: .mozipColor.gray700,
+                lineHeightMultiplier: 1.4
+            )
+        case .popup_BTNDeny:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.semiBold.font(size: 16),
+                color: .mozipColor.gray700,
+                lineHeightMultiplier: 1
+            )
+        case .popup_BTNApprove:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.semiBold.font(size: 16),
+                color: .mozipColor.white,
+                lineHeightMultiplier: 1
+            )
+        case .postList_PostDetailText:
+            return MozipLabelSetting(
+                font: DesignSystemFontFamily.Pretendard.regular.font(size: 16),
+                color: .mozipColor.gray800,
+                lineHeightMultiplier: 1.5
+            )
         }
     }
+}
+
+public struct MozipLabelSetting {
+    let font: UIFont
+    let color: UIColor
+    let lineHeightMultiplier: CGFloat
 }
