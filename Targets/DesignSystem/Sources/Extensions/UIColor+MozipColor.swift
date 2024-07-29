@@ -41,7 +41,8 @@ public struct MozipColor {
     public let primary10 = UIColor(hex: 0xF8F8F8)
     
     // MARK: ETC
-    public let blackAndWhite = UIColor(hex: 0xF8F8F8)
+    public let black = UIColor(hex: 0x000000)
+    public let white = UIColor(hex: 0xFFFFFF)
     public let dim = UIColor(hex: 0xF8F8F8)
     public let red = UIColor(hex: 0xF8F8F8)
 }
