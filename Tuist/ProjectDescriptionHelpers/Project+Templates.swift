@@ -9,6 +9,7 @@ import ProjectDescription
 
 public extension Project {
     enum Layer: CaseIterable {
+        case dependencyInjector
         case core
         case design
         case domain
@@ -17,6 +18,7 @@ public extension Project {
         
         public var layerName: String {
             switch self {
+            case .dependencyInjector: return "DIContainer"
             case .core: return "Core"
             case .design: return "DesignSystem"
             case .domain: return "DomainLayer"
