@@ -45,10 +45,11 @@ final class LoginCoordinator: LoginCoordinatorType {
 // MARK: - Private
 private extension LoginCoordinator {
   func loginViewController() -> LoginViewController {
-    guard let useCase = DIContainer.shared.resolve(type: LoginUseCaseType.self) else {
+    guard let loginUseCase = DIContainer.shared.resolve(type: LoginUseCaseType.self) else {
       fatalError()
     }
-    let reactor = LoginReactor(useCase: useCase)
+    
+    let reactor = LoginReactor(loginUseCase: loginUseCase)
     let viewController = LoginViewController(reactor: reactor)
     viewController.coordinator = self
     return viewController

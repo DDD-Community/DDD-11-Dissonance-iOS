@@ -14,13 +14,13 @@ import ReactorKit
 final class LoginReactor: Reactor {
 
   // MARK: - Properties
-  private let useCase: LoginUseCaseType
+  private let loginUseCase: LoginUseCaseType
   var initialState: State = .init()
   var isFirstLogin: Bool = AuthManager.load(authInfoType: .isFirstLogin) == nil
 
   // MARK: - Initializer
-  init(useCase: LoginUseCaseType) {
-    self.useCase = useCase
+  init(loginUseCase: LoginUseCaseType) {
+    self.loginUseCase = loginUseCase
   }
 
   enum Action {
@@ -35,12 +35,11 @@ final class LoginReactor: Reactor {
     var isSuccessLogin: Bool = false
   }
 
-  
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
     case .didTapKakaoLoginButton:
-      return useCase.tryKakaoLogin().map { .setUserToken(userToken: $0) }
+      return loginUseCase.tryKakaoLogin().map { .setUserToken(userToken: $0) }
     }
   }
 
