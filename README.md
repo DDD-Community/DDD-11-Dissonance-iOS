@@ -49,13 +49,13 @@ IT 동아리, 공모전, 해커톤 등 흩어져 있는 정보를 한눈에 볼 
 
 ### PM
 
-|[금민석]()|
+|[금민석](https://blog.naver.com/alsehfdl0316/223053932924)|
 |:---:|
 |`ProjectManger`|
 
 ### Designer
 
-|[이승호]()|[손예서]()|
+|[이승호](https://www.linkedin.com/in/seung-ho-lee-blacksugar?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)|[손예서](https://www.linkedin.com/in/yeseo-son-0371b1245?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app)|
 |:---:|:---:|
 |`Designer`|`Designer`|
 
