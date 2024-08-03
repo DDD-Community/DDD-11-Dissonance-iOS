@@ -13,10 +13,9 @@ public extension UILabel {
   func setMozipLabel(style: MozipLabelStyle, color: UIColor, text: String) {
     
     setTextWithLineHeight(
-      text,
-      lineHeight: style.labelSettings.font.lineHeight * (style.labelSettings.lineHeightMultiplier),
-      font: style.labelSettings.font,
-      textColor: color
+      style: style,
+      textColor: color,
+      text: text
     )
   }
   
@@ -47,15 +46,19 @@ public extension UILabel {
     self.attributedText = newAttributedText
   }
   
-  private func setTextWithLineHeight(_ text: String, lineHeight: CGFloat, font: UIFont?, textColor: UIColor) {
+  private func setTextWithLineHeight(style: MozipLabelStyle, textColor: UIColor, text: String) {
+    let font = style.labelSettings.font
+    let lineHeight = font.lineHeight * (style.labelSettings.lineHeightMultiplier)
     
     let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.alignment = .center
     paragraphStyle.minimumLineHeight = lineHeight
     paragraphStyle.maximumLineHeight = lineHeight
     
     let attributes: [NSAttributedString.Key: Any] = [
       .paragraphStyle: paragraphStyle,
-      .font: font ?? UIFont.systemFont(ofSize: 16),
+      .baselineOffset: (lineHeight - font.lineHeight) / 2,
+      .font: font,
       .foregroundColor: textColor
     ]
     
