@@ -48,10 +48,10 @@ public extension UILabel {
   
   private func setTextWithLineHeight(style: MozipLabelStyle, textColor: UIColor, text: String) {
     let font = style.labelSettings.font
-    let lineHeight = font.lineHeight * (style.labelSettings.lineHeightMultiplier)
+    let lineHeight = font.pointSize * (style.labelSettings.lineHeightMultiplier)
     
     let paragraphStyle = NSMutableParagraphStyle()
-    paragraphStyle.alignment = .center
+    paragraphStyle.alignment = .left
     paragraphStyle.minimumLineHeight = lineHeight
     paragraphStyle.maximumLineHeight = lineHeight
     
