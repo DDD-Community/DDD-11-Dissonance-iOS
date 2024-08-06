@@ -11,7 +11,6 @@ import UIKit
 public extension UILabel {
   
   func setMozipLabel(style: MozipLabelStyle, color: UIColor, text: String) {
-    
     setTextWithLineHeight(
       style: style,
       textColor: color,
@@ -20,7 +19,6 @@ public extension UILabel {
   }
   
   func updateTextKeepingAttributes(_ newText: String) {
-    
     guard let currentAttributedText = self.attributedText else {
       self.text = newText
       return
