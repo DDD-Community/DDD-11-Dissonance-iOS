@@ -19,5 +19,5 @@ let project = Project.makeProject(
         .external(name: "PinLayout"),
         .external(name: "FlexLayout")
     ],
-    resources: ["Resources/*"]
+    resources: ["Resources/**"]
 )
