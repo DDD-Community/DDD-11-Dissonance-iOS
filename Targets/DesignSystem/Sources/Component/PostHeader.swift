@@ -26,7 +26,7 @@ public final class PostHeader: UICollectionReusableView {
   private let buttonImageView: UIImageView = {
     let imgView = UIImageView()
     imgView.contentMode = .scaleAspectFit
-    imgView.image = UIImage(systemName: "chevron.right") // FIXME: 아이콘 변경
+    imgView.image = DesignSystemAsset.chevronRight.image
     imgView.tintColor = MozipColor.gray700
     return imgView
   }()

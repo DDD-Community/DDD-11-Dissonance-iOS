@@ -10,7 +10,7 @@ import UIKit
 
 public final class MozipLabel: UILabel {
   
-  public init(style: MozipLabelStyle, color: UIColor, text: String = "") {
+  public init(style: MozipLabelStyle, color: UIColor, text: String = "text") {
     super.init(frame: .zero)
     self.numberOfLines = 0
     setMozipLabel(style: style, color: color, text: text)
