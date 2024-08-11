@@ -18,5 +18,9 @@ public struct DomainAssembly: DependencyAssemblable {
     container.register(type: LoginUseCaseType.self) { container in
       return LoginUseCase(loginRepository: container.resolve(type: LoginRepositoryType.self)!)
     }
+    
+    container.register(type: PostUploadUseCaseType.self) { container in
+      return PostUploadUseCase(postUploadRepository: container.resolve(type: PostUploadRepositoryType.self)!)
+    }
   }
 }
