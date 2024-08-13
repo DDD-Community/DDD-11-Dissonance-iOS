@@ -46,7 +46,7 @@ public enum MozipLabelStyle {
         lineHeightMultiplier: 1.4)
     case .heading3:
       return MozipLabelSetting(
-        font: DesignSystemFontFamily.Pretendard.medium.font(size: 16),
+        font: DesignSystemFontFamily.Pretendard.semiBold.font(size: 16),
         lineHeightMultiplier: 1.4)
     case .caption1:
       return MozipLabelSetting(
