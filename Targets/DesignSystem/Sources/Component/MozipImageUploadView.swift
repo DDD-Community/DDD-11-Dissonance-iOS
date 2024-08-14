@@ -28,7 +28,7 @@ public final class MozipImageUploadView: UIView {
     let button: UIButton = .init()
     button.setTitle("업로드", for: .normal)
     button.setTitleColor(MozipColor.gray10, for: .normal)
-    button.titleLabel?.font = .pretendard.semiBold.font(size: 16)
+    button.titleLabel?.font = MozipFontStyle.heading3.font
     button.backgroundColor = MozipColor.gray800
     return button
   }()

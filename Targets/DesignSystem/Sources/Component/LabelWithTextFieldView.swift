@@ -15,7 +15,7 @@ public final class LabelWithTextFieldView: UIView {
   
   // MARK: - Properties
   private let rootContainer: UIView = .init()
-  private let label: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: .init())
+  private let label: MozipLabel = .init(style: .heading3, color: MozipColor.gray800)
   public let textField: MozipTextField = .init()
   
   // MARK: - Initializer
