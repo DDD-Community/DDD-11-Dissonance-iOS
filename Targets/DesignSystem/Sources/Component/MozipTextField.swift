@@ -61,9 +61,11 @@ private extension MozipTextField {
       .disposed(by: disposeBag)
     
     rx.controlEvent(.editingDidEnd)
-      .asSignal()
-      .emit(with: self, onNext: { owner, _ in
-        owner.layer.borderColor = MozipColor.gray200.cgColor
+      .withLatestFrom(rx.text.orEmpty)
+      .map { $0.isEmpty }
+      .asSignal(onErrorJustReturn: true)
+      .emit(with: self, onNext: { owner, isEmpty in
+        owner.layer.borderColor = isEmpty ? MozipColor.gray200.cgColor : MozipColor.gray700.cgColor
       })
       .disposed(by: disposeBag)
   }
