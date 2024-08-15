@@ -35,16 +35,15 @@ public final class ImageUploadView: UIView {
     return button
   }()
   
-  private let disposeBag: DisposeBag = .init()
-  
-  public let uploadButtonTapSubject: PublishSubject<Void> = .init()
+  public var uploadButtonTapObservable: Observable<Void> {
+    uploadButton.rx.tap.asObservable()
+  }
   
   // MARK: - Initializer
   public override init(frame: CGRect) {
     super.init(frame: frame)
     
     setupViews()
-    bind()
   }
   
   required init?(coder: NSCoder) {
@@ -89,11 +88,5 @@ private extension ImageUploadView {
     
     addSubview(imageView)
     addSubview(rootContainer)
-  }
-  
-  func bind() {
-    uploadButton.rx.tap
-      .bind(to: uploadButtonTapSubject)
-      .disposed(by: disposeBag)
   }
 }
