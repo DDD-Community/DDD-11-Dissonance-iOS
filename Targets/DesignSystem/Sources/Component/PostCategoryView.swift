@@ -65,6 +65,8 @@ private extension PostCategoryView {
     layer.borderWidth = 1
     layer.borderColor = MozipColor.gray700.cgColor
     layer.cornerRadius = 8
+    isHidden = true
+    
     addSubview(rootContainer)
     
     rootContainer.flex

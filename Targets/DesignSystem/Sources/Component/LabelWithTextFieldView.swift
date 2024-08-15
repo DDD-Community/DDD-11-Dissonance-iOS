@@ -37,7 +37,6 @@ public final class LabelWithTextFieldView: UIView {
     
     rootContainer.pin.all()
     rootContainer.flex.layout()
-    textField.pin.below(of: label).marginTop(12).bottom()
   }
 }
 
@@ -47,7 +46,7 @@ private extension LabelWithTextFieldView {
     rootContainer.flex
       .define {
         $0.addItem(label)
-        $0.addItem(textField)
+        $0.addItem(textField).marginTop(12).grow(1)
       }
     
     addSubview(rootContainer)
