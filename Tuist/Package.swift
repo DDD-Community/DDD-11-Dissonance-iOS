@@ -20,6 +20,7 @@ let package = Package(
         .package(url: "https://github.com/Moya/Moya.git", from: "15.0.0"),
         .package(url: "https://github.com/layoutBox/PinLayout.git", from: "1.10.5"),
         .package(url: "https://github.com/layoutBox/FlexLayout.git", from: "2.0.10"),
-        .package(url: "https://github.com/kakao/kakao-ios-sdk-rx.git", from: "2.22.0")
+        .package(url: "https://github.com/kakao/kakao-ios-sdk-rx.git", from: "2.22.0"),
+        .package(url: "https://github.com/RxSwiftCommunity/RxDataSources.git", from: "5.0.0")
     ]
 )
