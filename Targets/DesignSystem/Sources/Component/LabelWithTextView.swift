@@ -10,6 +10,7 @@ import UIKit
 
 import FlexLayout
 import PinLayout
+import RxSwift
 
 public final class LabelWithTextView: UIView {
   
@@ -17,6 +18,9 @@ public final class LabelWithTextView: UIView {
   private let rootContainer: UIView = .init()
   private let label: MozipLabel = .init(style: .heading3, color: MozipColor.gray800)
   public let textView: MozipTextView = .init()
+  public var textObservable: Observable<String> {
+    textView.rx.text.orEmpty.asObservable()
+  }
   
   // MARK: - Initializer
   public init(title: String, placeHolder: String) {
