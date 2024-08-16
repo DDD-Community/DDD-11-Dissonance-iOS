@@ -17,9 +17,11 @@ public struct Post {
   public var organization: String = .init()
   public var recruitStartDate: String = .init()
   public var recruitEndDate: String = .init()
-  public var jobs: [(String, Int)] = []
+  public var jobGroups: [(job: String, count: Int)] = []
   public var activityStartDate: String = .init()
   public var activityEndDate: String = .init()
   public var activityContents: String = .init()
   public var postUrlString: String = .init()
+  
+  public init() { }
 }
