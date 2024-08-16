@@ -77,6 +77,7 @@ public final class ImageUploadView: UIView {
 private extension ImageUploadView {
   func setupViews() {
     backgroundColor = MozipColor.gray10
+    imageView.contentMode = .scaleAspectFit
     
     rootContainer.flex
       .justifyContent(.center)
