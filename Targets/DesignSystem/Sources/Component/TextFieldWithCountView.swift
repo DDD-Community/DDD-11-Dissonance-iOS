@@ -60,5 +60,21 @@ private extension TextFieldWithCountView {
       .map { $0 }
       .bind(to: valueSubject)
       .disposed(by: disposeBag)
+    
+    textField.rx.controlEvent(.editingDidBegin)
+      .asSignal()
+      .emit(with: self, onNext: { owner, _ in
+        owner.numberCountView.updateColors(true)
+      })
+      .disposed(by: disposeBag)
+    
+    textField.rx.controlEvent(.editingDidEnd)
+      .withLatestFrom(textField.rx.text.orEmpty)
+      .map { $0.isEmpty }
+      .asSignal(onErrorJustReturn: true)
+      .emit(with: self, onNext: { owner, isEmpty in
+        owner.numberCountView.updateColors(!isEmpty)
+      })
+      .disposed(by: disposeBag)
   }
 }

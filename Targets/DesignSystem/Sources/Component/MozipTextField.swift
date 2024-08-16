@@ -47,7 +47,9 @@ private extension MozipTextField {
     layer.borderColor = MozipColor.gray200.cgColor
     layer.cornerRadius = 8
     leftViewMode = .always
+    rightViewMode = .always
     leftView = .init(frame: .init(x: 0, y: 0, width: 16, height: 1))
+    rightView = .init(frame: .init(x: 0, y: 0, width: 16, height: 1))
     autocorrectionType = .no
     spellCheckingType = .no
   }

@@ -57,6 +57,14 @@ public final class NumberCountView: UIView {
     rootContainer.pin.all()
     rootContainer.flex.layout()
   }
+  
+  // MARK: - Methods
+  internal func updateColors(_ isEnable: Bool) {
+    layer.borderColor = isEnable ? MozipColor.gray700.cgColor : MozipColor.gray200.cgColor
+    numberLabel.updateColorKeepingAttributed(isEnable ? MozipColor.gray700: MozipColor.gray200)
+    minusButton.setTitleColor(isEnable ? MozipColor.gray700 : MozipColor.gray200, for: .normal)
+    plusButton.setTitleColor(isEnable ? MozipColor.gray700 : MozipColor.gray200, for: .normal)
+  }
 }
 
 // MARK: - Private Extenion
@@ -95,17 +103,6 @@ private extension NumberCountView {
       .bind(with: self, onNext: { owner, count in
         owner.numberCountSubject.onNext(count)
         owner.numberLabel.updateTextKeepingAttributes(String(count))
-      })
-      .disposed(by: disposeBag)
-    
-    numberCountSubject
-      .map { $0 == 0 }
-      .asSignal(onErrorSignalWith: .empty())
-      .emit(with: self, onNext: { owner, isZero in
-        owner.layer.borderColor = isZero ? MozipColor.gray200.cgColor : MozipColor.gray700.cgColor
-        owner.numberLabel.updateColorKeepingAttributed(isZero ? MozipColor.gray200 : MozipColor.gray700)
-        owner.minusButton.setTitleColor(isZero ? MozipColor.gray200 : MozipColor.gray700, for: .normal)
-        owner.plusButton.setTitleColor(isZero ? MozipColor.gray200 : MozipColor.gray700, for: .normal)
       })
       .disposed(by: disposeBag)
   }

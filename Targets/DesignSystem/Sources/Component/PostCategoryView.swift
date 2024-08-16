@@ -71,15 +71,15 @@ private extension PostCategoryView {
     
     rootContainer.flex
       .define {
-        $0.addItem(makeCategoryButton(.contestPlan)).paddingVertical(16)
+        $0.addItem(makeCategoryButton(.contestPlan)).height(54)
         $0.addItem(DividerView()).height(1).marginHorizontal(16)
-        $0.addItem(makeCategoryButton(.contestDesign)).paddingVertical(16)
+        $0.addItem(makeCategoryButton(.contestDesign)).height(54)
         $0.addItem(DividerView()).height(1).marginHorizontal(16)
-        $0.addItem(makeCategoryButton(.contestIT)).paddingVertical(16)
+        $0.addItem(makeCategoryButton(.contestIT)).height(54)
         $0.addItem(DividerView()).height(1).marginHorizontal(16)
-        $0.addItem(makeCategoryButton(.hackathon)).paddingVertical(16)
+        $0.addItem(makeCategoryButton(.hackathon)).height(54)
         $0.addItem(DividerView()).height(1).marginHorizontal(16)
-        $0.addItem(makeCategoryButton(.club)).paddingVertical(16)
+        $0.addItem(makeCategoryButton(.club)).height(54)
       }
   }
   
