@@ -33,11 +33,9 @@ public extension CoordinatorType {
   }
 
   func removeChild(_ child: CoordinatorType?) {
-    for (idx, coordinator) in childCoordinators.enumerated() {
-      if coordinator === child {
-        childCoordinators.remove(at: idx)
-        break
-      }
+    for (idx, coordinator) in childCoordinators.enumerated() where coordinator === child {
+      childCoordinators.remove(at: idx)
+      break
     }
   }
 }
