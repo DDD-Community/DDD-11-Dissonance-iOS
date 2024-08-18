@@ -94,7 +94,7 @@ final class PostUploadReactor: Reactor {
     case .setActivityContents(let contents):   post.activityContents = contents
     case .setPostUrlString(let urlString):     post.postUrlString = urlString
     case .setLoading(let isLoading):           newState.isLoading = isLoading
-    case .uploadPost:                          postUploadUseCase.uploadPost(post) //TODO: API 문서 전달받은 후 수정 예정
+    case .uploadPost:                          postUploadUseCase.execute(with: post) //TODO: API 문서 전달받은 후 수정 예정
     }
 
     newState.isEnableComplete = checkPostCompletion(post)

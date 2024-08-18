@@ -12,7 +12,7 @@ public protocol PostUploadUseCaseType {
   var postUploadRepository: PostUploadRepositoryType { get }
   
   //TODO: API 문서 전달받은 후 수정 예정
-  func uploadPost(_ post: Post) -> Observable<Bool>
+  func execute(with post: Post) -> Observable<Bool>
 }
 
 final class PostUploadUseCase: PostUploadUseCaseType {
@@ -27,7 +27,7 @@ final class PostUploadUseCase: PostUploadUseCaseType {
   
   // MARK: - Methods
   //TODO: API 문서 전달받은 후 수정 예정
-  func uploadPost(_ post: Post) -> Observable<Bool> {
+  func execute(with post: Post) -> Observable<Bool> {
     return .just(true)
   }
 }
