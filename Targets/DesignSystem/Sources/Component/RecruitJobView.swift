@@ -20,6 +20,11 @@ public final class RecruitJobGroupView: UIView {
   private let rootContainer: UIView = .init()
   private let titleLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 직군")
   
+  private enum StackViewConstants {
+    static let rowHeight: Int = 56
+    static let spacing: Int = 12
+  }
+  
   private let jobGroupStackView: UIStackView = {
     let stackView: UIStackView = .init()
     stackView.axis = .vertical
@@ -144,7 +149,7 @@ private extension RecruitJobGroupView {
   }
   
   func updatejobGroupStackViewHeight() {
-    let newHeight: CGFloat = CGFloat((jobGroupRelay.value.count * 56) + (jobGroupRelay.value.count - 1) * 12)
+    let newHeight: CGFloat = CGFloat((jobGroupRelay.value.count * StackViewConstants.rowHeight) + (jobGroupRelay.value.count - 1) * StackViewConstants.spacing)
     jobGroupStackView.flex.height(newHeight)
     rootContainer.flex.layout()
     updatedStackViewSubject.onNext(())

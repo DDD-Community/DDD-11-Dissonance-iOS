@@ -42,6 +42,10 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Coo
     return picker
   }()
   
+  private var bottomBlankHeight: CGFloat {
+    CGFloat(view.frame.height * 0.127 + 25)
+  }
+  
   // MARK: UI 컴포넌트
   private let imageUploadView: ImageUploadView = .init(frame: .zero)
   private let titleTextFieldView: LabelWithTextFieldView = .init(title: "제목", placeHolder: "공고 제목을 입력해주세요.")
@@ -139,7 +143,7 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Coo
         $0.addItem(activityEndTextFieldView).marginTop(32).marginHorizontal(20).height(90)
         $0.addDivider().marginTop(32).marginHorizontal(20)
         $0.addItem(activityContentsTextView).marginTop(32).marginHorizontal(20).height(274)
-        $0.addItem(postUrlTextFieldView).marginTop(32).marginHorizontal(20).height(90).marginBottom(CGFloat(view.frame.height * 0.127 + 25))
+        $0.addItem(postUrlTextFieldView).marginTop(32).marginHorizontal(20).height(90).marginBottom(bottomBlankHeight)
       }
     rootContainer.addSubview(categoryView)
   }
