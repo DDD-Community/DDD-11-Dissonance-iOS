@@ -14,9 +14,9 @@ public struct PostSection {
 }
 
 extension PostSection: SectionModelType {
-  public typealias Item = Post
+  public typealias Item = PostCellData
   
-  public init(original: PostSection, items: [Post]) {
+  public init(original: PostSection, items: [PostCellData]) {
     self = original
     self.items = items
   }
@@ -26,7 +26,7 @@ extension PostSection: SectionModelType {
 
 public extension PostSection {
   static func stub(header: String = "공모전",
-                   items: [Post] = [.stub(), .stub(), .stub(), .stub(), .stub()]) -> Self {
+                   items: [PostCellData] = [.stub(), .stub(), .stub(), .stub(), .stub()]) -> Self {
     .init(header: header, items: items)
   }
 }

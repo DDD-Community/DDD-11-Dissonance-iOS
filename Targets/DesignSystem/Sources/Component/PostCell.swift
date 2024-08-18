@@ -62,7 +62,7 @@ public final class PostCell: UICollectionViewCell {
   }
   
   // MARK: - Methods
-  public func setData(_ data: Post) {
+  public func setData(_ data: PostCellData) {
     thumbnailImage.image = UIImage.image(with: MozipColor.gray300)/*data.imageURL*/ // FIXME: 이미지 처리방법 논의 필요.
     thumbnailImage.flex.markDirty()
     
