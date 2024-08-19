@@ -23,7 +23,7 @@ private let infoPlist: [String: Plist.Value] = [
     "KAKAO_NATIVE_APP_KEY": "${KAKAO_NATIVE_APP_KEY}",
     "LSApplicationQueriesSchemes": ["kakaokompassauth", "kakaolink"],
     "NSAppTransportSecurity": ["NSAllowsArbitraryLoads": true],
-    "NSPhotoLibraryAddUsageDescription": "사진첩 접근 권한 요청",
+    "NSPhotoLibraryUsageDescription": "공고를 대표할 이미지를 선택합니다.",
     "UIApplicationSupportsIndirectInputEvents": true,
     "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
     "UIApplicationSceneManifest": [
