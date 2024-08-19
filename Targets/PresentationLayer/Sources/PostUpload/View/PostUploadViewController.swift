@@ -50,7 +50,7 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Coo
   private let imageUploadView: ImageUploadView = .init(frame: .zero)
   private let titleTextFieldView: LabelWithTextFieldView = .init(title: "제목", placeHolder: "공고 제목을 입력해주세요.")
   private let categoryTextFieldView: LabelWithTextFieldView = .init(title: "공고 카테고리", placeHolder: "공고 카테고리를 선택해주세요.")
-  private let dropDownIcon: UIImageView = .init(image: MozipImage.dropDownIcon)
+  private let dropDownIcon: UIImageView = .init(image: DesignSystemAsset.dropDownIcon.image)
   private let categoryView: PostCategoryView = .init()
   private let organizationTextFieldView: LabelWithTextFieldView = .init(title: "기관•단체", placeHolder: "기관•단체 이름을 입력해주세요.")
   private let recruitStartTextFieldView: LabelWithTextFieldView = .init(title: "모집 시작 일자", placeHolder: "모집 시작 일자를 정해주세요.")
@@ -268,7 +268,7 @@ private extension PostUploadViewController {
       .emit(with: self, onNext: { owner, title in
         owner.categoryTextFieldView.textField.rx.text.onNext(title)
         owner.categoryTextFieldView.textField.sendActions(for: .editingDidEnd)
-        owner.dropDownIcon.image = MozipImage.dropDownActiveIcon
+        owner.dropDownIcon.image = DesignSystemAsset.dropDownActiveIcon.image
         owner.categoryView.isHidden.toggle()
       })
       .disposed(by: disposeBag)
