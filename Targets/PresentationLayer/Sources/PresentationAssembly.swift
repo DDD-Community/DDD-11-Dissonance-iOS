@@ -26,5 +26,9 @@ public struct PresentationAssembly: DependencyAssemblable {
     container.register(type: LoginCoordinatorType.self) { _ in
       LoginCoordinator(navigationController: navigationController)
     }
+    
+    container.register(type: PostUploadCoordinatorType.self) { _ in
+      PostUploadCoordinator(navigationController: navigationController)
+    }
   }
 }
