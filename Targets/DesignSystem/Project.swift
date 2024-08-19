@@ -14,8 +14,6 @@ let project = Project.makeProject(
     settings: .settings(base: .init().swiftCompilationMode(.wholemodule)),
     dependencies: [
         .project(target: Project.Layer.domain.layerName, path: .relativeToRoot("Targets/\(Project.Layer.domain.layerName)")),
-        .external(name: "PinLayout"),
-        .external(name: "FlexLayout"),
         .external(name: "RxCocoa"),
         .external(name: "RxSwift"),
         .external(name: "PinLayout"),
