@@ -14,7 +14,9 @@ import FlexLayout
 public final class PostHeader: UICollectionReusableView {
   
   private enum Metric {
-    static let height: CGFloat = 20
+    static let height: CGFloat = 22
+    static let buttonSpacing: CGFloat = 4
+    static let iconSize: CGFloat = 16
   }
   
   // MARK: - UI
@@ -64,8 +66,8 @@ public final class PostHeader: UICollectionReusableView {
       flex.addItem(sectionTitle)
       flex.addItem().grow(1)
       flex.addItem(showMoreButton).direction(.row).alignItems(.center).justifyContent(.end).define { flex in
-        flex.addItem(buttonLabel)
-        flex.addItem(buttonImageView).size(16)
+        flex.addItem(buttonLabel).marginRight(Metric.buttonSpacing)
+        flex.addItem(buttonImageView).size(Metric.iconSize)
       }
     }
   }

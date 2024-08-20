@@ -24,10 +24,10 @@ public final class PostCollectionView: UIView {
   
   private enum Metric {
     static let cellWidth: CGFloat = 148
-    static let cellHeight: CGFloat = 196
-    static let headerHeight: CGFloat = 20
+    static let cellHeight: CGFloat = 236
+    static let headerHeight: CGFloat = 22
     static let sectionTopMargin: CGFloat = 24
-    static let sectionBottomMargin: CGFloat = 29
+    static let sectionBottomMargin: CGFloat = 32
     static let horizontalMargin: CGFloat = 20
     static let interGroupSpacing: CGFloat = 16
     static let zero: CGFloat = 0

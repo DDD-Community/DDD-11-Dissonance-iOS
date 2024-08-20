@@ -17,7 +17,7 @@ public final class PostCell: UICollectionViewCell {
   private enum Metric {
     static let verticalSpacing: CGFloat = 8
     static let width: CGFloat = 148
-    static let imageHeight: CGFloat = 108
+    static let imageHeight: CGFloat = 148
     static let imageCornerRadius: CGFloat = 8
   }
   
