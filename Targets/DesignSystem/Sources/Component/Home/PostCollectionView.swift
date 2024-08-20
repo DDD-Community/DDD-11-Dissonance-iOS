@@ -18,6 +18,7 @@ import RxDataSources
 public protocol PostCollectionViewListener: AnyObject {
   func postCollectionView(_ collectionView: UICollectionView,
                           didSelectHeaderAtIndexPath indexPath: IndexPath)
+  // TODO: 셀 탭 액션도 함께 추가
 }
 
 public final class PostCollectionView: UIView {
@@ -97,6 +98,12 @@ public final class PostCollectionView: UIView {
     sections
         .bind(to: collectionView.rx.items(dataSource: dataSource))
         .disposed(by: disposeBag)
+    
+    collectionView.rx.itemSelected
+      .bind(with: self) { owner, indexPath in
+        // TODO: 셀 탭액션 추가 후 Listener 로 전달
+      }
+      .disposed(by: disposeBag)
   }
   
   private func setupViewHierarchy() {
