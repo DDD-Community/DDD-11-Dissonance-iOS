@@ -16,7 +16,7 @@ public final class Toast: UIView {
   private enum Metric {
     static let height: CGFloat = 56
     static let horizontalPadding: CGFloat = 20
-    static let bottomMargin: CGFloat = 20
+    static let bottomMargin: CGFloat = 24
     static let cornerRadius: CGFloat = 8
     static let animationDuration: CGFloat = 0.5
     static let zero: CGFloat = 0
@@ -32,6 +32,7 @@ public final class Toast: UIView {
     super.init(frame: .zero)
     setupViewHierarchy()
     setupInitialSetting()
+    setupGestureRecognizer()
   }
   
   required init?(coder: NSCoder) {
@@ -90,5 +91,19 @@ public final class Toast: UIView {
     self.backgroundColor = MozipColor.gray800
     self.layer.cornerRadius = Metric.cornerRadius
     self.alpha = Metric.zero
+  }
+  
+  private func setupGestureRecognizer() {
+    let swipeGestureRecognizer = UISwipeGestureRecognizer(
+      target: self,
+      action: #selector(toastSwipeDown)
+    )
+    swipeGestureRecognizer.direction = .down
+    self.addGestureRecognizer(swipeGestureRecognizer)
+  }
+  
+  @objc
+  private func toastSwipeDown() {
+    self.hide()
   }
 }
