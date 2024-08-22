@@ -57,5 +57,6 @@ let project = Project.makeProject(
         .project(target: Project.Layer.data.layerName, path: .relativeToRoot("Targets/\(Project.Layer.data.layerName)"))
     ],
     resources: ["Resources/**"],
+    entitlements: .file(path: "MOZIP.entitlements"),
     infoPlist: .extendingDefault(with: infoPlist)
 )

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AuthenticationServices
 
 import FlexLayout
 import PinLayout
@@ -17,6 +18,16 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
   
   // MARK: - Properties
   weak var coordinator: LoginCoordinator?
+  
+  private let appleLoginbutton: UIButton = {
+    //TODO: - 추후 수정
+    let button: UIButton = .init()
+    button.setTitle("애플 로그인", for: .normal)
+    button.setTitleColor(.white, for: .normal)
+    button.titleLabel?.font = .systemFont(ofSize: 16)
+    button.backgroundColor = .black
+    return button
+  }()
   
   private let kakaoLoginButton: UIButton = {
     //TODO: - 추후 수정
@@ -54,6 +65,7 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
       .justifyContent(.end)
       .define { container in
         container.addItem(kakaoLoginButton).marginHorizontal(50).marginTop(20)
+        container.addItem(appleLoginbutton).marginHorizontal(50).marginTop(10)
       }
   }
 }
@@ -72,6 +84,12 @@ private extension LoginViewController {
       .map { Action.didTapKakaoLoginButton }
       .emit(to: reactor.action)
       .disposed(by: disposeBag)
+    
+    appleLoginbutton.rx.tap
+      .bind(with: self) { owner, _ in
+        owner.appleLoginButtonTapped()
+      }
+      .disposed(by: disposeBag)
   }
   
   func bindState(reactor: LoginReactor) {
@@ -83,5 +101,47 @@ private extension LoginViewController {
         owner.coordinator?.didSuccessLogin()
       })
       .disposed(by: disposeBag)
+  }
+  
+  func appleLoginButtonTapped() {
+    let appleIDProvider = ASAuthorizationAppleIDProvider()
+    let request = appleIDProvider.createRequest()
+    request.requestedScopes = [.fullName, .email]
+    
+    let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+    authorizationController.delegate = self
+    authorizationController.presentationContextProvider = self
+    authorizationController.performRequests()
+  }
+}
+
+// MARK: - Apple Login
+
+extension LoginViewController: ASAuthorizationControllerDelegate,
+                               ASAuthorizationControllerPresentationContextProviding {
+  
+  func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+    self.view.window!
+  }
+  
+  func authorizationController(controller: ASAuthorizationController,
+                               didCompleteWithAuthorization authorization: ASAuthorization) {
+    switch authorization.credential {
+    case let appleIDCredential as ASAuthorizationAppleIDCredential:
+      let userIdentifier = appleIDCredential.user // jwt 값
+      let fn = appleIDCredential.fullName
+      let email = appleIDCredential.email
+      print("fn:\(fn?.description ?? "NULL") email:\(email ?? "NULL") jwt:\(userIdentifier)")
+    case let passwordCredential as ASPasswordCredential:
+      let username = passwordCredential.user
+      let pass = passwordCredential.password
+      print("username:\(username) pass:\(pass)")
+    default:
+      break
+    }
+  }
+  
+  func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    // TODO: Handle Error
   }
 }
