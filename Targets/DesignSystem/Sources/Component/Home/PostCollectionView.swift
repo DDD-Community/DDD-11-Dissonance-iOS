@@ -15,12 +15,6 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
-public protocol PostCollectionViewListener: AnyObject {
-  func postCollectionView(_ collectionView: UICollectionView,
-                          didSelectHeaderAtIndexPath indexPath: IndexPath)
-  // TODO: 셀 탭 액션도 함께 추가
-}
-
 public final class PostCollectionView: UIView {
   
   private enum Metric {
@@ -34,9 +28,9 @@ public final class PostCollectionView: UIView {
     static let zero: CGFloat = 0
   }
   
-  public weak var listener: PostCollectionViewListener?
-  private let disposeBag = DisposeBag()
+  public let headerTapRelay: PublishRelay<IndexPath> = .init()
   private let sectionsRelay: BehaviorRelay<[PostSection]> = .init(value: [])
+  private let disposeBag = DisposeBag()
   
   private lazy var dataSource = RxCollectionViewSectionedReloadDataSource<PostSection>(
     configureCell: { (dataSource, collectionView, indexPath, item) in
@@ -51,10 +45,9 @@ public final class PostCollectionView: UIView {
         for: indexPath)
       let headerTitle = dataSource.sectionModels[indexPath.section].header
       header.setTitle(headerTitle)
-      header.showMoreButton.rx.tap
-        .bind {  _ in
-          self.listener?.postCollectionView(collectionView, didSelectHeaderAtIndexPath: indexPath)
-        }
+      header.tapObservable
+        .map { indexPath }
+        .bind(to: headerTapRelay)
         .disposed(by: disposeBag)
       return header
     })
