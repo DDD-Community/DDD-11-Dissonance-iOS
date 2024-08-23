@@ -25,6 +25,7 @@ final class BannerCollectionView: UICollectionView {
   }
   
   let currentIndexRelay: BehaviorRelay<Int> = .init(value: Metric.contentFirstIndex)
+  let directSwipeRelay: PublishRelay<Int> = .init()
   var dataCount = 0
   private let slideTimeInterval: Double
   private let disposeBag = DisposeBag()
@@ -37,6 +38,7 @@ final class BannerCollectionView: UICollectionView {
     super.init(frame: .zero, collectionViewLayout: .init())
     self.setupCollectionViewFlowLayout()
     self.setupInitialSetting()
+    self.bind()
   }
   
   required init?(coder: NSCoder) {
@@ -60,20 +62,19 @@ final class BannerCollectionView: UICollectionView {
       autoScroll()
     }
   }
+}
+
+private extension BannerCollectionView {
   
   /// 직접 스와이프할 때를 구독
-  func bind(_ subject: Observable<Int>) {
-    subject
-      .withUnretained(self)
-      .subscribe { owner, index in
+  func bind() {
+    directSwipeRelay
+      .bind(with: self) { owner, index in
         owner.currentIndexRelay.accept(index)
         owner.transformIndex()
       }
       .disposed(by: disposeBag)
   }
-}
-
-private extension BannerCollectionView {
   
   func transformIndex() {
     let leftEdgeIndex = 0

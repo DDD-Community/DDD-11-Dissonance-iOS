@@ -18,7 +18,6 @@ public final class RecommendingBanner: UIView {
   }
   
   private let dataRelay = BehaviorRelay<[UIImage]>.init(value: [])
-  private let swipeRelay: PublishRelay<Int> = .init()
   private let disposeBag = DisposeBag()
   
   // MARK: - UI
@@ -82,7 +81,7 @@ public final class RecommendingBanner: UIView {
     bannerCollectionView.rx.didEndDecelerating
       .withUnretained(self)
       .map { owner, _ in Int((owner.bannerCollectionView.contentOffset.x / (Metric.width))) }
-      .bind(to: swipeRelay)
+      .bind(to: bannerCollectionView.directSwipeRelay)
       .disposed(by: disposeBag)
     
     bannerCollectionView.rx.itemSelected
@@ -97,7 +96,6 @@ public final class RecommendingBanner: UIView {
       .disposed(by: disposeBag)
     
     bannerCollectionView.startAutoScroll()
-    bannerCollectionView.bind(swipeRelay.asObservable())
   }
   
   private func setupPageControl() {
