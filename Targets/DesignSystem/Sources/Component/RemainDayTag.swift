@@ -71,7 +71,6 @@ public final class RemainDayTag: UIView {
   }
   
   private func setupLayout() {
-    self.pin.height(Metric.height).width(rootFlexContainer.frame.width) /// 이렇게 처리해도 되는지 의문
     rootFlexContainer.pin.all()
     rootFlexContainer.flex.layout(mode: .adjustWidth)
   }

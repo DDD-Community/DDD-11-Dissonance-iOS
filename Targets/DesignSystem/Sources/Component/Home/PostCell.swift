@@ -45,6 +45,7 @@ public final class PostCell: UICollectionViewCell {
   
   // MARK: - Overrides
 //  public override func prepareForReuse() {
+  // TODO: 데이터 연결 후 작업
 //    super.prepareForReuse()
 //    postImage.image = nil
 //    titleLabel.text = nil
@@ -52,12 +53,12 @@ public final class PostCell: UICollectionViewCell {
   
   public override func layoutSubviews() {
     super.layoutSubviews()
-    setpuLayout()
+    setupLayout()
   }
   
   public override func sizeThatFits(_ size: CGSize) -> CGSize {
     contentView.pin.width(size.width)
-    setpuLayout()
+    setupLayout()
     return contentView.frame.size
   }
   
@@ -88,7 +89,7 @@ public final class PostCell: UICollectionViewCell {
       }
   }
   
-  private func setpuLayout() {
+  private func setupLayout() {
     contentView.flex.layout()
   }
 }

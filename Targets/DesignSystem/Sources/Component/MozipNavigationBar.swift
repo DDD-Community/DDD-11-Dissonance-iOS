@@ -1,5 +1,5 @@
 //
-//  NavigationBar.swift
+//  MozipNavigationBar.swift
 //  DesignSystem
 //
 //  Created by 이원빈 on 8/3/24.
@@ -8,10 +8,11 @@
 
 import UIKit
 
-import PinLayout
 import FlexLayout
+import PinLayout
+import RxSwift
 
-public final class NavigationBar: UIView {
+public final class MozipNavigationBar: UIView {
   
   private enum Metric {
     static let backButtonImageResource = "arrow.left"
@@ -22,8 +23,12 @@ public final class NavigationBar: UIView {
     static let statusBarHeight = Device.statusBarFrame.height
   }
   
+  public var backButtonTapObservable: Observable<Void> {
+    backButton.rx.tap.asObservable()
+  }
+  
   // MARK: - UI
-  public let backButton: UIButton = {
+  private let backButton: UIButton = {
     let button = UIButton()
     let image = UIImage(systemName: Metric.backButtonImageResource)
     button.setImage(image, for: .normal)
@@ -77,7 +82,6 @@ public final class NavigationBar: UIView {
   }
   
   private func setupLayout() {
-    self.pin.width(of: self).height(Metric.height + Metric.statusBarHeight)
     backButton.pin.left().margin(Metric.horizontalPadding).vCenter(Metric.statusBarHeight/2).size(Metric.buttonSize)
     titleLabel.pin.hCenter().vCenter(Metric.statusBarHeight/2).sizeToFit(.widthFlexible)
     rightButtonFlexContainer.pin.top(Metric.statusBarHeight).bottom().left(to: titleLabel.edge.right).right()

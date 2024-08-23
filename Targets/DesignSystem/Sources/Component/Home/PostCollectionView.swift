@@ -35,8 +35,8 @@ public final class PostCollectionView: UIView {
   }
   
   public weak var listener: PostCollectionViewListener?
-  private var disposeBag = DisposeBag()
-  private var sections = BehaviorRelay<[PostSection]>.init(value: [])
+  private let disposeBag = DisposeBag()
+  private let sectionsRelay: BehaviorRelay<[PostSection]> = .init(value: [])
   
   private lazy var dataSource = RxCollectionViewSectionedReloadDataSource<PostSection>(
     configureCell: { (dataSource, collectionView, indexPath, item) in
@@ -83,7 +83,7 @@ public final class PostCollectionView: UIView {
   
   // MARK: - Methods
   public func setupData(_ data: [PostSection]) {
-    sections.accept(data)
+    sectionsRelay.accept(data)
   }
   
   private func setupCollectionView() {
@@ -95,7 +95,7 @@ public final class PostCollectionView: UIView {
       PostHeader.self,
       forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader)
     
-    sections
+    sectionsRelay
         .bind(to: collectionView.rx.items(dataSource: dataSource))
         .disposed(by: disposeBag)
     

@@ -17,9 +17,9 @@ public final class RecommendingBanner: UIView {
     static let width: CGFloat = Device.width - 40
   }
   
-  private var data = BehaviorRelay<[UIImage]>.init(value: [])
-  private var swipeRelay: PublishRelay<Int> = .init()
-  private var disposeBag = DisposeBag()
+  private let dataRelay = BehaviorRelay<[UIImage]>.init(value: [])
+  private let swipeRelay: PublishRelay<Int> = .init()
+  private let disposeBag = DisposeBag()
   
   // MARK: - UI
   private var bannerCollectionView = BannerCollectionView()
@@ -45,7 +45,7 @@ public final class RecommendingBanner: UIView {
   // MARK: - Methods
   public func setupData(_ data: [UIImage]) {
     let transformedData = transformData(from: data)
-    self.data.accept(transformedData)
+    self.dataRelay.accept(transformedData)
   }
   /// [1,2,3,4] -> [4,1,2,3,4,1]
   private func transformData(from data: [UIImage]) -> [UIImage] {
@@ -60,7 +60,7 @@ public final class RecommendingBanner: UIView {
   
   private func setupCollectionView() {
 
-    data
+    dataRelay
       .bind(
         to: bannerCollectionView.rx.items(
           cellIdentifier: BannerCell.defaultReuseIdentifier,
@@ -70,20 +70,19 @@ public final class RecommendingBanner: UIView {
       }
       .disposed(by: disposeBag)
     
-    data
+    dataRelay
       .skip(1)
+      .filter { !$0.isEmpty }
       .bind(with: self) { owner, value in
-        guard value.isEmpty == false else { return }
         owner.setupPageControl()
-        owner.bannerCollectionView.count.accept(value.count)
+        owner.bannerCollectionView.dataCount = value.count
       }
       .disposed(by: disposeBag)
     
     bannerCollectionView.rx.didEndDecelerating
-      .bind(with: self) { owner, _ in
-        let index = Int((owner.bannerCollectionView.contentOffset.x / (Metric.width)))
-        owner.swipeRelay.accept(index)
-      }
+      .withUnretained(self)
+      .map { owner, _ in Int((owner.bannerCollectionView.contentOffset.x / (Metric.width))) }
+      .bind(to: swipeRelay)
       .disposed(by: disposeBag)
     
     bannerCollectionView.rx.itemSelected
@@ -92,18 +91,18 @@ public final class RecommendingBanner: UIView {
       }
       .disposed(by: disposeBag)
     
+    bannerCollectionView.currentIndexRelay
+      .map { $0 - 1 }
+      .bind(to: pageControl.rx.currentPage)
+      .disposed(by: disposeBag)
+    
     bannerCollectionView.startAutoScroll()
     bannerCollectionView.bind(swipeRelay.asObservable())
-    bannerCollectionView.currentIndex
-      .bind(with: self) { owner, index in
-        owner.pageControl.currentPage = index - 1
-      }
-      .disposed(by: disposeBag)
   }
   
   private func setupPageControl() {
     pageControl.currentPage = 0
-    pageControl.numberOfPages = data.value.count - 2
+    pageControl.numberOfPages = dataRelay.value.count - 2
   }
   
   private func setupViewHierarchy() {

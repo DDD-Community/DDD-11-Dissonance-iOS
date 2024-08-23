@@ -72,7 +72,6 @@ public final class HomeNavigationBar: UIView {
   }
   
   private func setupLayout() {
-    self.pin.width(of: self).height(Metric.height + Metric.statusBarHeight)
     rootFlexContainer.pin.all()
     rootFlexContainer.flex.layout()
   }

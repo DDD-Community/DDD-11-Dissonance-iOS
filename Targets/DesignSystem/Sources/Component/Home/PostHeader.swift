@@ -10,6 +10,7 @@ import UIKit
 
 import PinLayout
 import FlexLayout
+import RxSwift
 
 public final class PostHeader: UICollectionReusableView {
   
@@ -19,11 +20,14 @@ public final class PostHeader: UICollectionReusableView {
     static let iconSize: CGFloat = 16
   }
   
+  public var tapObservable: Observable<Void> {
+    showMoreButton.rx.tap.asObservable()
+  }
+  
   // MARK: - UI
   private let rootFlexContainer = UIView()
   private let sectionTitle = MozipLabel(style: .heading1, color: MozipColor.gray800)
-  
-  public let showMoreButton = UIButton(type: .custom)
+  private let showMoreButton = UIButton(type: .custom)
   private let buttonLabel = MozipLabel(style: .body2, color: MozipColor.gray700, text: "더보기")
   private let buttonImageView: UIImageView = {
     let imgView = UIImageView()
@@ -50,6 +54,7 @@ public final class PostHeader: UICollectionReusableView {
   }
   
 //  public override func prepareForReuse() {
+  // TODO: 추후 구현
 //    super.prepareForReuse()
 //  }
   
