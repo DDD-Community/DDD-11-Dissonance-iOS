@@ -30,5 +30,9 @@ public struct PresentationAssembly: DependencyAssemblable {
     container.register(type: PostUploadCoordinatorType.self) { _ in
       PostUploadCoordinator(navigationController: navigationController)
     }
+    
+    container.register(type: PostDetailCoordinatorType.self) { _ in
+      PostDetailCoordinator(navigationController: navigationController)
+    }
   }
 }
