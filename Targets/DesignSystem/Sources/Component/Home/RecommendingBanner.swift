@@ -70,7 +70,6 @@ public final class RecommendingBanner: UIView {
       .disposed(by: disposeBag)
     
     dataRelay
-      .skip(1)
       .filter { !$0.isEmpty }
       .bind(with: self) { owner, value in
         owner.setupPageControl()
