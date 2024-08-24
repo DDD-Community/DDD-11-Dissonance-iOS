@@ -6,9 +6,8 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import DesignSystem
 import UIKit
-
-import FlexLayout
 
 public protocol Alertable {}
 
