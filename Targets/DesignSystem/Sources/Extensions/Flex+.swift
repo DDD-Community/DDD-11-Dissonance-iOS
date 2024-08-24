@@ -16,4 +16,9 @@ public extension Flex {
   func addDivider(height: CGFloat = 1, color: UIColor = MozipColor.gray100) -> Flex {
     return addItem().height(height).backgroundColor(color)
   }
+  
+  @discardableResult
+  func addFakeView(cornerRadius: CGFloat = 8, backgroundColor: UIColor = MozipColor.gray10) -> Flex {
+    return addItem().cornerRadius(cornerRadius).backgroundColor(backgroundColor)
+  }
 }

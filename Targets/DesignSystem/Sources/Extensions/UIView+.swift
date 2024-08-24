@@ -17,6 +17,8 @@ public extension UIView {
     Reactive<UIGestureRecognizer>(tapGesture())
   }
   
+  static var toastFlag: Bool = false
+  
   // MARK: - Methods
   func tapGesture() -> UITapGestureRecognizer {
     let tapGestureRecognizer: UITapGestureRecognizer = .init()
@@ -37,5 +39,15 @@ public extension UIView {
     }
     
     return nil
+  }
+  
+  func showToast(message: String, duration: CGFloat = 2.0) {
+    guard UIView.toastFlag == false else { return }
+    let toast = Toast()
+    toast.setMessage(message)
+    UIView.toastFlag = true
+    toast.showIn(view: self, duration: duration) {
+      UIView.toastFlag = false
+    }
   }
 }

@@ -14,6 +14,7 @@ let project = Project.makeProject(
     settings: .settings(base: .init().swiftCompilationMode(.wholemodule)),
     dependencies: [
         .project(target: Project.Layer.core.layerName, path: .relativeToRoot("Targets/\(Project.Layer.core.layerName)")),
-        .project(target: Project.Layer.dependencyInjector.layerName, path: .relativeToRoot("Targets/\(Project.Layer.dependencyInjector.layerName)"))
+        .project(target: Project.Layer.dependencyInjector.layerName, path: .relativeToRoot("Targets/\(Project.Layer.dependencyInjector.layerName)")),
+        .external(name: "RxDataSources")
     ]
 )

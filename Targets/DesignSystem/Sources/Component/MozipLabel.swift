@@ -15,7 +15,7 @@ public final class MozipLabel: UILabel {
     super.init(frame: .zero)
     numberOfLines = 0
     
-    setTextWithLineHeight(style: style, textColor: color, text: text )
+    setTextWithLineHeight(style: style, textColor: color, text: text)
   }
   
   required init?(coder: NSCoder) {
@@ -63,7 +63,7 @@ private extension MozipLabel {
     
     let attributes: [NSAttributedString.Key: Any] = [
       .paragraphStyle: paragraphStyle,
-      .baselineOffset: (lineHeight - font.lineHeight) / 2,
+      .baselineOffset: (lineHeight - font.lineHeight) / 4,
       .font: font,
       .foregroundColor: textColor
     ]
