@@ -19,7 +19,7 @@ public final class RectangleButton: UIButton {
   }
   
   // MARK: - Initializer
-  public init(title: String, fontStyle: MozipFontStyle, titleColor: UIColor, backgroundColor: UIColor, cornerRadius: CGFloat = 8) {
+  public init(title: String = "", fontStyle: MozipFontStyle, titleColor: UIColor, backgroundColor: UIColor, cornerRadius: CGFloat = 8) {
     super.init(frame: .zero)
     
     setTitle(title, for: .normal)
@@ -31,5 +31,10 @@ public final class RectangleButton: UIButton {
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  // MARK: - Methods
+  public func updateTitle(_ title: String) {
+    self.setTitle(title, for: .normal)
   }
 }
