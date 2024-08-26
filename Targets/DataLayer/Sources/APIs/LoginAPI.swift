@@ -13,6 +13,7 @@ import Moya
 
 enum LoginAPI {
   case tryKakaoLogin(accessToken: String)
+  case tryAppleLogin(jwt: String)
 }
 
 // MARK: - TargetType
@@ -27,6 +28,8 @@ extension LoginAPI: TargetType {
     switch self {
     case .tryKakaoLogin:
       return basePath + "/kakao"
+    case .tryAppleLogin:
+      return basePath + "/apple"
     }
   }
 
@@ -61,6 +64,8 @@ extension LoginAPI: TargetType {
     switch self {
     case .tryKakaoLogin(let accessToken):
       return ["accessToken": accessToken]
+    case .tryAppleLogin(let jwt):
+      return ["accessToken": jwt]
     }
   }
 }

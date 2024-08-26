@@ -12,4 +12,5 @@ public protocol LoginRepositoryType {
 
   // MARK: Methods
   func tryKakaoLogin() -> Observable<UserToken>
+  func tryAppleLogin() -> Observable<UserToken>
 }
