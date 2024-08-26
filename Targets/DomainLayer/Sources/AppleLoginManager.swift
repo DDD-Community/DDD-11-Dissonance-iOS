@@ -11,7 +11,7 @@ import AuthenticationServices
 
 import RxSwift
 
-public class AppleLoginManager: NSObject {
+public final class AppleLoginManager: NSObject {
   public let appleLoginSubject = PublishSubject<ASAuthorization>()
   
   public func signInWithApple() {
