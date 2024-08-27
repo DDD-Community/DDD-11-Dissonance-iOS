@@ -12,11 +12,16 @@ public protocol LoginUseCaseType {
   var loginRepository: LoginRepositoryType { get }
   
   func tryKakaoLogin() -> Observable<UserToken>
+  func tryAppleLogin() -> Observable<UserToken>
 }
 
 extension LoginUseCaseType {
   func tryKakaoLogin() -> Observable<UserToken> {
     loginRepository.tryKakaoLogin()
+  }
+  
+  func tryAppleLogin() -> Observable<UserToken> {
+    loginRepository.tryAppleLogin()
   }
 }
 

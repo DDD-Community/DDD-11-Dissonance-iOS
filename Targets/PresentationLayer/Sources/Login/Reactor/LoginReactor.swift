@@ -25,6 +25,7 @@ final class LoginReactor: Reactor {
 
   enum Action {
     case didTapKakaoLoginButton
+    case didTapAppleLoginButton
   }
 
   enum Mutation {
@@ -40,6 +41,8 @@ final class LoginReactor: Reactor {
     switch action {
     case .didTapKakaoLoginButton:
       return loginUseCase.tryKakaoLogin().map { .setUserToken(userToken: $0) }
+    case .didTapAppleLoginButton:
+      return loginUseCase.tryAppleLogin().map { .setUserToken(userToken: $0) }
     }
   }
 

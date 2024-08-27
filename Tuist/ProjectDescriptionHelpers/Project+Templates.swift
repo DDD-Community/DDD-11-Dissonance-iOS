@@ -36,17 +36,19 @@ public extension Project {
         dependencies: [TargetDependency] = [],
         sources: SourceFilesList = ["Sources/**"],
         resources: ResourceFileElements? = nil,
+        entitlements: Entitlements? = nil,
         infoPlist: InfoPlist = .default
     ) -> Project {
         let app: Target = .target(
             name: name,
             destinations: .iOS,
             product: product,
-            bundleId: "com.ddd.\(name)",
+            bundleId: "run.ddd.\(name)",
             deploymentTargets: deploymentTarget,
             infoPlist: infoPlist,
             sources: sources,
             resources: resources,
+            entitlements: entitlements,
             dependencies: dependencies
         )
 
@@ -54,7 +56,7 @@ public extension Project {
             name: "\(name)Tests",
             destinations: .iOS,
             product: .unitTests,
-            bundleId: "com.ddd.\(name)Tests",
+            bundleId: "run.ddd.\(name)Tests",
             deploymentTargets: deploymentTarget,
             infoPlist: .default,
             sources: ["Tests/**"],

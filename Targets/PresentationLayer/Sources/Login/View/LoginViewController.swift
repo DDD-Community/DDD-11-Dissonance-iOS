@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AuthenticationServices
 
 import FlexLayout
 import PinLayout
@@ -17,6 +18,16 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
   
   // MARK: - Properties
   weak var coordinator: LoginCoordinator?
+  
+  private let appleLoginbutton: UIButton = {
+    //TODO: - 추후 수정
+    let button: UIButton = .init()
+    button.setTitle("애플 로그인", for: .normal)
+    button.setTitleColor(.white, for: .normal)
+    button.titleLabel?.font = .systemFont(ofSize: 16)
+    button.backgroundColor = .black
+    return button
+  }()
   
   private let kakaoLoginButton: UIButton = {
     //TODO: - 추후 수정
@@ -54,6 +65,7 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
       .justifyContent(.end)
       .define { container in
         container.addItem(kakaoLoginButton).marginHorizontal(50).marginTop(20)
+        container.addItem(appleLoginbutton).marginHorizontal(50).marginTop(10)
       }
   }
 }
@@ -72,6 +84,13 @@ private extension LoginViewController {
       .map { Action.didTapKakaoLoginButton }
       .emit(to: reactor.action)
       .disposed(by: disposeBag)
+    
+    appleLoginbutton.rx.tap
+      .asSignal()
+      .map { Action.didTapAppleLoginButton }
+      .emit(to: reactor.action)
+      .disposed(by: disposeBag)
+
   }
   
   func bindState(reactor: LoginReactor) {
