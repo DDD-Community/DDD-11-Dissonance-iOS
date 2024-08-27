@@ -30,11 +30,7 @@ public struct Post {
 public extension Post {
   static func stub() -> Self {
     var stub: Self = .init()
-    
-    if let stubImagePath = Bundle.main.path(forResource: "StubImage", ofType: "jpeg") {
-      let url = URL(fileURLWithPath: stubImagePath)
-      stub.imageData = try! Data(contentsOf: url)
-    }
+    stub.imageData = UIImage(named: "StubImage")!.pngData()!
     stub.title = "DDD 12기 모집"
     stub.category = "3"
     stub.organization = "IT 연합동아리 DDD"
