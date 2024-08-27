@@ -12,6 +12,7 @@ import UIKit
 
 protocol PostDetailCoordinatorType: CoordinatorType {
   func pushWebView()
+  func popView()
 }
 
 final class PostDetailCoordinator: PostDetailCoordinatorType {
@@ -29,8 +30,12 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
   // MARK: - Methods
   func start() {
     //TODO: 추후 구현
-//    let vc = postDetailViewController()
-//    navigationController.setViewControllers([vc], animated: false)
+    let vc = postDetailViewController()
+    navigationController.setViewControllers([vc], animated: false)
+  }
+  
+  func popView() {
+    navigationController.popViewController(animated: true)
   }
 
   func didFinish() {
@@ -45,8 +50,9 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
 private extension PostDetailCoordinator {
   func postDetailViewController() -> PostDetailViewController {
     //TODO: 추후 구현
+    navigationController.navigationBar.isHidden = true
     let reactor: PostDetailReactor = .init()
-    let viewController: PostDetailViewController = .init(reactor: reactor)
+    let viewController: PostDetailViewController = .init(categoryTitle: "IT 동아리", reactor: reactor)
     viewController.coordinator = self
     return viewController
   }
