@@ -46,7 +46,6 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
 private extension PostDetailCoordinator {
   func postDetailViewController() -> PostDetailViewController {
     //TODO: 추후 구현
-    navigationController.navigationBar.isHidden = true
     let reactor: PostDetailReactor = .init()
     let viewController: PostDetailViewController = .init(categoryTitle: "IT 동아리", reactor: reactor)
     viewController.coordinator = self
