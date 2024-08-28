@@ -47,8 +47,7 @@ class BaseViewController<T: Reactor>: UIViewController, View {
   
   func setupViews() {
     //TODO: 추후 수정
-    navigationController?.navigationBar.tintColor = .white
-    navigationItem.backButtonTitle = ""
+    navigationController?.navigationBar.isHidden = true
     view.backgroundColor = .white
     
     view.addSubview(rootContainer)

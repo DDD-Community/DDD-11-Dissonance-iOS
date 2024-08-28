@@ -16,7 +16,7 @@ public final class MozipNavigationBar: UIView {
   
   private enum Metric {
     static let backButtonImageResource = "arrow.left"
-    static let height: CGFloat = 56
+    static let verticalPadding: CGFloat = 16
     static let horizontalPadding: CGFloat = 20
     static let buttonSize: CGFloat = 24
     static let rightButtonSpacing: CGFloat = 12
@@ -37,13 +37,14 @@ public final class MozipNavigationBar: UIView {
   }()
   
   private let titleLabel = MozipLabel(style: .heading2, color: MozipColor.gray900)
+  private let itemsContainer: UIView = .init()
   private let rightButtonFlexContainer = UIView()
   
   // MARK: - Initializers
   public init(title: String, backgroundColor: UIColor) {
     super.init(frame: .zero)
     setupInitialState(title: title, backgroundColor: backgroundColor)
-    setupViewHierarchy()
+    setupLayout()
   }
   
   required init?(coder: NSCoder) {
@@ -53,7 +54,10 @@ public final class MozipNavigationBar: UIView {
   // MARK: - Overrides
   public override func layoutSubviews() {
     super.layoutSubviews()
-    setupLayout()
+    
+    pin.all()
+    flex.layout(mode: .adjustHeight)
+    titleLabel.pin.all()
   }
   
   // MARK: - Methods
@@ -61,30 +65,35 @@ public final class MozipNavigationBar: UIView {
     rightButtonFlexContainer.flex
       .direction(.row)
       .justifyContent(.end)
-      .paddingRight(Metric.horizontalPadding)
       .gap(Metric.rightButtonSpacing)
+      .marginVertical(Metric.verticalPadding)
       .define { flex in
         buttons.forEach {
-          flex.addItem($0).size(Metric.buttonSize).alignSelf(.center)
+          flex.addItem($0).size(Metric.buttonSize)
         }
       }
   }
   
   private func setupInitialState(title: String, backgroundColor: UIColor) {
+    itemsContainer.addSubview(titleLabel)
     titleLabel.updateTextKeepingAttributes(title)
+    titleLabel.textAlignment = .center
     self.backgroundColor = backgroundColor
   }
   
-  private func setupViewHierarchy() {
-    addSubview(backButton)
-    addSubview(titleLabel)
-    addSubview(rightButtonFlexContainer)
-  }
-  
   private func setupLayout() {
-    backButton.pin.left().margin(Metric.horizontalPadding).vCenter(Metric.statusBarHeight/2).size(Metric.buttonSize)
-    titleLabel.pin.hCenter().vCenter(Metric.statusBarHeight/2).sizeToFit(.widthFlexible)
-    rightButtonFlexContainer.pin.top(Metric.statusBarHeight).bottom().left(to: titleLabel.edge.right).right()
-    rightButtonFlexContainer.flex.layout()
+    flex
+      .justifyContent(.end)
+      .define {
+        $0.addItem(itemsContainer)
+          .direction(.row)
+          .justifyContent(.spaceBetween)
+          .marginHorizontal(Metric.horizontalPadding)
+          .marginTop(Metric.statusBarHeight)
+          .define { itemsContainer in
+            itemsContainer.addItem(backButton).size(Metric.buttonSize).marginVertical(Metric.verticalPadding)
+            itemsContainer.addItem(rightButtonFlexContainer)
+          }
+      }
   }
 }
