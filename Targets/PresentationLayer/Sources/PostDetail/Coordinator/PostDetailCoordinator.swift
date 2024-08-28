@@ -12,7 +12,6 @@ import UIKit
 
 protocol PostDetailCoordinatorType: CoordinatorType {
   func pushWebView()
-  func popView()
 }
 
 final class PostDetailCoordinator: PostDetailCoordinatorType {
@@ -34,12 +33,9 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
     navigationController.setViewControllers([vc], animated: false)
   }
   
-  func popView() {
-    navigationController.popViewController(animated: true)
-  }
-
   func didFinish() {
     parentCoordinator?.removeChild(self)
+    navigationController.popViewController(animated: true)
   }
 
   //TODO: 웹 뷰 디자인 문의 후 구현
