@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import DomainLayer
 
 import RxSwift
 import RxCocoa
@@ -17,7 +18,14 @@ public final class RecommendingBanner: UIView {
     static let width: CGFloat = Device.width - 40
   }
   
-  private let dataRelay = BehaviorRelay<[UIImage]>.init(value: [])
+  public var bannerTapObservable: Observable<BannerCellData> {
+    bannerCollectionView.rx.itemSelected
+      .withUnretained(self)
+      .map { owner, indexPath in owner.dataRelay.value[indexPath.row] }
+      .asObservable()
+  }
+  
+  private let dataRelay = BehaviorRelay<[BannerCellData]>.init(value: [])
   private let disposeBag = DisposeBag()
   
   // MARK: - UI
@@ -42,12 +50,18 @@ public final class RecommendingBanner: UIView {
   }
   
   // MARK: - Methods
-  public func setupData(_ data: [UIImage]) {
+  public func setupData(_ data: [BannerCellData]) {
     let transformedData = transformData(from: data)
     self.dataRelay.accept(transformedData)
   }
+  
+  public func start() {
+    bannerCollectionView.setFirstIndex()
+    bannerCollectionView.startAutoScroll()
+  }
+  
   /// [1,2,3,4] -> [4,1,2,3,4,1]
-  private func transformData(from data: [UIImage]) -> [UIImage] {
+  private func transformData(from data: [BannerCellData]) -> [BannerCellData] {
       var tmp = data
       guard let last = tmp.last, let first = tmp.first else { return [] }
       tmp.append(first)
@@ -65,7 +79,7 @@ public final class RecommendingBanner: UIView {
           cellIdentifier: BannerCell.defaultReuseIdentifier,
           cellType: BannerCell.self)
       ) { index, item, cell in
-        cell.setImage(item)
+        cell.setData(item)
       }
       .disposed(by: disposeBag)
     
@@ -83,18 +97,10 @@ public final class RecommendingBanner: UIView {
       .bind(to: bannerCollectionView.directSwipeRelay)
       .disposed(by: disposeBag)
     
-    bannerCollectionView.rx.itemSelected
-      .bind(with: self) { owner, indexPath in
-        print("didSelectItemAt \(indexPath.row)")
-      }
-      .disposed(by: disposeBag)
-    
     bannerCollectionView.currentIndexRelay
       .map { $0 - 1 }
       .bind(to: pageControl.rx.currentPage)
       .disposed(by: disposeBag)
-    
-    bannerCollectionView.startAutoScroll()
   }
   
   private func setupPageControl() {

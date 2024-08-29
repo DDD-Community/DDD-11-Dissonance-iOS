@@ -48,10 +48,16 @@ final class BannerCollectionView: UICollectionView {
   // MARK: - Overrides
   override func draw(_ rect: CGRect) {
     super.draw(rect)
-    self.setFirstIndex()
   }
   
   // MARK: - Methods
+  func setFirstIndex() {
+    scrollToItem(
+      at: .init(row: Metric.contentFirstIndex, section: Metric.firstSection),
+      at: .centeredHorizontally,
+      animated: false)
+  }
+  
   func startAutoScroll() {
     guard timer == nil else { return }
     timer = Timer.scheduledTimer(
@@ -106,13 +112,6 @@ private extension BannerCollectionView {
   func stopAutoScroll() {
     timer?.invalidate()
     timer = nil
-  }
-  
-  func setFirstIndex() {
-    scrollToItem(
-      at: .init(row: Metric.contentFirstIndex, section: Metric.firstSection),
-      at: .centeredHorizontally,
-      animated: false)
   }
   
   func delayAutoScroll(for second: Double) {

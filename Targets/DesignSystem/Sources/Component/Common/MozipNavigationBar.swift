@@ -41,9 +41,9 @@ public final class MozipNavigationBar: UIView {
   private let rightButtonFlexContainer = UIView()
   
   // MARK: - Initializers
-  public init(title: String, backgroundColor: UIColor) {
+  public init(title: String, tintColor: UIColor = .black, backgroundColor: UIColor) {
     super.init(frame: .zero)
-    setupInitialState(title: title, backgroundColor: backgroundColor)
+    setupInitialState(title: title, tintColor: tintColor, backgroundColor: backgroundColor)
     setupLayout()
   }
   
@@ -60,6 +60,10 @@ public final class MozipNavigationBar: UIView {
     titleLabel.pin.all()
   }
   
+  public override func sizeThatFits(_ size: CGSize) -> CGSize {
+    return .init(width: Device.width, height: 56 + Device.statusBarFrame.height)
+  }
+  
   // MARK: - Methods
   public func setRightButtons(_ buttons: [UIButton]) {
     rightButtonFlexContainer.flex
@@ -74,10 +78,16 @@ public final class MozipNavigationBar: UIView {
       }
   }
   
-  private func setupInitialState(title: String, backgroundColor: UIColor) {
+  public func setNavigationTitle(_ title: String) {
+    titleLabel.updateTextKeepingAttributes(title)
+  }
+  
+  private func setupInitialState(title: String, tintColor: UIColor, backgroundColor: UIColor) {
     itemsContainer.addSubview(titleLabel)
     titleLabel.updateTextKeepingAttributes(title)
     titleLabel.textAlignment = .center
+    titleLabel.updateColorKeepingAttributed(tintColor)
+    backButton.tintColor = tintColor
     self.backgroundColor = backgroundColor
   }
   

@@ -28,7 +28,12 @@ public final class PostCollectionView: UIView {
     static let zero: CGFloat = 0
   }
   
+  public var cellTapObservable: Observable<IndexPath> {
+    collectionView.rx.itemSelected.asObservable()
+  }
+  
   public let headerTapRelay: PublishRelay<IndexPath> = .init()
+  
   private let sectionsRelay: BehaviorRelay<[PostSection]> = .init(value: [])
   private let disposeBag = DisposeBag()
   
@@ -69,6 +74,12 @@ public final class PostCollectionView: UIView {
   }
   
   // MARK: - Overrides
+  public override func sizeThatFits(_ size: CGSize) -> CGSize {
+    let sectionsCount: CGFloat = CGFloat(sectionsRelay.value.count)
+    let height: CGFloat = (282*sectionsCount) + (32*(sectionsCount-1))
+    return CGSize(width: Device.width, height: height)
+  }
+  
   public override func layoutSubviews() {
     super.layoutSubviews()
     setupLayout()
@@ -91,12 +102,6 @@ public final class PostCollectionView: UIView {
     sectionsRelay
         .bind(to: collectionView.rx.items(dataSource: dataSource))
         .disposed(by: disposeBag)
-    
-    collectionView.rx.itemSelected
-      .bind(with: self) { owner, indexPath in
-        // TODO: 셀 탭액션 추가 후 Listener 로 전달
-      }
-      .disposed(by: disposeBag)
   }
   
   private func setupViewHierarchy() {

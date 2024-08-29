@@ -10,15 +10,19 @@ import UIKit
 
 import PinLayout
 import FlexLayout
+import RxRelay
 
 public final class FABButton: UIView {
   
   private enum Metric {
+    static let size: CGSize = .init(width: 72, height: 72)
     static let cornerRadius: CGFloat = 36
     static let plusIconTopMargin: CGFloat = 10
     static let textLabelTopMargin: CGFloat = 4
     static let title: String = "공고등록"
   }
+  
+  public let tapRelay: PublishRelay<Void> = .init()
   
   // MARK: - UI
   private let rootFlexContainer = UIView()
@@ -36,6 +40,7 @@ public final class FABButton: UIView {
   public init() {
     super.init(frame: .zero)
     setupViewHierarchy()
+    setupTapGesture()
   }
   
   required init?(coder: NSCoder) {
@@ -48,12 +53,11 @@ public final class FABButton: UIView {
     setupLayer()
   }
   
-  // MARK: - Methods
-  public func bindAction(target: Any?, action: Selector?) {
-    let tapGestureRecognizer = UITapGestureRecognizer(target: target, action: action)
-    self.addGestureRecognizer(tapGestureRecognizer)
+  public override func sizeThatFits(_ size: CGSize) -> CGSize {
+    return Metric.size
   }
   
+  // MARK: - Methods
   private func setupViewHierarchy() {
     addSubview(rootFlexContainer)
     rootFlexContainer.flex
@@ -70,5 +74,18 @@ public final class FABButton: UIView {
   private func setupLayer() {
     rootFlexContainer.pin.all()
     rootFlexContainer.flex.layout()
+  }
+  
+  private func setupTapGesture() {
+    let tapGestureRecognizer = UITapGestureRecognizer(
+      target: self,
+      action: #selector(viewTapped)
+    )
+    self.addGestureRecognizer(tapGestureRecognizer)
+  }
+  
+  @objc
+  private func viewTapped() {
+    tapRelay.accept(())
   }
 }
