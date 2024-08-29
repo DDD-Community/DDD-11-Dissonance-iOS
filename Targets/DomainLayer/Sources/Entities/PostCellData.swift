@@ -6,7 +6,8 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
-public struct PostCellData {
+public struct PostCellData: Equatable {
+  public let id: String
   public let imageURL: String
   public let title: String
   public let remainTag: String
@@ -15,10 +16,12 @@ public struct PostCellData {
 // MARK: - Stub
 
 public extension PostCellData {
-  static func stub(imageURL: String = "",
+  static func stub(id: String = "",
+                   imageURL: String = "",
                    title: String = "2024년 미디어 온라인 홍보단 2기 모집",
                    remainTag: String = "D-1") -> Self {
-    .init(imageURL: imageURL,
+    .init(id: id,
+          imageURL: imageURL,
           title: title,
           remainTag: remainTag)
   }
