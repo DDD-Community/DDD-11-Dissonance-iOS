@@ -144,7 +144,8 @@ private extension PostListViewController {
       .map { $0.isSuccessPostFetch }
       .distinctUntilChanged()
       .filter { $0 }
-      .bind(with: self, onNext: { owner, _ in
+      .asSignal(onErrorJustReturn: true)
+      .emit(with: self, onNext: { owner, _ in
         UIView.animate(withDuration: 0.5) {
           owner.scrollView.alpha = 1
         }
@@ -156,7 +157,8 @@ private extension PostListViewController {
       .map { $0.posts }
       .distinctUntilChanged()
       .filter { !$0.isEmpty }
-      .bind(with: self) { owner, posts in
+      .asSignal(onErrorJustReturn: [])
+      .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
         owner.collectionView.pin.sizeToFit()
         owner.postOrderControlView.setCount(posts.count)
@@ -165,7 +167,8 @@ private extension PostListViewController {
     
     reactor.state
       .compactMap { $0.selectedCell }
-      .bind(with: self) { owner, cell in
+      .asSignal(onErrorJustReturn: .stub())
+      .emit(with: self) { owner, cell in
         owner.coordinator?.pushPostDetail(id: cell.id)
       }
       .disposed(by: disposeBag)

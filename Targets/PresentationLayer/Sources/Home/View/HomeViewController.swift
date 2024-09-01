@@ -132,7 +132,8 @@ private extension HomeViewController {
       .map { $0.isSuccessPostFetch && $0.isSuccessBannerFetch }
       .distinctUntilChanged()
       .filter { $0 }
-      .bind(with: self, onNext: { owner, _ in
+      .asSignal(onErrorJustReturn: true)
+      .emit(with: self, onNext: { owner, _ in
         UIView.animate(withDuration: 0.5) {
           owner.scrollView.alpha = 1
         }
@@ -144,7 +145,8 @@ private extension HomeViewController {
       .map { $0.postSections }
       .distinctUntilChanged()
       .filter { !$0.isEmpty }
-      .bind(with: self) { owner, postSections in
+      .asSignal(onErrorJustReturn: [])
+      .emit(with: self) { owner, postSections in
         owner.collectionView.setupData(postSections)
         owner.collectionView.pin.sizeToFit()
       }
@@ -154,7 +156,8 @@ private extension HomeViewController {
       .map { $0.banners }
       .distinctUntilChanged()
       .filter { !$0.isEmpty }
-      .bind(with: self) { owner, banners in
+      .asSignal(onErrorJustReturn: [])
+      .emit(with: self) { owner, banners in
         owner.bannerView.setupData(banners)
         owner.bannerView.start()
       }
@@ -162,7 +165,8 @@ private extension HomeViewController {
     
     reactor.state
       .compactMap { $0.selectedCell }
-      .bind(with: self) { owner, cell in
+      .asSignal(onErrorJustReturn: .stub())
+      .emit(with: self) { owner, cell in
         owner.coordinator?.pushPostDetail(id: cell.id)
       }
       .disposed(by: disposeBag)
@@ -177,7 +181,8 @@ private extension HomeViewController {
       .disposed(by: disposeBag)
     
     bannerView.bannerTapObservable
-      .bind(with: self) { owner, banner in
+      .asSignal(onErrorJustReturn: .stub())
+      .emit(with: self) { owner, banner in
         owner.coordinator?.pushPostDetail(id: String(banner.featuredPostId))
       }
       .disposed(by: disposeBag)
