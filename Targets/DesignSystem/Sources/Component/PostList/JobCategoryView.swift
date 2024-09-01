@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import DomainLayer
 import UIKit
 
 import RxSwift
@@ -14,15 +15,8 @@ import PinLayout
 import FlexLayout
 
 public final class JobCategoryView: UIView {
-  public enum Category: String, CaseIterable {
-    case all = "전체"
-    case idea = "아이디어·기획"
-    case design = "디자인"
-    case develop = "개발·IT"
-  }
-  
-  public let selectionRelay: BehaviorRelay<Category> = .init(value: .all)
-  private let dataRelay: BehaviorRelay<[String]> = .init(value: Category.allCases.map { $0.rawValue })
+  public let selectionRelay: BehaviorRelay<ContestCategory> = .init(value: .all)
+  private let dataRelay: BehaviorRelay<[String]> = .init(value: ContestCategory.allCases.map { $0.rawValue })
   private let disposeBag = DisposeBag()
   
   // MARK: - UI
@@ -105,20 +99,16 @@ public final class JobCategoryView: UIView {
     selectionRelay
       .distinctUntilChanged()
       .delay(.milliseconds(50), scheduler: MainScheduler.instance)
-      .bind(with: self) { owner, category in
-        for (i, item) in Category.allCases.enumerated() {
+      .bind(with: self) { owner, contestCategory in
+        for (i, item) in ContestCategory.allCases.enumerated() {
           let cell = owner.fetchCell(at: .init(row: i, section: 0))
-          cell.setMode(category == item ? .dark : .light)
+          cell.setMode(contestCategory == item ? .dark : .light)
         }
       }
       .disposed(by: disposeBag)
     
-    collectionView.rx.itemSelected
-      .withUnretained(self)
-      .map { owner, value in
-        let value = owner.dataRelay.value[value.row]
-        return Category.init(rawValue: value) ?? .all
-      }
+    Observable.combineLatest(collectionView.rx.itemSelected, dataRelay)
+      .map { (indexPath, dataList) in ContestCategory.init(rawValue: dataList[indexPath.row]) ?? .all }
       .bind(to: selectionRelay)
       .disposed(by: disposeBag)
   }

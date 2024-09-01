@@ -30,7 +30,7 @@ public final class JobCategoryCell: UICollectionViewCell {
   
   // MARK: - UI
   private let rootFlexContainer = UIView()
-  public let tagLabel = MozipLabel(style: .body2, color: MozipColor.gray800)
+  private let tagLabel = MozipLabel(style: .body2, color: MozipColor.gray800)
   
   // MARK: - Initializers
   public override init(frame: CGRect) {
