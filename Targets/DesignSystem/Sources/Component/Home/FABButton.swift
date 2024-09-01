@@ -22,8 +22,6 @@ public final class FABButton: UIView {
     static let title: String = "공고등록"
   }
   
-  public let tapRelay: PublishRelay<Void> = .init()
-  
   // MARK: - UI
   private let rootFlexContainer = UIView()
   
@@ -40,7 +38,6 @@ public final class FABButton: UIView {
   public init() {
     super.init(frame: .zero)
     setupViewHierarchy()
-    setupTapGesture()
   }
   
   required init?(coder: NSCoder) {
@@ -74,18 +71,5 @@ public final class FABButton: UIView {
   private func setupLayer() {
     rootFlexContainer.pin.all()
     rootFlexContainer.flex.layout()
-  }
-  
-  private func setupTapGesture() {
-    let tapGestureRecognizer = UITapGestureRecognizer(
-      target: self,
-      action: #selector(viewTapped)
-    )
-    self.addGestureRecognizer(tapGestureRecognizer)
-  }
-  
-  @objc
-  private func viewTapped() {
-    tapRelay.accept(())
   }
 }

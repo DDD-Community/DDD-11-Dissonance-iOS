@@ -191,8 +191,8 @@ private extension HomeViewController {
       }
       .disposed(by: disposeBag)
     
-    fabButton.tapRelay
-      .asSignal()
+    fabButton.rxGesture.tap
+      .asSignal(onErrorJustReturn: .init())
       .emit(with: self) { owner, _ in
         owner.coordinator?.pushPostRegister()
       }
