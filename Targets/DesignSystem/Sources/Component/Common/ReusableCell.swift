@@ -19,6 +19,7 @@ public extension ReusableView where Self: UIView {
 }
 
 extension UITableViewCell: ReusableView { }
+extension UITableViewHeaderFooterView: ReusableView { }
 
 extension UITableView {
   
@@ -31,6 +32,17 @@ extension UITableView {
       fatalError("Could not dequeue cell: \(T.self) with identifier: \(T.defaultReuseIdentifier)")
     }
     return cell
+  }
+  
+  public func register<T: UITableViewHeaderFooterView>(_: T.Type) {
+    register(T.self, forHeaderFooterViewReuseIdentifier: T.defaultReuseIdentifier)
+  }
+
+  public func dequeueReusableHeaderFooterView<T: UITableViewHeaderFooterView>() -> T {
+    guard let headerFooterView = dequeueReusableHeaderFooterView(withIdentifier: T.defaultReuseIdentifier) as? T else {
+      fatalError("Could not dequeue headerFooterView: \(T.self) with identifier: \(T.defaultReuseIdentifier)")
+    }
+    return headerFooterView
   }
 }
 

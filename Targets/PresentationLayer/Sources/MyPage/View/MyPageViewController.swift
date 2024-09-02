@@ -45,7 +45,7 @@ final class MyPageViewController: BaseViewController<MyPageReactor>, Coordinatab
     tableView.rowHeight = TableViewMetric.rowHeight
     tableView.sectionHeaderTopPadding = 0
     tableView.register(MyPageTableViewCell.self)
-    tableView.register(MyPageTableHeaderView.self, forHeaderFooterViewReuseIdentifier: "MyPageTableHeaderView")
+    tableView.register(MyPageTableHeaderView.self)
     return tableView
   }()
   
@@ -120,11 +120,7 @@ final class MyPageViewController: BaseViewController<MyPageReactor>, Coordinatab
 // MARK: - UITableViewDelegate
 extension MyPageViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "MyPageTableHeaderView")
-            as? MyPageTableHeaderView else {
-      return nil
-    }
-    
+    let headerView: MyPageTableHeaderView = tableView.dequeueReusableHeaderFooterView()
     let sectionModel = dataSource[section]
     headerView.configure(sectionModel.header)
     
