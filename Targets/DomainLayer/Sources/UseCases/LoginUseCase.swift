@@ -11,16 +11,16 @@ import RxSwift
 public protocol LoginUseCaseType {
   var loginRepository: LoginRepositoryType { get }
   
-  func tryKakaoLogin() -> Observable<UserToken>
-  func tryAppleLogin() -> Observable<UserToken>
+  func tryKakaoLogin() -> Observable<String>
+  func tryAppleLogin() -> Observable<String>
 }
 
 extension LoginUseCaseType {
-  func tryKakaoLogin() -> Observable<UserToken> {
+  func tryKakaoLogin() -> Observable<String> {
     loginRepository.tryKakaoLogin()
   }
   
-  func tryAppleLogin() -> Observable<UserToken> {
+  func tryAppleLogin() -> Observable<String> {
     loginRepository.tryAppleLogin()
   }
 }

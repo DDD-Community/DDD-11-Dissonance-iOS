@@ -29,11 +29,12 @@ final class LoginReactor: Reactor {
   }
 
   enum Mutation {
-    case setUserToken(userToken: UserToken)
+    case setUserToken(userToken: String)
   }
 
   struct State {
-    var isSuccessLogin: Bool = false
+//    var isSuccessLogin: Bool = false
+    var accessToken: String = ""
   }
 
   // MARK: - Methods
@@ -52,14 +53,15 @@ final class LoginReactor: Reactor {
     switch mutation {
     case .setUserToken(let userToken):
       
-      //TODO: 추후 예외처리 구현 예정
-      guard let accessTokenData = userToken.accessToken.data(using: .utf8),
-            let refreshTokenData = userToken.refreshToken.data(using: .utf8)
-      else { fatalError() }
-
-      AuthManager.save(authInfoType: .accessToken, data: accessTokenData)
-      AuthManager.save(authInfoType: .refreshToken, data: refreshTokenData)
-      newState.isSuccessLogin = true
+//      //TODO: 추후 예외처리 구현 예정
+//      guard let accessTokenData = userToken.accessToken.data(using: .utf8),
+//            let refreshTokenData = userToken.refreshToken.data(using: .utf8)
+//      else { fatalError() }
+//
+//      AuthManager.save(authInfoType: .accessToken, data: accessTokenData)
+//      AuthManager.save(authInfoType: .refreshToken, data: refreshTokenData)
+//      newState.isSuccessLogin = true
+      newState.accessToken = userToken
     }
 
     return newState

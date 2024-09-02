@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import DesignSystem
 import UIKit
 import AuthenticationServices
 
@@ -39,15 +40,31 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
     return button
   }()
   
+  let temp: UILabel = {
+    let label: UILabel = .init()
+    label.font = MozipFontStyle.heading1.font
+    label.textAlignment = .center
+    label.text = "액세스 토큰 자리"
+    label.numberOfLines = 0
+    label.isUserInteractionEnabled = true
+    return label
+  }()
+  
   // MARK: - Initializer
   init(reactor: LoginReactor) {
     super.init()
     
     self.reactor = reactor
+    view.addSubview(temp)
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    temp.pin.horizontally().marginHorizontal(20).height(300).vCenter()
   }
   
   // MARK: - Methods
@@ -90,16 +107,22 @@ private extension LoginViewController {
       .map { Action.didTapAppleLoginButton }
       .emit(to: reactor.action)
       .disposed(by: disposeBag)
+    
+    temp.rxGesture.tap
+      .bind(with: self, onNext: { owner, _ in
+        UIPasteboard.general.string = owner.temp.text
+      })
+      .disposed(by: disposeBag)
 
   }
   
   func bindState(reactor: LoginReactor) {
     reactor.state
-      .map { $0.isSuccessLogin }
+      .map { $0.accessToken }
       .distinctUntilChanged()
-      .filter { $0 }
-      .bind(with: self, onNext: { owner, _ in
-        owner.coordinator?.didSuccessLogin()
+      .filter { !$0.isEmpty }
+      .bind(with: self, onNext: { owner, token in
+        owner.temp.text = token
       })
       .disposed(by: disposeBag)
   }

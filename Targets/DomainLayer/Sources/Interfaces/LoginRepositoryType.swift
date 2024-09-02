@@ -11,6 +11,6 @@ import RxSwift
 public protocol LoginRepositoryType {
 
   // MARK: Methods
-  func tryKakaoLogin() -> Observable<UserToken>
-  func tryAppleLogin() -> Observable<UserToken>
+  func tryKakaoLogin() -> Observable<String>
+  func tryAppleLogin() -> Observable<String>
 }

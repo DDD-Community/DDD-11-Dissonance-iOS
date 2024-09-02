@@ -28,7 +28,7 @@ public final class LoginRepository: LoginRepositoryType {
   }
 
   // MARK: - Methods
-  public func tryKakaoLogin() -> Observable<UserToken> {
+  public func tryKakaoLogin() -> Observable<String> {
     let isInstalledKakaoTalk: Bool = UserApi.isKakaoTalkLoginAvailable()
     let loginRequest: Observable<OAuthToken> = (
       isInstalledKakaoTalk ? UserApi.shared.rx.loginWithKakaoTalk() : UserApi.shared.rx.loginWithKakaoAccount()
@@ -37,18 +37,20 @@ public final class LoginRepository: LoginRepositoryType {
     return loginRequest
       .withUnretained(self)
       .flatMap { owner, oAuthToken in
-        owner.requestKakaoLogin(accessToken: oAuthToken.accessToken)
+//        owner.requestKakaoLogin(accessToken: oAuthToken.accessToken)
+        Observable.just(oAuthToken.accessToken)
       }
   }
   
-  public func tryAppleLogin() -> Observable<UserToken> {
+  public func tryAppleLogin() -> Observable<String> {
     appleLoginManager.signInWithApple()
     
     return appleLoginManager.appleLoginSubject
       .asObservable()
       .withUnretained(self)
       .flatMap { owner, asauthorization in
-        owner.requestAppleLogin(jwt: owner.parseJWT(from: asauthorization))
+//        owner.requestAppleLogin(jwt: owner.parseJWT(from: asauthorization))
+        Observable.just(owner.parseJWT(from: asauthorization))
       }
   }
 }
