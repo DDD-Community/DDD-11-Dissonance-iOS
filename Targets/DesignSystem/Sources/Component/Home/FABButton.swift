@@ -10,10 +10,12 @@ import UIKit
 
 import PinLayout
 import FlexLayout
+import RxRelay
 
 public final class FABButton: UIView {
   
   private enum Metric {
+    static let size: CGSize = .init(width: 72, height: 72)
     static let cornerRadius: CGFloat = 36
     static let plusIconTopMargin: CGFloat = 10
     static let textLabelTopMargin: CGFloat = 4
@@ -48,12 +50,11 @@ public final class FABButton: UIView {
     setupLayer()
   }
   
-  // MARK: - Methods
-  public func bindAction(target: Any?, action: Selector?) {
-    let tapGestureRecognizer = UITapGestureRecognizer(target: target, action: action)
-    self.addGestureRecognizer(tapGestureRecognizer)
+  public override func sizeThatFits(_ size: CGSize) -> CGSize {
+    return Metric.size
   }
   
+  // MARK: - Methods
   private func setupViewHierarchy() {
     addSubview(rootFlexContainer)
     rootFlexContainer.flex

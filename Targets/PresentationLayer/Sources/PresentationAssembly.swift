@@ -34,5 +34,13 @@ public struct PresentationAssembly: DependencyAssemblable {
     container.register(type: PostDetailCoordinatorType.self) { _ in
       PostDetailCoordinator(navigationController: navigationController)
     }
+    
+    container.register(type: HomeCoordinatorType.self) { _ in
+      HomeCoordinator(navigationController: navigationController)
+    }
+    
+    container.register(type: PostListCoordinatorType.self) { _ in
+      PostListCoordinator(navigationController: navigationController)
+    }
   }
 }

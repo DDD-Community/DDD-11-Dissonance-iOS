@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import DomainLayer
 
 import PinLayout
 import FlexLayout
@@ -49,8 +50,16 @@ public final class BannerCell: UICollectionViewCell {
   }
   
   // MARK: - Methods
-  public func setImage(_ uiimage: UIImage = UIImage.image(with: MozipColor.gray300)) {
-    bannerImage.image = uiimage
+  public func setData(_ data: BannerCellData) {
+    // FIXME: url -> UIImage 방법 필요
+    let images: [UIImage] = [
+      UIImage.image(with: MozipColor.gray100),
+      UIImage.image(with: MozipColor.gray200),
+      UIImage.image(with: MozipColor.gray300),
+      UIImage.image(with: MozipColor.primary100),
+      UIImage.image(with: MozipColor.primary300)
+    ]
+    bannerImage.image = images[data.featuredPostId]
     bannerImage.flex.markDirty()
     setNeedsLayout()
   }

@@ -6,6 +6,7 @@
 //
 
 import DIContainer
+import DesignSystem
 import DataLayer
 import DomainLayer
 import PresentationLayer
@@ -29,8 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     guard let windowScene = (scene as? UIWindowScene) else { return }
     window = UIWindow(windowScene: windowScene)
     
-    
-    let navigationController: UINavigationController = .init(nibName: nil, bundle: nil)
+    let navigationController: UINavigationController = MozipNavigationController()
     self.navigationController = navigationController
     window?.rootViewController = navigationController
     window?.makeKeyAndVisible()

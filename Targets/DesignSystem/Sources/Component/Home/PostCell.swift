@@ -16,8 +16,6 @@ public final class PostCell: UICollectionViewCell {
   
   private enum Metric {
     static let verticalSpacing: CGFloat = 8
-    static let width: CGFloat = 148
-    static let imageHeight: CGFloat = 148
     static let imageCornerRadius: CGFloat = 8
   }
   
@@ -44,12 +42,11 @@ public final class PostCell: UICollectionViewCell {
   }
   
   // MARK: - Overrides
-//  public override func prepareForReuse() {
-  // TODO: 데이터 연결 후 작업
-//    super.prepareForReuse()
-//    postImage.image = nil
-//    titleLabel.text = nil
-//  }
+  public override func prepareForReuse() {
+    super.prepareForReuse()
+    thumbnailImage.image = nil
+    titleLabel.text = nil
+  }
   
   public override func layoutSubviews() {
     super.layoutSubviews()
@@ -70,7 +67,7 @@ public final class PostCell: UICollectionViewCell {
     titleLabel.updateTextKeepingAttributes(data.title)
     titleLabel.flex.markDirty()
     
-    remainDayTag.setText(data.remainTag)
+    remainDayTag.setText(data.remainTag, mode: data.remainTag == "마감" ? .dark : .light) // FIXME: 추후 수정
     remainDayTag.flex.markDirty()
     
     setNeedsLayout()
@@ -81,9 +78,8 @@ public final class PostCell: UICollectionViewCell {
       .direction(.column)
       .alignItems(.start)
       .gap(Metric.verticalSpacing)
-      .width(Metric.width)
       .define { flex in
-        flex.addItem(thumbnailImage).width(Metric.width).height(Metric.imageHeight)
+        flex.addItem(thumbnailImage).aspectRatio(1).grow(1)
         flex.addItem(titleLabel)
         flex.addItem(remainDayTag)
       }

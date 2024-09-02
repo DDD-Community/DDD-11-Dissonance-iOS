@@ -10,6 +10,7 @@ import UIKit
 
 import PinLayout
 import FlexLayout
+import RxSwift
 
 public final class HomeNavigationBar: UIView {
   
@@ -18,6 +19,10 @@ public final class HomeNavigationBar: UIView {
     static let horizontalPadding: CGFloat = 20
     static let statusBarHeight = Device.statusBarFrame.height
     static let one: CGFloat = 1
+  }
+  
+  public var myPageButtonTapObservable: Observable<Void> {
+    mypageButton.rx.tap.asObservable()
   }
   
   // MARK: - UI
@@ -30,7 +35,7 @@ public final class HomeNavigationBar: UIView {
     return imageView
   }()
   
-  public let mypageButton: UIButton = {
+  private let mypageButton: UIButton = {
     let button = UIButton()
     button.setImage(DesignSystemAsset.personEmpty.image, for: .normal)
     return button
@@ -51,6 +56,10 @@ public final class HomeNavigationBar: UIView {
   public override func layoutSubviews() {
     super.layoutSubviews()
     setupLayout()
+  }
+  
+  public override func sizeThatFits(_ size: CGSize) -> CGSize {
+    return .init(width: Device.width, height: Device.statusBarFrame.height + Metric.height)
   }
   
   // MARK: - Methods

@@ -8,7 +8,7 @@
 
 import RxDataSources
 
-public struct PostSection {
+public struct PostSection: Equatable {
   public let header: String
   public var items: [Item]
 }
