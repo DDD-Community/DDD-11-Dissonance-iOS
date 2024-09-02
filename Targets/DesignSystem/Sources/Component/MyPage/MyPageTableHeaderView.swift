@@ -13,12 +13,7 @@ import PinLayout
 public final class MyPageTableHeaderView: UITableViewHeaderFooterView {
   
   // MARK: - Properties
-  private let titleLabel: UILabel = {
-    let label = UILabel()
-    label.textColor = MozipColor.gray800
-    label.font = MozipFontStyle.heading1.font
-    return label
-  }()
+  private let titleLabel: MozipLabel = .init(style: .heading1, color: MozipColor.gray800)
   
   private let dividerView: DividerView = {
     let dividerView: DividerView = .init()
@@ -46,7 +41,7 @@ public final class MyPageTableHeaderView: UITableViewHeaderFooterView {
   
   // MARK: - Methods
   public func configure(_ text: String) {
-    titleLabel.text = text
+    titleLabel.updateTextKeepingAttributes(text)
   }
   
   public func setDividerView() {

@@ -17,26 +17,14 @@ public final class MyPageTableViewCell: UITableViewCell {
     case kakao, apple
   }
   
-  private let titleLabel: UILabel = {
-    let label: UILabel = .init()
-    label.font = MozipFontStyle.body2.font
-    label.textColor = MozipColor.gray500
-    return label
-  }()
+  private let titleLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray500)
+  private let versionLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray300)
   
   private let socialTypeImageView: UIImageView = {
     let imageView: UIImageView = .init()
     imageView.contentMode = .scaleAspectFit
     imageView.isHidden = true
     return imageView
-  }()
-  
-  private let versionLabel: UILabel = {
-    let label: UILabel = .init()
-    label.font = MozipFontStyle.body2.font
-    label.textColor = MozipColor.gray300
-    label.isHidden = true
-    return label
   }()
   
   // MARK: - Initializer
@@ -54,9 +42,9 @@ public final class MyPageTableViewCell: UITableViewCell {
   public override func prepareForReuse() {
     super.prepareForReuse()
 
-    titleLabel.text = nil
+    titleLabel.updateTextKeepingAttributes(" ")
+    versionLabel.updateTextKeepingAttributes(" ")
     socialTypeImageView.image = nil
-    versionLabel.text = nil
   }
   
   public override func layoutSubviews() {
@@ -67,11 +55,11 @@ public final class MyPageTableViewCell: UITableViewCell {
   
   // MARK: - Methods
   public func configure(title: String) {
-    titleLabel.text = title
+    titleLabel.updateTextKeepingAttributes(title)
   }
   
   public func configure(socialType: SocialType) {
-    titleLabel.text = "연결된 계정"
+    titleLabel.updateTextKeepingAttributes("연결된 계정")
     socialTypeImageView.image = socialType == .kakao ? DesignSystemAsset.kakaoAccountIcon.image : DesignSystemAsset.appleAccountIcon.image
     socialTypeImageView.isHidden = false
   }
@@ -83,8 +71,8 @@ public final class MyPageTableViewCell: UITableViewCell {
       return
     }
     
-    titleLabel.text = "버전 정보"
-    versionLabel.text = "\(version).\(build)"
+    titleLabel.updateTextKeepingAttributes("버전 정보")
+    versionLabel.updateTextKeepingAttributes("\(version).\(build)")
     versionLabel.isHidden = false
   }
 }
@@ -94,6 +82,7 @@ private extension MyPageTableViewCell {
   func setupViews() {
     backgroundColor = .white
     selectionStyle = .none
+    versionLabel.isHidden = true
     
     contentView.addSubview(titleLabel)
     contentView.addSubview(socialTypeImageView)
