@@ -113,7 +113,7 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
         container.addItem().grow(1)
         container.addItem(logoDescription).alignSelf(.center)
         container.addItem(logoImageView).marginTop(16)
-        container.addItem().grow(1)
+        container.addItem().grow(1.88)
         container.addItem(kakaoLoginButton).height(52).marginHorizontal(24).marginTop(20)
         container.addItem(appleLoginbutton).height(52).marginHorizontal(24).marginTop(16)
         container.addItem(descriptionLabel).marginTop(20).alignSelf(.center)
