@@ -72,8 +72,11 @@ private extension LoginRepository {
   func parseJWT(from authorization: ASAuthorization) -> String {
     switch authorization.credential {
     case let appleIDCredential as ASAuthorizationAppleIDCredential:
-      let userIdentifier = appleIDCredential.user // jwt 값
-      return userIdentifier
+      guard let jwtData = appleIDCredential.identityToken,
+            let jwtString = String(data: jwtData, encoding: .utf8) else {
+        return "NULL"
+      }
+      return jwtString
     case let passwordCredential as ASPasswordCredential:
       let userIdentifier = passwordCredential.user
       return userIdentifier

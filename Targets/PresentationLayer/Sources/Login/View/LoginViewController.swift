@@ -42,7 +42,7 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
   
   let temp: UILabel = {
     let label: UILabel = .init()
-    label.font = MozipFontStyle.heading1.font
+    label.font = MozipFontStyle.caption1.font
     label.textAlignment = .center
     label.text = "액세스 토큰 자리"
     label.numberOfLines = 0
@@ -64,7 +64,7 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
   
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    temp.pin.horizontally().marginHorizontal(20).height(300).vCenter()
+    temp.pin.horizontally().marginHorizontal(20).height(500).vCenter()
   }
   
   // MARK: - Methods
