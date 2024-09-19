@@ -8,26 +8,41 @@
 
 import RxSwift
 
+public enum PostUploadResult: Error, Equatable {
+  case success
+  case error(message: String?)
+}
+
 public protocol PostUploadUseCaseType {
-  var postUploadRepository: PostUploadRepositoryType { get }
   
-  //TODO: API 문서 전달받은 후 수정 예정
-  func execute(with post: Post) -> Observable<Bool>
+  // MARK: - Properties
+  var postRepository: PostRepositoryType { get }
+  
+  // MARK: - Methods
+  func execute(with post: Post) -> Observable<PostUploadResult>
 }
 
 final class PostUploadUseCase: PostUploadUseCaseType {
   
   // MARK: - Properties
-  let postUploadRepository: PostUploadRepositoryType
+  let postRepository: PostRepositoryType
+  private let disposeBag: DisposeBag = .init()
   
   // MARK: - Initializer
-  init(postUploadRepository: PostUploadRepositoryType) {
-    self.postUploadRepository = postUploadRepository
+  init(postRepository: PostRepositoryType) {
+    self.postRepository = postRepository
   }
   
   // MARK: - Methods
-  //TODO: API 문서 전달받은 후 수정 예정
-  func execute(with post: Post) -> Observable<Bool> {
-    return .just(true)
+  func execute(with post: Post) -> Observable<PostUploadResult> {
+    return postRepository.upload(post)
+      .asObservable()
+      .map { (isSuccess, message) -> PostUploadResult in
+        if isSuccess {
+          return .success
+        }
+        
+        return .error(message: message)
+      }
   }
 }

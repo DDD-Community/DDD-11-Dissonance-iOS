@@ -20,7 +20,7 @@ public struct DomainAssembly: DependencyAssemblable {
     }
     
     container.register(type: PostUploadUseCaseType.self) { container in
-      return PostUploadUseCase(postUploadRepository: container.resolve(type: PostUploadRepositoryType.self)!)
+      return PostUploadUseCase(postRepository: container.resolve(type: PostRepositoryType.self)!)
     }
   }
 }
