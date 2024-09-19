@@ -45,14 +45,14 @@ final class PostUploadReactor: Reactor {
     case setActivityEndDate(String)
     case setActivityContents(String)
     case setPostUrlString(String)
-    case uploadPost
     case setLoading(Bool)
+    case setUploadResult(PostUploadResult)
   }
 
   struct State {
     var isEnableComplete: Bool = false
     var isLoading: Bool = false
-    var isSuccessUpload = false
+    var uploadResult: PostUploadResult? = nil
   }
   
   // MARK: - Initializer
@@ -74,7 +74,7 @@ final class PostUploadReactor: Reactor {
     case .inputActivityEndDate(let endDate):     return .just(.setActivityEndDate(endDate))
     case .inputActivityContents(let contents):   return .just(.setActivityContents(contents))
     case .inputPostUrlString(let urlString):     return .just(.setPostUrlString(urlString))
-    case .didTapCompletionButton:                return .concat([.just(.setLoading(true)), .just(.uploadPost)])
+    case .didTapCompletionButton:                return .concat([.just(.setLoading(true)), uploadPost()])
     }
   }
 
@@ -88,13 +88,13 @@ final class PostUploadReactor: Reactor {
     case .setOrganization(let organization):   post.organization = organization
     case .setRecruitStartDate(let startDate):  post.recruitStartDate = startDate
     case .setRecruitEndDate(let endDate):      post.recruitEndDate = endDate
-    case .setJobGroup(let jobGroups):          post.jobGroups = jobGroups
+    case .setJobGroup(let jobGroups):          post.jobGroups = setupJobGroup(jobGroups)
     case .setActivityStartDate(let startDate): post.activityStartDate = startDate
     case .setActivityEndDate(let endDate):     post.activityEndDate = endDate
     case .setActivityContents(let contents):   post.activityContents = contents
     case .setPostUrlString(let urlString):     post.postUrlString = urlString
     case .setLoading(let isLoading):           newState.isLoading = isLoading
-    case .uploadPost:                          postUploadUseCase.execute(with: post) //TODO: API 문서 전달받은 후 수정 예정
+    case .setUploadResult(let result):         newState.uploadResult = result
     }
 
     newState.isEnableComplete = checkPostCompletion(post)
@@ -109,7 +109,7 @@ private extension PostUploadReactor {
       return false
     }
     
-    for jobGroup in post.jobGroups where jobGroup.job.isEmpty {
+    for jobGroup in post.jobGroups where jobGroup.name.isEmpty {
       return false
     }
     
@@ -119,5 +119,27 @@ private extension PostUploadReactor {
     ].contains(.init())
     
     return isEnable
+  }
+  
+  func setupJobGroup(_ jobGroups: [(job: String, count: Int)]) -> [JobInformation] {
+    var jobInformationArray: [JobInformation] = []
+    
+    jobGroups.forEach {
+      jobInformationArray.append(.init(job: $0.job, count: $0.count))
+    }
+    
+    return jobInformationArray
+  }
+  
+  func uploadPost() -> Observable<Mutation> {
+    postUploadUseCase.execute(with: post)
+      .flatMap { uploadResult -> Observable<Mutation> in
+        switch uploadResult {
+        case .success:
+          return .concat(.just(.setLoading(false)), .just(.setUploadResult(.success)))
+        case .error(let message):
+          return .concat(.just(.setLoading(false)), .just(.setUploadResult(.error(message: message))))
+        }
+      }
   }
 }
