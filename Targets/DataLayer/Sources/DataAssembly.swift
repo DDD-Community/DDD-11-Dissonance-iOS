@@ -18,6 +18,6 @@ public struct DataAssembly: DependencyAssemblable {
   public func assemble(container: DIContainer) {
     container.register(type: LoginRepositoryType.self) { _ in LoginRepository() }
     
-    container.register(type: PostUploadRepositoryType.self) { _ in PostUploadRepository() }
+    container.register(type: PostRepositoryType.self) { _ in PostRepository() }
   }
 }
