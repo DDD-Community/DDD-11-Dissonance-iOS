@@ -40,7 +40,8 @@ final class PostDetailReactor: Reactor {
   func mutate(action: Action) -> Observable<Mutation> {
     // TODO: 추후 구현
     switch action {
-    case .fetchData:          return .just(.setPost(.stub()))
+    case .fetchData: return .empty()
+//    case .fetchData:          return .just(.setPost(.stub()))
     case .didTapReportButton: return .concat([.just(.setReportState(true)), .just(.setReportState(false))])
     }
   }
