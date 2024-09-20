@@ -17,7 +17,8 @@ let project = Project.makeProject(
         .external(name: "RxCocoa"),
         .external(name: "RxSwift"),
         .external(name: "PinLayout"),
-        .external(name: "FlexLayout")
+        .external(name: "FlexLayout"),
+        .external(name: "Kingfisher")
     ],
     resources: ["Resources/**"]
 )
