@@ -11,6 +11,16 @@ import Foundation
 public struct BannerCellData: Equatable {
   public let featuredPostId, infoPostId: Int
   public let bannerImageUrl: String
+  
+  public init(
+    featuredPostId: Int,
+    infoPostId: Int,
+    bannerImageUrl: String
+  ) {
+    self.featuredPostId = featuredPostId
+    self.infoPostId = infoPostId
+    self.bannerImageUrl = bannerImageUrl
+  }
 }
 
 extension BannerCellData {

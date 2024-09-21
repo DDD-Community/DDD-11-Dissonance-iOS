@@ -12,4 +12,6 @@ public protocol PostRepositoryType {
   
   // MARK: Methods
   func upload(_ post: Post) -> Single<(isSuccess: Bool, message: String?)>
+  func fetchPostList(categoryId: Int) -> Single<[PostCellData]>
+  func fetchBanner() -> Single<[BannerCellData]>
 }
