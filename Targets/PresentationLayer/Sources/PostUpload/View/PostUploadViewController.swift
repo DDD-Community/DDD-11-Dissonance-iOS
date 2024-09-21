@@ -7,6 +7,7 @@
 //
 
 import DesignSystem
+import DomainLayer
 import PhotosUI
 import UIKit
 
@@ -15,7 +16,7 @@ import PinLayout
 import ReactorKit
 import RxCocoa
 
-final class PostUploadViewController: BaseViewController<PostUploadReactor>, Coordinatable {
+final class PostUploadViewController: BaseViewController<PostUploadReactor>, Alertable, Coordinatable {
   
   // MARK: - Properties
   weak var coordinator: PostUploadCoordinator?
@@ -155,6 +156,21 @@ private extension PostUploadViewController {
   // MARK: Properties
   typealias Action = PostUploadReactor.Action
   
+  var uploadBinder: Binder<MozipNetworkResult> {
+    return .init(self) { owner, uploadResult in
+      switch uploadResult {
+      case .success:
+        owner.coordinator?.didFinish()
+        owner.coordinator?.didSuccessUpload()
+        
+      // TODO: 에러 팝업 적용 예정
+      case .error(let message):
+//        owner.presentAlert(type: <#T##AlertType#>, rightButtonAction: <#T##() -> Void#>)
+        return
+      }
+    }
+  }
+  
   // MARK: Methods
   func bindAction(reactor: PostUploadReactor) {
     titleTextFieldView.textObservable
@@ -231,11 +247,10 @@ private extension PostUploadViewController {
       .disposed(by: disposeBag)
     
     reactor.state
-      .map { $0.isSuccessUpload }
-      .filter { $0 }
-      .bind(with: self, onNext: { owner, _ in
-        owner.coordinator?.didSuccessUpload()
-      })
+      .compactMap { $0.uploadResult }
+      .distinctUntilChanged()
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(to: uploadBinder)
       .disposed(by: disposeBag)
   }
   
@@ -393,7 +408,7 @@ extension PostUploadViewController: PHPickerViewControllerDelegate {
     provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
       guard let self = self,
             let image = image as? UIImage,
-            let imageData = image.pngData() else {
+            let imageData = image.jpegData(compressionQuality: 0.5) else {
         return
       }
       

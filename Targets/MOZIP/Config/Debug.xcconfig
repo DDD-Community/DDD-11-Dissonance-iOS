@@ -1,2 +1,2 @@
 KAKAO_NATIVE_APP_KEY = 44a8243753287a20f25628901dd52d8b
-BASE_URL = "" // TODO: 추가 예정
+BASE_URL = dissonance-server.duckdns.org/api/v1

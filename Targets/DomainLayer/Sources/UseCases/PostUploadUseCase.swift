@@ -9,25 +9,32 @@
 import RxSwift
 
 public protocol PostUploadUseCaseType {
-  var postUploadRepository: PostUploadRepositoryType { get }
   
-  //TODO: API 문서 전달받은 후 수정 예정
-  func execute(with post: Post) -> Observable<Bool>
+  // MARK: - Properties
+  var postRepository: PostRepositoryType { get }
+  
+  // MARK: - Methods
+  func execute(with post: Post) -> Observable<MozipNetworkResult>
 }
 
 final class PostUploadUseCase: PostUploadUseCaseType {
   
   // MARK: - Properties
-  let postUploadRepository: PostUploadRepositoryType
+  let postRepository: PostRepositoryType
+  private let disposeBag: DisposeBag = .init()
   
   // MARK: - Initializer
-  init(postUploadRepository: PostUploadRepositoryType) {
-    self.postUploadRepository = postUploadRepository
+  init(postRepository: PostRepositoryType) {
+    self.postRepository = postRepository
   }
   
   // MARK: - Methods
-  //TODO: API 문서 전달받은 후 수정 예정
-  func execute(with post: Post) -> Observable<Bool> {
-    return .just(true)
+  func execute(with post: Post) -> Observable<MozipNetworkResult> {
+    return postRepository.upload(post)
+      .asObservable()
+      .map { (isSuccess, message) -> MozipNetworkResult in
+        isSuccess ? .success : .error(message: message)
+      }
+      .catchAndReturnNetworkError()
   }
 }

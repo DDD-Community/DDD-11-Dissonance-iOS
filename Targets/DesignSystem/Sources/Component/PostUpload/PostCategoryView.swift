@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import DomainLayer
 import UIKit
 
 import FlexLayout
@@ -16,27 +17,9 @@ import RxSwift
 public final class PostCategoryView: UIView {
   
   // MARK: - Properties
-  public enum PostCategory {
-    case contestPlan
-    case contestDesign
-    case contestIT
-    case hackathon
-    case club
-    
-    public var title: String {
-      switch self {
-      case .contestPlan: "공모전 - 아이디어•기획"
-      case .contestDesign: "공모전 - 디자인"
-      case .contestIT: "공모전 - 개발•IT"
-      case .hackathon: "해커톤"
-      case .club: "IT 동아리"
-      }
-    }
-  }
-  
   private let rootContainer: UIView = .init()
   private let disposeBag: DisposeBag = .init()
-  public let selectedCategorySubject: PublishSubject<PostCategory> = .init()
+  public let selectedCategorySubject: PublishSubject<PostUploadCategory> = .init()
   
   // MARK: - Initializer
   public init() {
@@ -83,7 +66,7 @@ private extension PostCategoryView {
       }
   }
   
-  func makeCategoryButton(_ category: PostCategory) -> UIButton {
+  func makeCategoryButton(_ category: PostUploadCategory) -> UIButton {
     let button: UIButton = {
       let button: UIButton = .init()
       button.setTitle(category.title, for: .normal)

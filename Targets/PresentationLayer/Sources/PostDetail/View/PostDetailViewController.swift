@@ -207,10 +207,10 @@ private extension PostDetailViewController {
       .disposed(by: disposeBag)
   }
   
-  func addTagLabel(_ jobGroups: [(job: String, count: Int)]) {
+  func addTagLabel(_ jobGroups: [JobInformation]) {
     for jobGroup in jobGroups {
       let tagLabel: TagLabel = .init()
-      tagLabel.text = "\(jobGroup.job) • \(jobGroup.count)명"
+      tagLabel.text = "\(jobGroup.name) • \(jobGroup.count)명"
       
       tagLabelAreaView.flex.define {
         $0.addItem(tagLabel).height(36).marginTop(8).marginRight(8)
