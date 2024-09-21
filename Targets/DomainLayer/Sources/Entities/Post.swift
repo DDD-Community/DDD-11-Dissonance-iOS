@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Post {
+public struct Post: Equatable {
 
   // MARK: Properties
   public var imageData: Data = .init()
@@ -33,5 +33,11 @@ public struct Post {
     }
     
     return category.ID
+  }
+  
+  public static func == (lhs: Post, rhs: Post) -> Bool {
+    lhs.title == rhs.title &&
+    lhs.organization == rhs.organization &&
+    lhs.postUrlString == rhs.postUrlString
   }
 }
