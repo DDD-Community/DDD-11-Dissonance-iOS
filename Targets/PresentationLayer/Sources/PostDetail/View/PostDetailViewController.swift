@@ -161,17 +161,18 @@ private extension PostDetailViewController {
       owner.imageView.image = UIImage(data: post.imageData)
       owner.titleValueLabel.text = post.title
       owner.organizationValueLabel.text = post.organization
-      owner.recruitDateValueLabel.text = post.recruitStartDate + "~" + post.recruitEndDate
+      owner.recruitDateValueLabel.text = post.recruitStartDate + " ~ " + post.recruitEndDate
       owner.addTagLabel(post.jobGroups)
-      owner.activityDateValueLabel.text = post.activityStartDate + "~" + post.activityEndDate
+      owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
       owner.activityContentsValueLabel.text = post.activityContents
+      owner.updateLayout()
     }
   }
   
   // MARK: Methods
   func bindAction(reactor: PostDetailReactor) {
     rx.viewDidLoad
-      .map { Action.fetchData }
+      .map { Action.fetchPost }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -184,18 +185,50 @@ private extension PostDetailViewController {
   func bindState(reactor: PostDetailReactor) {
     reactor.state
       .map { $0.post }
+      .filter { !$0.title.isEmpty }
+      .distinctUntilChanged()
       .asSignal(onErrorSignalWith: .empty())
       .emit(to: postBinder)
       .disposed(by: disposeBag)
     
     reactor.state
       .map { $0.isSuccessReport }
+      .distinctUntilChanged()
       .filter { $0 }
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
         // TODO: 토스트 팝업
       })
       .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isErrorReport }
+      .filter { $0.isError }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, errorState in
+        // TODO: 토스트 팝업
+      })
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isLoading }
+      .distinctUntilChanged()
+      .filter { $0 }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        // TODO: 스켈레톤 적용
+      })
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isFetchError }
+      .filter { $0 }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        owner.coordinator?.pushErrorView()
+      })
+      .disposed(by: disposeBag)
+    
   }
   
   func bind() {
@@ -216,5 +249,13 @@ private extension PostDetailViewController {
         $0.addItem(tagLabel).height(36).marginTop(8).marginRight(8)
       }
     }
+  }
+  
+  func updateLayout() {
+    [titleValueLabel, organizationValueLabel, activityContentsValueLabel, rootContainer].forEach {
+      $0.flex.layout(mode: .adjustHeight)
+    }
+    
+    scrollView.contentSize = rootContainer.frame.size
   }
 }
