@@ -46,13 +46,13 @@ final class PostUploadReactor: Reactor {
     case setActivityContents(String)
     case setPostUrlString(String)
     case setLoading(Bool)
-    case setUploadResult(PostUploadResult)
+    case setUploadResult(MozipNetworkResult)
   }
 
   struct State {
     var isEnableComplete: Bool = false
     var isLoading: Bool = false
-    var uploadResult: PostUploadResult? = nil
+    var uploadResult: MozipNetworkResult? = nil
   }
   
   // MARK: - Initializer
@@ -74,7 +74,7 @@ final class PostUploadReactor: Reactor {
     case .inputActivityEndDate(let endDate):     return .just(.setActivityEndDate(endDate))
     case .inputActivityContents(let contents):   return .just(.setActivityContents(contents))
     case .inputPostUrlString(let urlString):     return .just(.setPostUrlString(urlString))
-    case .didTapCompletionButton:                return .concat([.just(.setLoading(true)), uploadPost()])
+    case .didTapCompletionButton:                return .concat([.just(.setLoading(true)), uploadPost(), .just(.setLoading(false))])
     }
   }
 
@@ -133,13 +133,6 @@ private extension PostUploadReactor {
   
   func uploadPost() -> Observable<Mutation> {
     postUploadUseCase.execute(with: post)
-      .flatMap { uploadResult -> Observable<Mutation> in
-        switch uploadResult {
-        case .success:
-          return .concat(.just(.setLoading(false)), .just(.setUploadResult(.success)))
-        case .error(let message):
-          return .concat(.just(.setLoading(false)), .just(.setUploadResult(.error(message: message))))
-        }
-      }
+      .flatMap { Observable<Mutation>.just(.setUploadResult($0)) }
   }
 }

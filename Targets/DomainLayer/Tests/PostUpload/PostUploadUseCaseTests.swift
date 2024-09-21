@@ -37,7 +37,7 @@ final class PostUploadUseCaseTests: XCTestCase {
   func test_게시글_업로드_성공() {
     // Given
     let post: Post = .init()
-    var result: PostUploadResult?
+    var result: MozipNetworkResult?
     let expectation: XCTestExpectation = .init(description: "게시글 업로드 성공")
     
     // When
@@ -59,7 +59,7 @@ final class PostUploadUseCaseTests: XCTestCase {
     // Given
     let post: Post = .init()
     let errorMessage = "게시글 업로드 실패"
-    var result: PostUploadResult?
+    var result: MozipNetworkResult?
     let expectation: XCTestExpectation = .init(description: "게시글 업로드 실패")
     
     // When

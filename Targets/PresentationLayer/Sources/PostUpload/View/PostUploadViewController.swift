@@ -156,7 +156,7 @@ private extension PostUploadViewController {
   // MARK: Properties
   typealias Action = PostUploadReactor.Action
   
-  var uploadBinder: Binder<PostUploadResult> {
+  var uploadBinder: Binder<MozipNetworkResult> {
     return .init(self) { owner, uploadResult in
       switch uploadResult {
       case .success:

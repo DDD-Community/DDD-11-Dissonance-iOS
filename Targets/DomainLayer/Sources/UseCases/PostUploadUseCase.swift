@@ -8,18 +8,13 @@
 
 import RxSwift
 
-public enum PostUploadResult: Error, Equatable {
-  case success
-  case error(message: String?)
-}
-
 public protocol PostUploadUseCaseType {
   
   // MARK: - Properties
   var postRepository: PostRepositoryType { get }
   
   // MARK: - Methods
-  func execute(with post: Post) -> Observable<PostUploadResult>
+  func execute(with post: Post) -> Observable<MozipNetworkResult>
 }
 
 final class PostUploadUseCase: PostUploadUseCaseType {
@@ -34,15 +29,12 @@ final class PostUploadUseCase: PostUploadUseCaseType {
   }
   
   // MARK: - Methods
-  func execute(with post: Post) -> Observable<PostUploadResult> {
+  func execute(with post: Post) -> Observable<MozipNetworkResult> {
     return postRepository.upload(post)
       .asObservable()
-      .map { (isSuccess, message) -> PostUploadResult in
-        if isSuccess {
-          return .success
-        }
-        
-        return .error(message: message)
+      .map { (isSuccess, message) -> MozipNetworkResult in
+        isSuccess ? .success : .error(message: message)
       }
+      .catchAndReturnNetworkError()
   }
 }
