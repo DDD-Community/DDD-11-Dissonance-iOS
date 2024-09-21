@@ -41,7 +41,7 @@ final class PostUploadUseCaseTests: XCTestCase {
     let expectation: XCTestExpectation = .init(description: "게시글 업로드 성공")
     
     // When
-    mockPostRepository.setupUploadResult(isSuccess: true, message: nil)
+    mockPostRepository.uploadResultSingle = .just((isSuccess: true, message: nil))
     
     postUploadUseCase.execute(with: post)
       .bind { uploadResult in
@@ -63,7 +63,7 @@ final class PostUploadUseCaseTests: XCTestCase {
     let expectation: XCTestExpectation = .init(description: "게시글 업로드 실패")
     
     // When
-    mockPostRepository.setupUploadResult(isSuccess: false, message: errorMessage)
+    mockPostRepository.uploadResultSingle = .just((isSuccess: false, message: errorMessage))
     
     postUploadUseCase.execute(with: post)
       .bind { uploadResult in
