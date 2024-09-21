@@ -12,14 +12,9 @@ import RxSwift
 final class MockPostRepository: PostRepositoryType {
   
   // MARK: - Properties
-  private var uploadResult: Single<(isSuccess: Bool, message: String?)>!
-  
-  // MARK: - Methods
-  func setupUploadResult(isSuccess: Bool, message: String?) {
-    uploadResult = .just((isSuccess: isSuccess, message: message))
-  }
+  var uploadResultSingle: Single<(isSuccess: Bool, message: String?)>!
   
   func upload(_ post: Post) -> Single<(isSuccess: Bool, message: String?)> {
-    return uploadResult
+    return uploadResultSingle
   }
 }

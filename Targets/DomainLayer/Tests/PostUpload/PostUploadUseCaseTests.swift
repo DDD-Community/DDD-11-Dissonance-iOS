@@ -76,4 +76,27 @@ final class PostUploadUseCaseTests: XCTestCase {
     wait(for: [expectation], timeout: 1.0)
     XCTAssertEqual(result, .error(message: errorMessage))
   }
+  
+  func test_게시글_업로드_네트워크_오류_발생() {
+    // Given
+    let post: Post = .init()
+    let errorMessage = "네트워크 오류가 발생했습니다."
+    var result: MozipNetworkResult?
+    let expectation: XCTestExpectation = .init(description: "네트워크 오류로 인해 게시글 업로드 실패")
+    
+    // When
+    mockPostRepository.uploadResultSingle = .error(MozipNetworkResult.error(message: errorMessage))
+    
+    postUploadUseCase.execute(with: post)
+    //
+      .bind { uploadResult in
+        result = uploadResult
+        expectation.fulfill()
+      }
+      .disposed(by: disposeBag)
+    
+    // Then
+    wait(for: [expectation], timeout: 1.0)
+    XCTAssertEqual(result, .error(message: errorMessage))
+  }
 }
