@@ -16,15 +16,15 @@ import RxCocoa
 
 final class PostListViewController: BaseViewController<PostListReactor>, Coordinatable {
   
-  enum PostKind: String {
-    case 동아리 = "동아리"
+  enum PostKind: String, CaseIterable {
     case 공모전 = "공모전"
     case 해커톤 = "해커톤"
+    case 동아리 = "동아리"
   }
   
   // MARK: - Properties
   weak var coordinator: PostListCoordinator?
-  private let postkind: BehaviorRelay<PostKind> = .init(value: .공모전)
+  private let postkind: PostKind
   
   // MARK: - UI
   private let scrollView = UIScrollView()
@@ -46,9 +46,10 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   
   // MARK: - Initializer
   init(reactor: PostListReactor, code: String) {
+    self.postkind = PostKind.init(rawValue: code) ?? .공모전
+    
     super.init()
     self.reactor = reactor
-    self.postkind.accept(PostKind.init(rawValue: code) ?? .공모전)
     setupViewHierarchy()
   }
   
@@ -76,7 +77,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   // MARK: - Methods
   private func setupViewHierarchy() {
     view.addSubview(navigationBar)
-    if postkind.value == .공모전 {
+    if postkind == .공모전 {
       view.addSubview(jobCategoryView)
     }
     view.addSubview(postListSkeleton)
@@ -91,7 +92,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   
   private func setupViewLayout() {
     navigationBar.pin.top().left().right().sizeToFit(.content)
-    if postkind.value == .공모전 {
+    if postkind == .공모전 {
       jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit()
       postListSkeleton.pin.top(to: jobCategoryView.edge.bottom).left().right().bottom()
       scrollView.pin.left().right().bottom().top(to: jobCategoryView.edge.bottom)
@@ -115,6 +116,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   
   private func setupInitialState() {
     scrollView.alpha = 0
+    navigationBar.setNavigationTitle(postkind.rawValue)
   }
 }
 
@@ -128,7 +130,11 @@ private extension PostListViewController {
   // MARK: Methods
   func bindAction(reactor: PostListReactor) {
     rx.viewDidLoad
-      .map { Action.fetchPosts(id: 0) }
+      .withUnretained(self)
+      .map { owner, _ in
+        let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
+        return Action.fetchPosts(id: id)
+      }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -175,35 +181,27 @@ private extension PostListViewController {
   }
   
   private func bind() {
-    jobCategoryView.selectionRelay
-      .distinctUntilChanged()
-      .withUnretained(self)
-      .filter { owner, _ in owner.postkind.value == .공모전 }
-      .bind { ( _, value) in
-        // TODO: 데이터 필터링 로직 수행
-        print("\(value.rawValue) 탭")
+    if postkind == .공모전 {
+      Observable.combineLatest(
+        postOrderControlView.orderRelay,
+        jobCategoryView.selectionRelay
+      )
+      .distinctUntilChanged { previous, current in
+        let (previousOrder, previousCategory) = previous
+        let (currentOrder, currentCategory) = current
+        return previousOrder == currentOrder && previousCategory == currentCategory
+      }
+      .bind(with: self) { owner, args in
+        let (order, category) = args
+        print("category: \(category), order: \(order)")
       }
       .disposed(by: disposeBag)
-    
-    postOrderControlView.latestButtonTapObservable
-      .bind(with: self) { owner, _ in
-        // TODO: 최신순 정렬
-        print("최신순")
-      }
-      .disposed(by: disposeBag)
-    
-    postOrderControlView.deadlineButtonTapObservable
-      .bind(with: self) { owner, _ in
-        // TODO: 마감순 정렬
-        print("마감순")
-      }
-      .disposed(by: disposeBag)
-    
-    postkind
-      .bind(with: self) { owner, postKind in
-        owner.navigationBar.setNavigationTitle(postKind.rawValue)
-        owner.jobCategoryView.isHidden = !(postKind == .공모전)
-      }
-      .disposed(by: disposeBag)
+    } else {
+      postOrderControlView.orderRelay
+        .bind(with: self) { owner, order in
+          print("order: \(order)")
+        }
+        .disposed(by: disposeBag)
+    }
   }
 }

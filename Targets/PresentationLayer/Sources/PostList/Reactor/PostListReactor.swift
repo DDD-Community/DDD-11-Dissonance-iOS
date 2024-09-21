@@ -15,13 +15,14 @@ import ReactorKit
 final class PostListReactor: Reactor {
 
   // MARK: - Properties
-  // FIXME: 추후 UseCase 주입
-  //  private let fetchPostUseCase: FetchPostUseCaseType
+  private let fetchPostListUseCase: FetchPostListUseCaseType
   var initialState: State = .init()
 
   // MARK: - Initializer
-  init() {
-  //    self.fetchPostUseCase = fetchPostUseCase
+  init(
+    fetchPostListUseCase: FetchPostListUseCaseType
+  ) {
+      self.fetchPostListUseCase = fetchPostListUseCase
   }
 
   enum Action {
@@ -45,7 +46,7 @@ final class PostListReactor: Reactor {
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
     case let .fetchPosts(id):
-      return fakeFetchPostUseCase(with: id).map { .setPosts(data: $0) }
+      return fetchPostListUseCase.execute(categoryId: id).map { .setPosts(data: $0) }
     case let .tapCell(indexPath):
       return fetchCellData(at: indexPath).map { .setSelectedCell(data: $0) }
     }
@@ -61,14 +62,6 @@ final class PostListReactor: Reactor {
       newState.selectedCell = data
     }
     return newState
-  }
-  
-  // MARK: -  TEST 용 MockAPI
-  private func fakeFetchPostUseCase(with id: Int) -> Observable<[PostCellData]> {
-    let data: [PostCellData] = [
-      .stub(id: "0", remainTag: "마감"), .stub(id: "1", remainTag: "D-831"), .stub(), .stub(), .stub(), .stub(), .stub(), .stub()
-    ]
-    return Observable.just(data).delay(.seconds(1), scheduler: MainScheduler.instance)
   }
   
   private func fetchCellData(at indexPath: IndexPath) -> Observable<PostCellData> {

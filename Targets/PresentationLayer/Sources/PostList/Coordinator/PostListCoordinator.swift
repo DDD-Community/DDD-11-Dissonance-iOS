@@ -12,7 +12,7 @@ import UIKit
 
 protocol PostListCoordinatorType: CoordinatorType {
   func start(with code: String)
-  func pushPostDetail(id: String)
+  func pushPostDetail(id: Int)
 }
 
 final class PostListCoordinator: PostListCoordinatorType {
@@ -42,7 +42,7 @@ final class PostListCoordinator: PostListCoordinatorType {
     parentCoordinator?.removeChild(self)
   }
   
-  func pushPostDetail(id: String) {
+  func pushPostDetail(id: Int) {
     // TODO: 공고 상세페이지로 이동
     print("TODO: 공고(\(id)) 상세페이지로 이동")
   }
@@ -51,7 +51,10 @@ final class PostListCoordinator: PostListCoordinatorType {
 // MARK: - Private
 private extension PostListCoordinator {
   func postListViewController(with code: String) -> PostListViewController {
-    let reactor = PostListReactor()
+    guard let fetchPostListUseCase = DIContainer.shared.resolve(type: FetchPostListUseCaseType.self) else {
+      fatalError()
+    }
+    let reactor = PostListReactor(fetchPostListUseCase: fetchPostListUseCase)
     let viewController = PostListViewController(reactor: reactor, code: code)
     viewController.coordinator = self
     return viewController
