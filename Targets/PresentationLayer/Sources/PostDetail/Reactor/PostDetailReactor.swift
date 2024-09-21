@@ -13,35 +13,38 @@ import ReactorKit
 final class PostDetailReactor: Reactor {
   
   // MARK: - Properties
-  // TODO: 추후 구현
-  //  private let useCase: useCaseType
+  private let postDetailUseCase: PostDetailUseCaseType
   var initialState: State = .init()
   
   enum Action {
-    case fetchData
+    case fetchPost(id: Int)
     case didTapReportButton
   }
   
   enum Mutation {
     case setPost(Post)
+    case setLoading(Bool)
     case setReportState(Bool)
+    case setFetchError(Bool)
   }
   
   struct State {
     var post: Post = .init()
+    var isLoading: Bool = false
     var isSuccessReport: Bool = false
+    var isFetchError: Bool = false
   }
   
   // MARK: - Initializer
-  // TODO: 추후 구현
-  init() { }
+  init(postDetailUseCase: PostDetailUseCaseType) {
+    self.postDetailUseCase = postDetailUseCase
+  }
   
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
     // TODO: 추후 구현
     switch action {
-    case .fetchData: return .empty()
-//    case .fetchData:          return .just(.setPost(.stub()))
+    case .fetchPost(let id): return .concat([.just(.setLoading(true)), fetchPost(id: id), .just(.setLoading(false))])
     case .didTapReportButton: return .concat([.just(.setReportState(true)), .just(.setReportState(false))])
     }
   }
@@ -50,12 +53,25 @@ final class PostDetailReactor: Reactor {
     var newState = state
     
     switch mutation {
-    case .setPost(let post):
-      newState.post = post
-    case .setReportState(let result):
-      newState.isSuccessReport = result
+    case .setPost(let post):          newState.post = post
+    case .setLoading(let isLoading):  newState.isLoading = isLoading
+    case .setReportState(let result): newState.isSuccessReport = result
+    case .setFetchError(let isError): newState.isFetchError = isError
     }
     
     return newState
+  }
+}
+
+// MARK: - Private Extenion
+private extension PostDetailReactor {
+  func fetchPost(id: Int) -> Observable<Mutation> {
+    postDetailUseCase.fetchPost(id: id)
+      .flatMap { networkResult -> Observable<Mutation> in
+        switch networkResult {
+        case .success(let post): return .just(.setPost(post))
+        case .error: return .just(.setFetchError(true))
+        }
+      }
   }
 }
