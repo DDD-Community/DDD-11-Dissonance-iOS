@@ -14,10 +14,11 @@ final class PostDetailReactor: Reactor {
   
   // MARK: - Properties
   private let postDetailUseCase: PostDetailUseCaseType
+  private let postID: Int
   var initialState: State = .init()
   
   enum Action {
-    case fetchPost(id: Int)
+    case fetchPost
     case didTapReportButton
   }
   
@@ -36,7 +37,8 @@ final class PostDetailReactor: Reactor {
   }
   
   // MARK: - Initializer
-  init(postDetailUseCase: PostDetailUseCaseType) {
+  init(postID: Int, postDetailUseCase: PostDetailUseCaseType) {
+    self.postID = postID
     self.postDetailUseCase = postDetailUseCase
   }
   
@@ -44,7 +46,7 @@ final class PostDetailReactor: Reactor {
   func mutate(action: Action) -> Observable<Mutation> {
     // TODO: 추후 구현
     switch action {
-    case .fetchPost(let id): return .concat([.just(.setLoading(true)), fetchPost(id: id), .just(.setLoading(false))])
+    case .fetchPost: return .concat([.just(.setLoading(true)), fetchPost(id: postID), .just(.setLoading(false))])
     case .didTapReportButton: return .concat([.just(.setReportState(true)), .just(.setReportState(false))])
     }
   }
