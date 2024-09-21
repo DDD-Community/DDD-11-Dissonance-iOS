@@ -20,6 +20,7 @@ public protocol PostDetailUseCaseType {
   
   // MARK: - Methods
   func fetchPost(id: Int) -> Observable<PostDetailNetworkResult>
+  func report(id: Int) -> Observable<MozipNetworkResult>
 }
 
 final class PostDetailUseCase: PostDetailUseCaseType {
@@ -40,5 +41,14 @@ final class PostDetailUseCase: PostDetailUseCaseType {
         isSuccess ? .success(post: post) : .error
       }
       .catchAndReturn(.error)
+  }
+  
+  func report(id: Int) -> Observable<MozipNetworkResult> {
+    return postRepository.report(id: id)
+      .asObservable()
+      .map { (isSuccess, message) -> MozipNetworkResult in
+        isSuccess ? .success : .error(message: message)
+      }
+      .catchAndReturnNetworkError()
   }
 }
