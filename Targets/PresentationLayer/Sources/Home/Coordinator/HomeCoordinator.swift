@@ -13,7 +13,7 @@ import UIKit
 protocol HomeCoordinatorType: CoordinatorType {
   func pushPostList(code: String)
   func pushMyPage()
-  func pushPostDetail(id: String)
+  func pushPostDetail(id: Int)
   func pushPostRegister()
 }
 
@@ -51,7 +51,7 @@ final class HomeCoordinator: HomeCoordinatorType {
     print("TODO: 마이페이지로 이동")
   }
   
-  func pushPostDetail(id: String) {
+  func pushPostDetail(id: Int) {
     // TODO: 공고 상세페이지로 이동
     print("TODO: 공고(\(id)) 상세페이지로 이동")
   }
@@ -65,7 +65,14 @@ final class HomeCoordinator: HomeCoordinatorType {
 // MARK: - Private
 private extension HomeCoordinator {
   func homeViewController() -> HomeViewController {
-    let reactor = HomeReactor()
+    guard let fetchPostListUseCase = DIContainer.shared.resolve(type: FetchPostListUseCaseType.self),
+          let fetchBannerUseCase = DIContainer.shared.resolve(type: FetchBannerUseCaseType.self) else {
+      fatalError()
+    }
+    let reactor = HomeReactor(
+      fetchPostListUseCase: fetchPostListUseCase,
+      fetchBannerUseCase: fetchBannerUseCase
+    )
     let viewController = HomeViewController(reactor: reactor)
     viewController.coordinator = self
     return viewController

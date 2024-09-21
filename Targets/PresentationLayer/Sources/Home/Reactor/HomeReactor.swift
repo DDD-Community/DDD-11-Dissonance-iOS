@@ -16,15 +16,17 @@ final class HomeReactor: Reactor {
 
   // MARK: - Properties
   // TODO: 추후 UseCase 주입
-//  private let fetchPostUseCase: FetchPostUseCaseType
-//  private let fetchBannerUseCase: FetchBanerUseCaseType
+  private let fetchPostListUseCase: FetchPostListUseCaseType
+  private let fetchBannerUseCase: FetchBannerUseCaseType
   var initialState: State = .init()
 
   // MARK: - Initializer
-  init() {
-    // TODO: 추후 UseCase 주입
-//    self.fetchPostUseCase = fetchPostUseCase
-//    self.fetchBannerUseCase = fetchBannerUseCase
+  init(
+    fetchPostListUseCase: FetchPostListUseCaseType,
+    fetchBannerUseCase: FetchBannerUseCaseType
+  ) {
+    self.fetchPostListUseCase = fetchPostListUseCase
+    self.fetchBannerUseCase = fetchBannerUseCase
   }
 
   enum Action {
@@ -53,9 +55,29 @@ final class HomeReactor: Reactor {
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
     case .fetchPosts:
-      return fakeFetchPostUseCase().map { .setPosts(data: $0) }
+      return Observable.zip(
+        fetchPostListUseCase.execute(categoryId: 1),
+        fetchPostListUseCase.execute(categoryId: 2),
+        fetchPostListUseCase.execute(categoryId: 3)
+      )
+      .do(onError: { error in
+        print(error.localizedDescription)
+        // FIXME: 에러 종류 확인 후 필요하면 VC 까지 넘겨주도록 구현
+      })
+      .map { (firstGroup, secondGroup, thirdGroup) in
+          .setPosts(data: [
+            firstGroup.toPostSection(header: "공모전"),
+            secondGroup.toPostSection(header: "해커톤"),
+            thirdGroup.toPostSection(header: "동아리")
+          ])
+      }
     case .fetchBanners:
-      return fakeFetchBannerUseCase().map { .setBanners(data: $0) }
+      return fetchBannerUseCase.execute()
+        .do(onError: { error in
+          print(error.localizedDescription)
+          // FIXME: 에러 종류 확인 후 필요하면 VC 까지 넘겨주도록 구현
+        })
+        .map { .setBanners(data: $0) }
     case .tapCell(let indexPath):
       return fetchCellData(from: indexPath).map { .setSelectedCell(data: $0) }
     }
@@ -76,27 +98,6 @@ final class HomeReactor: Reactor {
       newState.selectedCell = data
     }
     return newState
-  }
-  
-  // MARK: -  TEST 용 MockAPI
-  private func fakeFetchPostUseCase() -> Observable<[PostSection]> {
-    let data: [PostSection] = [
-      .stub(header: "동아리", items: [.stub(id: "마감id" ,remainTag: "마감"), .stub(), .stub(), .stub()]),
-      .stub(header: "공모전"),
-      .stub(header: "해커톤")
-    ]
-    return Observable.just(data).delay(.seconds(2), scheduler: MainScheduler.instance)
-  }
-  
-  private func fakeFetchBannerUseCase() -> Observable<[BannerCellData]> {
-    let data: [BannerCellData] = [
-      .stub(featuredPostId: 0),
-      .stub(featuredPostId: 1),
-      .stub(featuredPostId: 2),
-      .stub(featuredPostId: 3),
-      .stub(featuredPostId: 4),
-    ]
-    return Observable.just(data).delay(.seconds(2), scheduler: MainScheduler.instance)
   }
   
   private func fetchCellData(from indexPath: IndexPath) -> Observable<PostCellData> {
