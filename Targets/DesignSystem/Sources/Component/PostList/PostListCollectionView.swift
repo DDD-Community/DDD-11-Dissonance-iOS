@@ -52,10 +52,13 @@ public final class PostListCollectionView: UIView {
   // MARK: - Overrides
   public override func sizeThatFits(_ size: CGSize) -> CGSize {
     let cellSpacing: CGFloat = Metric.minimumLineSpacing
-    let count: CGFloat = CGFloat(dataRelay.value.count) / 2
+    let count = dataRelay.value.count
+    let offset = CGFloat(count % 2)
+    let rowCount: CGFloat = (CGFloat(dataRelay.value.count) / 2) + offset
+    
     return CGSize(
       width: Device.width,
-      height: Metric.cellHeight*count + cellSpacing*(count-1)
+      height: Metric.cellHeight*rowCount + cellSpacing*(rowCount-1)
     )
   }
   
