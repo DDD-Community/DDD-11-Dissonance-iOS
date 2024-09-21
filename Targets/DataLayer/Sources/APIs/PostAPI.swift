@@ -14,6 +14,8 @@ import Moya
 
 enum PostAPI {
   case upload(_ post: Post)
+  case fetchPostList(categoryId: Int)
+  case fetchBanner
 }
 
 // MARK: - TargetType
@@ -28,11 +30,20 @@ extension PostAPI: TargetType {
     switch self {
     case .upload:
       return basePath
+    case let .fetchPostList(categoryId):
+      return basePath + "/categories/\(categoryId)/posts"
+    case .fetchBanner:
+      return "/featured-posts"
     }
   }
   
   var method: Moya.Method {
-    return .post
+    switch self {
+    case .upload:
+      return .post
+    case .fetchPostList, .fetchBanner:
+      return .get
+    }
   }
   
   public var sampleData: Data {
@@ -41,7 +52,7 @@ extension PostAPI: TargetType {
   
   public var headers: [String : String]? {
     var headers: [String : String] = [
-      "Authorization": "Bearer \(AppProperties.accessToken)"
+      "Authorization": AppProperties.accessToken
     ]
     
     if case .upload = self {
@@ -71,7 +82,16 @@ extension PostAPI: TargetType {
   }
   
   private var parameters: [String: Any]? {
-    return nil
+    switch self {
+    case .fetchPostList: // TODO: 추후 페이징 처리
+      return [
+        "page": 0,
+        "size": 10,
+        "sort": "latest"
+      ]
+    default:
+      return nil
+    }
   }
 }
 
