@@ -47,6 +47,7 @@ public final class PostCell: UICollectionViewCell {
     super.prepareForReuse()
     thumbnailImage.image = nil
     titleLabel.text = nil
+    // FIXME: remainDayTag 초기화 수행
   }
   
   public override func layoutSubviews() {

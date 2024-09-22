@@ -143,19 +143,54 @@ private extension PostListViewController {
       .map { Action.tapCell(indexPath: $0) }
       .emit(to: reactor.action)
       .disposed(by: disposeBag)
+    
+    if postkind == .공모전 {
+      Observable.combineLatest(
+        postOrderControlView.orderRelay,
+        jobCategoryView.selectionRelay
+      )
+      .distinctUntilChanged { previous, current in
+        let (previousOrder, previousCategory) = previous
+        let (currentOrder, currentCategory) = current
+        return previousOrder == currentOrder && previousCategory == currentCategory
+      }
+      .withUnretained(self)
+      .map { owner, args in
+        let (order, category) = args
+        let id = category.id
+        return Action.fetchPosts(id: id, order: order)
+      }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    } else {
+      postOrderControlView.orderRelay
+        .withUnretained(self)
+        .map { owner, order in
+          let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
+          return Action.fetchPosts(id: id, order: order)
+        }
+        .bind(to: reactor.action)
+        .disposed(by: disposeBag)
+    }
   }
   
   func bindState(reactor: PostListReactor) {
     reactor.state
-      .map { $0.isSuccessPostFetch }
+      .map { $0.isLoading }
       .distinctUntilChanged()
-      .filter { $0 }
       .asSignal(onErrorJustReturn: true)
-      .emit(with: self, onNext: { owner, _ in
-        UIView.animate(withDuration: 0.5) {
-          owner.scrollView.alpha = 1
+      .emit(with: self, onNext: { owner, isLoading in
+        if isLoading {
+          // 로딩뷰
+          UIView.animate(withDuration: 0.5) {
+            owner.scrollView.alpha = 0
+          }
+        } else {
+          UIView.animate(withDuration: 0.5) {
+            owner.scrollView.alpha = 1
+          }
+          owner.postListSkeleton.hide()
         }
-        owner.postListSkeleton.hide()
       })
       .disposed(by: disposeBag)
     
@@ -167,6 +202,7 @@ private extension PostListViewController {
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
         owner.collectionView.pin.sizeToFit()
+        owner.scrollView.contentSize.height = owner.collectionView.sizeThatFits(.zero).height + owner.postOrderControlView.frame.height
         owner.postOrderControlView.setCount(posts.count)
       }
       .disposed(by: disposeBag)
@@ -181,27 +217,6 @@ private extension PostListViewController {
   }
   
   private func bind() {
-    if postkind == .공모전 {
-      Observable.combineLatest(
-        postOrderControlView.orderRelay,
-        jobCategoryView.selectionRelay
-      )
-      .distinctUntilChanged { previous, current in
-        let (previousOrder, previousCategory) = previous
-        let (currentOrder, currentCategory) = current
-        return previousOrder == currentOrder && previousCategory == currentCategory
-      }
-      .bind(with: self) { owner, args in
-        let (order, category) = args
-        print("category: \(category), order: \(order)")
-      }
-      .disposed(by: disposeBag)
-    } else {
-      postOrderControlView.orderRelay
-        .bind(with: self) { owner, order in
-          print("order: \(order)")
-        }
-        .disposed(by: disposeBag)
-    }
+    
   }
 }
