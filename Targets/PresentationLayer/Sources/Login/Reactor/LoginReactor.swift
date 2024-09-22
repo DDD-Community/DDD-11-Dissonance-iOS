@@ -16,7 +16,6 @@ final class LoginReactor: Reactor {
   // MARK: - Properties
   private let loginUseCase: LoginUseCaseType
   var initialState: State = .init()
-  var isFirstLogin: Bool = AuthManager.load(authInfoType: .isFirstLogin) == nil
 
   // MARK: - Initializer
   init(loginUseCase: LoginUseCaseType) {
