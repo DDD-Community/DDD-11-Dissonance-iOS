@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import UIKit
 
 import PinLayout
@@ -13,10 +14,6 @@ import PinLayout
 public final class MyPageTableViewCell: UITableViewCell {
   
   // MARK: - Properties
-  public enum SocialType {
-    case kakao, apple
-  }
-  
   private let titleLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray500)
   private let versionLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray300)
   
@@ -58,9 +55,9 @@ public final class MyPageTableViewCell: UITableViewCell {
     titleLabel.updateTextKeepingAttributes(title)
   }
   
-  public func configure(socialType: SocialType) {
+  public func configure() {
     titleLabel.updateTextKeepingAttributes("연결된 계정")
-    socialTypeImageView.image = socialType == .kakao ? DesignSystemAsset.kakaoAccountIcon.image : DesignSystemAsset.appleAccountIcon.image
+    socialTypeImageView.image = AppProperties.provider == "KAKAO" ? DesignSystemAsset.kakaoAccountIcon.image : DesignSystemAsset.appleAccountIcon.image
     socialTypeImageView.isHidden = false
   }
   

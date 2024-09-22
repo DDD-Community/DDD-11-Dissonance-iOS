@@ -68,8 +68,7 @@ final class MyPageViewController: BaseViewController<MyPageReactor>, Coordinatab
       
       switch indexPath.section {
       case 0:
-        // TODO: 연결된 소셜 로그인 타입을 서버에서 받아 파라미터로 넘길 예정
-        cell.configure(socialType: .apple)
+        cell.configure()
         return cell
         
       default:
