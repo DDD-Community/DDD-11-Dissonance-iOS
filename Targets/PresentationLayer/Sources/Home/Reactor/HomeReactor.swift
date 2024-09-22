@@ -56,9 +56,9 @@ final class HomeReactor: Reactor {
     switch action {
     case .fetchPosts:
       return Observable.zip(
-        fetchPostListUseCase.execute(categoryId: 1),
-        fetchPostListUseCase.execute(categoryId: 2),
-        fetchPostListUseCase.execute(categoryId: 3)
+        fetchPostListUseCase.execute(categoryId: 1, pageable: .defaultValue),
+        fetchPostListUseCase.execute(categoryId: 2, pageable: .defaultValue),
+        fetchPostListUseCase.execute(categoryId: 3, pageable: .defaultValue)
       )
       .do(onError: { error in
         print(error.localizedDescription)

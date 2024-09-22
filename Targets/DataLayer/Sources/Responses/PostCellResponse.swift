@@ -32,6 +32,7 @@ public extension Array<PostCellResponse> {
 
 public struct PostCellListResponse: Decodable {
   let content: [PostCellResponse]
+  let last: Bool // FIXME: 마지막 페이지인지 여부, 추후 페이징처리에 활용
   
   func toDomain() -> [PostCellData] {
     content.map { $0.toDomain() }

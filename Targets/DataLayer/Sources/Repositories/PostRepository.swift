@@ -29,8 +29,13 @@ public final class PostRepository: PostRepositoryType {
       .map { (isSuccess: $0.isSuccess, message: $0.message) }
   }
 
-  public func fetchPostList(categoryId: Int) -> Single<[PostCellData]> {
-    provider.rx.request(.fetchPostList(categoryId: categoryId))
+  public func fetchPostList(categoryId: Int, pageable: Pageable) -> Single<[PostCellData]> {
+    let postListFetchRequestDTO = PostListFetchRequestDTO(
+      categoryID: categoryId,
+      pageable: pageable
+    )
+    
+    return provider.rx.request(.fetchPostList(postListFetchRequestDTO))
       .map(APIResponse<PostCellListResponse>.self)
       .map {
         guard let data = $0.data else { return [] }

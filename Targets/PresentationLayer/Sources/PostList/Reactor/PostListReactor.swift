@@ -31,12 +31,13 @@ final class PostListReactor: Reactor {
   }
 
   enum Mutation {
+    case setLoading
     case setPosts(data: [PostCellData])
     case setSelectedCell(data: PostCellData)
   }
 
   struct State {
-    var isSuccessPostFetch: Bool = false
+    var isLoading: Bool = false
     var selectedCell: PostCellData?
     
     var posts: [PostCellData] = []
@@ -45,8 +46,15 @@ final class PostListReactor: Reactor {
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
-    case let .fetchPosts(id):
-      return fetchPostListUseCase.execute(categoryId: id).map { .setPosts(data: $0) }
+    case let .fetchPosts(id, order):
+      return .concat([
+        .just(.setLoading),
+        fetchPostListUseCase.execute(
+          categoryId: id,
+          pageable: .init(page: 0, size: 30, sort: order.rawValue) // FIXME: 추후 페이징처리
+        )
+        .map { .setPosts(data: $0) }
+      ])
     case let .tapCell(indexPath):
       return fetchCellData(at: indexPath).map { .setSelectedCell(data: $0) }
     }
@@ -55,9 +63,11 @@ final class PostListReactor: Reactor {
   func reduce(state: State, mutation: Mutation) -> State {
     var newState = state
     switch mutation {
+    case .setLoading:
+      newState.isLoading = true
     case let .setPosts(data):
       newState.posts = data
-      newState.isSuccessPostFetch = true
+      newState.isLoading = false
     case let .setSelectedCell(data):
       newState.selectedCell = data
     }

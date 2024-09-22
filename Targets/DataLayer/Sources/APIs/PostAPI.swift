@@ -14,7 +14,7 @@ import Moya
 
 enum PostAPI {
   case upload(_ post: Post)
-  case fetchPostList(categoryId: Int)
+  case fetchPostList(PostListFetchRequestDTO)
   case fetchBanner
 }
 
@@ -30,8 +30,8 @@ extension PostAPI: TargetType {
     switch self {
     case .upload:
       return basePath
-    case let .fetchPostList(categoryId):
-      return basePath + "/categories/\(categoryId)/posts"
+    case let .fetchPostList(dto):
+      return basePath + "/categories/\(dto.categoryID)/posts"
     case .fetchBanner:
       return "/featured-posts"
     }
@@ -51,12 +51,11 @@ extension PostAPI: TargetType {
   }
   
   public var headers: [String : String]? {
-    var headers: [String : String] = [
-      "Authorization": AppProperties.accessToken
-    ]
+    var headers: [String : String] = [:]
     
     if case .upload = self {
       headers["Content-Type"] = "multipart/form-data"
+      headers["Authorization"] = AppProperties.accessToken
     }
     
     return headers
@@ -83,12 +82,8 @@ extension PostAPI: TargetType {
   
   private var parameters: [String: Any]? {
     switch self {
-    case .fetchPostList: // TODO: 추후 페이징 처리
-      return [
-        "page": 0,
-        "size": 10,
-        "sort": "latest"
-      ]
+    case let .fetchPostList(dto):
+      return dto.pageable.toDictionary()
     default:
       return nil
     }
