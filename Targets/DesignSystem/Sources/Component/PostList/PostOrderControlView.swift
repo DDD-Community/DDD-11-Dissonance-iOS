@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import DomainLayer
 
 import RxSwift
 import RxCocoa
@@ -20,7 +21,7 @@ public final class PostOrderControlView: UIView {
     static let verticalPadding: CGFloat = 16
   }
   
-  public var orderRelay: BehaviorRelay<Order> = .init(value: .latest)
+  public var orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
   private var disposeBag = DisposeBag()
   
   // MARK: - UI
@@ -80,12 +81,12 @@ public final class PostOrderControlView: UIView {
   
   private func bindButton() {
     latestButton.rx.tap
-      .map { Order.latest }
+      .map { PostOrder.latest }
       .bind(to: orderRelay)
       .disposed(by: disposeBag)
     
     deadlineButton.rx.tap
-      .map { Order.deadline }
+      .map { PostOrder.deadline }
       .bind(to: orderRelay)
       .disposed(by: disposeBag)
     
@@ -97,12 +98,5 @@ public final class PostOrderControlView: UIView {
         owner.deadlineButton.setHighlight(order == .deadline)
       }
       .disposed(by: disposeBag)
-  }
-}
-
-public extension PostOrderControlView {
-  enum Order {
-    case latest
-    case deadline
   }
 }

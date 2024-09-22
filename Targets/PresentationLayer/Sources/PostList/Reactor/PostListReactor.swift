@@ -26,7 +26,7 @@ final class PostListReactor: Reactor {
   }
 
   enum Action {
-    case fetchPosts(id: Int)
+    case fetchPosts(id: Int, order: PostOrder)
     case tapCell(indexPath: IndexPath)
   }
 

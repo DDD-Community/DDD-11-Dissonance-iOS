@@ -133,7 +133,7 @@ private extension PostListViewController {
       .withUnretained(self)
       .map { owner, _ in
         let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
-        return Action.fetchPosts(id: id)
+        return Action.fetchPosts(id: id, order: .latest)
       }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
