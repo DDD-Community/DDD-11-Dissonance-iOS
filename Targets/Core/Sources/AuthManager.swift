@@ -15,7 +15,8 @@ public enum AuthManager {
   public enum AuthInfoType: String {
     case accessToken = "accessToken"
     case refreshToken = "refreshToken"
-    case isFirstLogin = "isFirstLogin"
+    case isAdmin = "isAdmin"
+    case provider = "provider"
   }
 
   // MARK: - Methods
@@ -56,7 +57,7 @@ public enum AuthManager {
   }
 
   public static func deleteTokens() {
-    [AuthInfoType.accessToken, AuthInfoType.refreshToken].forEach {
+    [AuthInfoType.accessToken, AuthInfoType.refreshToken, AuthInfoType.isAdmin, AuthInfoType.provider].forEach {
       let query: NSDictionary = .init(dictionary: [
         kSecClass: kSecClassGenericPassword,
         kSecAttrAccount: $0.rawValue
