@@ -14,4 +14,5 @@ public protocol PostRepositoryType {
   func upload(_ post: Post) -> Single<(isSuccess: Bool, message: String?)>
   func fetchPostList(categoryId: Int, pageable: Pageable) -> Single<[PostCellData]>
   func fetchBanner() -> Single<[BannerCellData]>
+  func fetchPost(id: Int) -> Single<(isSuccess: Bool, post: Post)>
 }

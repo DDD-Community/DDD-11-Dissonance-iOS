@@ -51,4 +51,10 @@ public final class PostRepository: PostRepositoryType {
         return data.toDomain()
       }
   }
+  
+  public func fetchPost(id: Int) -> Single<(isSuccess: Bool, post: Post)> {
+    return provider.rx.request(.fetchPost(id: id))
+      .map(APIResponse<PostDetailResponse>.self)
+      .map { (isSuccess: $0.isSuccess, post: ($0.data?.toPost() ?? .init())) }
+  }
 }
