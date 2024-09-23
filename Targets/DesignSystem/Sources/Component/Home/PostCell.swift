@@ -11,6 +11,7 @@ import DomainLayer
 
 import PinLayout
 import FlexLayout
+import Kingfisher
 
 public final class PostCell: UICollectionViewCell {
   
@@ -46,6 +47,7 @@ public final class PostCell: UICollectionViewCell {
     super.prepareForReuse()
     thumbnailImage.image = nil
     titleLabel.text = nil
+    // FIXME: remainDayTag 초기화 수행
   }
   
   public override func layoutSubviews() {
@@ -61,7 +63,10 @@ public final class PostCell: UICollectionViewCell {
   
   // MARK: - Methods
   public func setData(_ data: PostCellData) {
-    thumbnailImage.image = UIImage.image(with: MozipColor.gray300)/*data.imageURL*/ // FIXME: 이미지 처리방법 논의 필요.
+    thumbnailImage.kf.setImage(
+      with: URL(string: data.imageURL),
+      placeholder: UIImage.image(with: MozipColor.gray300)
+    )
     thumbnailImage.flex.markDirty()
     
     titleLabel.updateTextKeepingAttributes(data.title)
@@ -79,7 +84,7 @@ public final class PostCell: UICollectionViewCell {
       .alignItems(.start)
       .gap(Metric.verticalSpacing)
       .define { flex in
-        flex.addItem(thumbnailImage).aspectRatio(1).grow(1)
+        flex.addItem(thumbnailImage).width(100%).aspectRatio(1)
         flex.addItem(titleLabel)
         flex.addItem(remainDayTag)
       }

@@ -22,5 +22,13 @@ public struct DomainAssembly: DependencyAssemblable {
     container.register(type: PostUploadUseCaseType.self) { container in
       return PostUploadUseCase(postRepository: container.resolve(type: PostRepositoryType.self)!)
     }
+    
+    container.register(type: FetchPostListUseCaseType.self) { container in
+      return FetchPostListUseCase(postRepository: container.resolve(type: PostRepositoryType.self)!)
+    }
+    
+    container.register(type: FetchBannerUseCaseType.self) { container in
+      return FetchBannerUseCase(postRepository: container.resolve(type: PostRepositoryType.self)!)
+    }
   }
 }

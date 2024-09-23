@@ -16,15 +16,15 @@ import RxCocoa
 
 final class PostListViewController: BaseViewController<PostListReactor>, Coordinatable {
   
-  enum PostKind: String {
-    case 동아리 = "동아리"
+  enum PostKind: String, CaseIterable {
     case 공모전 = "공모전"
     case 해커톤 = "해커톤"
+    case 동아리 = "동아리"
   }
   
   // MARK: - Properties
   weak var coordinator: PostListCoordinator?
-  private let postkind: BehaviorRelay<PostKind> = .init(value: .공모전)
+  private let postkind: PostKind
   
   // MARK: - UI
   private let scrollView = UIScrollView()
@@ -46,9 +46,10 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   
   // MARK: - Initializer
   init(reactor: PostListReactor, code: String) {
+    self.postkind = PostKind.init(rawValue: code) ?? .공모전
+    
     super.init()
     self.reactor = reactor
-    self.postkind.accept(PostKind.init(rawValue: code) ?? .공모전)
     setupViewHierarchy()
   }
   
@@ -76,7 +77,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   // MARK: - Methods
   private func setupViewHierarchy() {
     view.addSubview(navigationBar)
-    if postkind.value == .공모전 {
+    if postkind == .공모전 {
       view.addSubview(jobCategoryView)
     }
     view.addSubview(postListSkeleton)
@@ -91,7 +92,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   
   private func setupViewLayout() {
     navigationBar.pin.top().left().right().sizeToFit(.content)
-    if postkind.value == .공모전 {
+    if postkind == .공모전 {
       jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit()
       postListSkeleton.pin.top(to: jobCategoryView.edge.bottom).left().right().bottom()
       scrollView.pin.left().right().bottom().top(to: jobCategoryView.edge.bottom)
@@ -115,6 +116,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   
   private func setupInitialState() {
     scrollView.alpha = 0
+    navigationBar.setNavigationTitle(postkind.rawValue)
   }
 }
 
@@ -128,7 +130,11 @@ private extension PostListViewController {
   // MARK: Methods
   func bindAction(reactor: PostListReactor) {
     rx.viewDidLoad
-      .map { Action.fetchPosts(id: 0) }
+      .withUnretained(self)
+      .map { owner, _ in
+        let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
+        return Action.fetchPosts(id: id, order: .latest)
+      }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -137,19 +143,54 @@ private extension PostListViewController {
       .map { Action.tapCell(indexPath: $0) }
       .emit(to: reactor.action)
       .disposed(by: disposeBag)
+    
+    if postkind == .공모전 {
+      Observable.combineLatest(
+        postOrderControlView.orderRelay,
+        jobCategoryView.selectionRelay
+      )
+      .distinctUntilChanged { previous, current in
+        let (previousOrder, previousCategory) = previous
+        let (currentOrder, currentCategory) = current
+        return previousOrder == currentOrder && previousCategory == currentCategory
+      }
+      .withUnretained(self)
+      .map { owner, args in
+        let (order, category) = args
+        let id = category.id
+        return Action.fetchPosts(id: id, order: order)
+      }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    } else {
+      postOrderControlView.orderRelay
+        .withUnretained(self)
+        .map { owner, order in
+          let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
+          return Action.fetchPosts(id: id, order: order)
+        }
+        .bind(to: reactor.action)
+        .disposed(by: disposeBag)
+    }
   }
   
   func bindState(reactor: PostListReactor) {
     reactor.state
-      .map { $0.isSuccessPostFetch }
+      .map { $0.isLoading }
       .distinctUntilChanged()
-      .filter { $0 }
       .asSignal(onErrorJustReturn: true)
-      .emit(with: self, onNext: { owner, _ in
-        UIView.animate(withDuration: 0.5) {
-          owner.scrollView.alpha = 1
+      .emit(with: self, onNext: { owner, isLoading in
+        if isLoading {
+          // 로딩뷰
+          UIView.animate(withDuration: 0.5) {
+            owner.scrollView.alpha = 0
+          }
+        } else {
+          UIView.animate(withDuration: 0.5) {
+            owner.scrollView.alpha = 1
+          }
+          owner.postListSkeleton.hide()
         }
-        owner.postListSkeleton.hide()
       })
       .disposed(by: disposeBag)
     
@@ -161,6 +202,7 @@ private extension PostListViewController {
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
         owner.collectionView.pin.sizeToFit()
+        owner.scrollView.contentSize.height = owner.collectionView.sizeThatFits(.zero).height + owner.postOrderControlView.frame.height
         owner.postOrderControlView.setCount(posts.count)
       }
       .disposed(by: disposeBag)
@@ -175,35 +217,6 @@ private extension PostListViewController {
   }
   
   private func bind() {
-    jobCategoryView.selectionRelay
-      .distinctUntilChanged()
-      .withUnretained(self)
-      .filter { owner, _ in owner.postkind.value == .공모전 }
-      .bind { ( _, value) in
-        // TODO: 데이터 필터링 로직 수행
-        print("\(value.rawValue) 탭")
-      }
-      .disposed(by: disposeBag)
     
-    postOrderControlView.latestButtonTapObservable
-      .bind(with: self) { owner, _ in
-        // TODO: 최신순 정렬
-        print("최신순")
-      }
-      .disposed(by: disposeBag)
-    
-    postOrderControlView.deadlineButtonTapObservable
-      .bind(with: self) { owner, _ in
-        // TODO: 마감순 정렬
-        print("마감순")
-      }
-      .disposed(by: disposeBag)
-    
-    postkind
-      .bind(with: self) { owner, postKind in
-        owner.navigationBar.setNavigationTitle(postKind.rawValue)
-        owner.jobCategoryView.isHidden = !(postKind == .공모전)
-      }
-      .disposed(by: disposeBag)
   }
 }

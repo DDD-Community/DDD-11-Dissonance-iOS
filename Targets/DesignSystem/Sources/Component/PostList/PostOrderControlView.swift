@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import DomainLayer
 
 import RxSwift
+import RxCocoa
 import PinLayout
 import FlexLayout
 
@@ -19,14 +21,7 @@ public final class PostOrderControlView: UIView {
     static let verticalPadding: CGFloat = 16
   }
   
-  public var latestButtonTapObservable: Observable<Void> {
-    latestButton.tapRelay.filter { $0 }.map { _ in }.asObservable()
-  }
-  
-  public var deadlineButtonTapObservable: Observable<Void> {
-    deadlineButton.tapRelay.filter { $0 }.map { _ in }.asObservable()
-  }
-  
+  public var orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
   private var disposeBag = DisposeBag()
   
   // MARK: - UI
@@ -86,20 +81,21 @@ public final class PostOrderControlView: UIView {
   
   private func bindButton() {
     latestButton.rx.tap
-      .withLatestFrom(deadlineButton.tapRelay)
-      .filter { $0 }
-      .bind(with: self) { owner, _ in
-        owner.deadlineButton.setHighlight(false)
-        owner.latestButton.setHighlight(true)
-      }
+      .map { PostOrder.latest }
+      .bind(to: orderRelay)
       .disposed(by: disposeBag)
     
     deadlineButton.rx.tap
-      .withLatestFrom(latestButton.tapRelay)
-      .filter { $0 }
-      .bind(with: self) { owner, _ in
-        owner.latestButton.setHighlight(false)
-        owner.deadlineButton.setHighlight(true)
+      .map { PostOrder.deadline }
+      .bind(to: orderRelay)
+      .disposed(by: disposeBag)
+    
+    orderRelay
+      .distinctUntilChanged()
+      .asSignal(onErrorJustReturn: .latest)
+      .emit(with: self) { owner, order in
+        owner.latestButton.setHighlight(order == .latest)
+        owner.deadlineButton.setHighlight(order == .deadline)
       }
       .disposed(by: disposeBag)
   }

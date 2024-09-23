@@ -13,9 +13,6 @@ import RxSwift
 
 public final class SortButton: UIButton {
   
-  // MARK: - Properties
-  public var tapRelay: BehaviorRelay<Bool> = .init(value: false)
-  
   // MARK: - UI
   private let nameLabel = MozipLabel(style: .body5, color: MozipColor.gray600)
   
@@ -34,7 +31,6 @@ public final class SortButton: UIButton {
   
   // MARK: - Methods
   public func setHighlight(_ bool: Bool) {
-    tapRelay.accept(bool)
     nameLabel.updateColorKeepingAttributed(bool ? MozipColor.primary500 : MozipColor.gray600)
     self.layer.borderWidth = bool ? 1 : 0
     self.layer.borderColor = bool ? MozipColor.primary500.cgColor : UIColor.clear.cgColor
