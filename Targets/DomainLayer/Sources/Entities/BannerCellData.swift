@@ -9,26 +9,26 @@
 import Foundation
 
 public struct BannerCellData: Equatable {
-  public let featuredPostId, infoPostId: Int
-  public let bannerImageUrl: String
+  public let featuredPostID, infoPostID: Int
+  public let bannerImageURL: String
   
   public init(
-    featuredPostId: Int,
-    infoPostId: Int,
-    bannerImageUrl: String
+    featuredPostID: Int,
+    infoPostID: Int,
+    bannerImageURL: String
   ) {
-    self.featuredPostId = featuredPostId
-    self.infoPostId = infoPostId
-    self.bannerImageUrl = bannerImageUrl
+    self.featuredPostID = featuredPostID
+    self.infoPostID = infoPostID
+    self.bannerImageURL = bannerImageURL
   }
 }
 
 extension BannerCellData {
-  public static func stub(featuredPostId: Int = 0,
-                   infoPostId: Int = 0,
-                   bannerImageUrl: String = "www.naver.com") -> Self {
-    .init(featuredPostId: featuredPostId,
-          infoPostId: infoPostId,
-          bannerImageUrl: bannerImageUrl)
+  public static func stub(featuredPostID: Int = 0,
+                   infoPostID: Int = 0,
+                   bannerImageURL: String = "www.naver.com") -> Self {
+    .init(featuredPostID: featuredPostID,
+          infoPostID: infoPostID,
+          bannerImageURL: bannerImageURL)
   }
 }

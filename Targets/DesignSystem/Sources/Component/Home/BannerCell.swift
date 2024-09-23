@@ -53,7 +53,7 @@ public final class BannerCell: UICollectionViewCell {
   // MARK: - Methods
   public func setData(_ data: BannerCellData) {
     bannerImage.kf.setImage(
-      with: URL(string: data.bannerImageUrl),
+      with: URL(string: data.bannerImageURL),
       placeholder: UIImage.image(with: MozipColor.gray300)
     )
     bannerImage.flex.markDirty()
