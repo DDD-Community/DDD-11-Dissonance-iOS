@@ -16,6 +16,7 @@ enum PostAPI {
   case upload(_ post: Post)
   case fetchPostList(PostListFetchRequestDTO)
   case fetchBanner
+  case fetchPost(id: Int)
 }
 
 // MARK: - TargetType
@@ -34,6 +35,8 @@ extension PostAPI: TargetType {
       return basePath + "/categories/\(dto.categoryID)/posts"
     case .fetchBanner:
       return "/featured-posts"
+    case .fetchPost(let id):
+      return basePath + "/\(id)"
     }
   }
   
@@ -41,7 +44,7 @@ extension PostAPI: TargetType {
     switch self {
     case .upload:
       return .post
-    case .fetchPostList, .fetchBanner:
+    case .fetchPostList, .fetchBanner, .fetchPost:
       return .get
     }
   }
