@@ -21,7 +21,6 @@ final class PostUploadUseCase: PostUploadUseCaseType {
   
   // MARK: - Properties
   let postRepository: PostRepositoryType
-  private let disposeBag: DisposeBag = .init()
   
   // MARK: - Initializer
   init(postRepository: PostRepositoryType) {
