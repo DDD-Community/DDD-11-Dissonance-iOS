@@ -152,12 +152,10 @@ private extension MyPageViewController {
         owner.presentAlert(type: .logout, rightButtonAction: {
           owner.reactor?.action.onNext(.didTapLogoutButton)
         })
-        owner.coordinator?.didFinish()
       case 4:
         owner.presentAlert(type: .deleteAccount, rightButtonAction: {
           owner.reactor?.action.onNext(.didTapDeleteAccountButton)
         })
-        owner.coordinator?.didFinish()
       default:
         return
       }
@@ -173,7 +171,7 @@ private extension MyPageViewController {
       .distinctUntilChanged()
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, isLoggedOut in
-        // TODO: 로그아웃 또는 회원탈퇴한 경우 '연결된 계정'을 어떻게 보여줄지 문의 후 구현
+        owner.coordinator?.didFinish()
       })
       .disposed(by: disposeBag)
   }

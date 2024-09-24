@@ -32,14 +32,13 @@ final class MyPageCoordinator: MyPageCoordinatorType {
   
   // MARK: - Methods
   func start() {
-    //TODO: 추후 구현
-    let vc = myPageViewController()
-    navigationController.setViewControllers([vc], animated: false)
+    let myPageViewController = myPageViewController()
+    navigationController.pushViewController(myPageViewController, animated: true)
   }
   
   func didFinish() {
-    parentCoordinator?.removeChild(self)
     navigationController.popViewController(animated: true)
+    parentCoordinator?.removeChild(self)
   }
 
   //TODO: 웹 뷰 디자인 문의 후 구현
