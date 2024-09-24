@@ -10,9 +10,7 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-protocol LoginCoordinatorType: CoordinatorType {
-  func didSuccessLogin()
-}
+protocol LoginCoordinatorType: CoordinatorType {}
 
 final class LoginCoordinator: LoginCoordinatorType {
 
@@ -28,28 +26,25 @@ final class LoginCoordinator: LoginCoordinatorType {
 
   // MARK: - Methods
   func start() {
-    let vc = loginViewController()
-    navigationController.setViewControllers([vc], animated: false)
+    let loginViewController = loginViewController()
+    navigationController.pushViewController(loginViewController, animated: true)
   }
 
   func didFinish() {
+    navigationController.popViewController(animated: true)
     parentCoordinator?.removeChild(self)
-  }
-
-  func didSuccessLogin() {
-    //TODO: 추후 구현
-    print("didSuccessLogin()")
   }
 }
 
 // MARK: - Private
 private extension LoginCoordinator {
   func loginViewController() -> LoginViewController {
-    guard let loginUseCase = DIContainer.shared.resolve(type: LoginUseCaseType.self) else {
+    guard let loginUseCase = DIContainer.shared.resolve(type: LoginUseCaseType.self),
+          let userUseCase = DIContainer.shared.resolve(type: UserUseCaseType.self) else {
       fatalError()
     }
     
-    let reactor = LoginReactor(loginUseCase: loginUseCase)
+    let reactor = LoginReactor(loginUseCase: loginUseCase, userUseCase: userUseCase)
     let viewController = LoginViewController(reactor: reactor)
     viewController.coordinator = self
     return viewController

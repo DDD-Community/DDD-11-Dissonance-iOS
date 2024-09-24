@@ -169,8 +169,16 @@ private extension LoginViewController {
       .map { $0.isSuccessLogin }
       .distinctUntilChanged()
       .filter { $0 }
+      .map { _ in Action.fetchUserInfo }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.didFinish }
+      .distinctUntilChanged()
+      .filter { $0 }
       .bind(with: self, onNext: { owner, _ in
-        owner.coordinator?.didSuccessLogin()
+        owner.coordinator?.didFinish()
       })
       .disposed(by: disposeBag)
   }
@@ -179,7 +187,7 @@ private extension LoginViewController {
     navigationBar.backButtonTapObservable
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
-        // TODO: 뒤로가기 수행
+        owner.coordinator?.didFinish()
       }
       .disposed(by: disposeBag)
     

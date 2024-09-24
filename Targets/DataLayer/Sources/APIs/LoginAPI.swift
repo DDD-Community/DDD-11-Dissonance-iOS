@@ -23,7 +23,7 @@ extension LoginAPI: TargetType {
   }
 
   var path: String {
-    let basePath = "/api/v1/oauth"
+    let basePath = "/oauth"
 
     switch self {
     case .tryKakaoLogin:
