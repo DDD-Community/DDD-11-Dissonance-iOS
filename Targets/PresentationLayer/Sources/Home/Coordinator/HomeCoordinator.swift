@@ -12,6 +12,7 @@ import UIKit
 
 public protocol HomeCoordinatorType: CoordinatorType {
   func pushPostList(code: String)
+  func pushLoginPage()
   func pushMyPage()
   func pushPostDetail(id: Int)
   func pushPostRegister()
@@ -35,9 +36,7 @@ final class HomeCoordinator: HomeCoordinatorType {
     navigationController.pushViewController(vc, animated: true)
   }
 
-  func didFinish() {
-    parentCoordinator?.removeChild(self)
-  }
+  func didFinish() {}
 
   func pushPostList(code: String) {
     let coordinator = PostListCoordinator(navigationController: navigationController)
@@ -46,9 +45,26 @@ final class HomeCoordinator: HomeCoordinatorType {
     self.addChild(coordinator)
   }
   
+  func pushLoginPage() {
+    guard let loginCoordinator = DIContainer.shared.resolve(type: LoginCoordinatorType.self)
+            as? LoginCoordinator else {
+      return
+    }
+    
+    loginCoordinator.parentCoordinator = self
+    addChild(loginCoordinator)
+    loginCoordinator.start()
+  }
+  
   func pushMyPage() {
-    // TODO: 마이페이지로 이동
-    print("TODO: 마이페이지로 이동")
+    guard let myPageCoordinator = DIContainer.shared.resolve(type: MyPageCoordinatorType.self)
+            as? MyPageCoordinator else {
+      return
+    }
+    
+    myPageCoordinator.parentCoordinator = self
+    addChild(myPageCoordinator)
+    myPageCoordinator.start()
   }
   
   func pushPostDetail(id: Int) {

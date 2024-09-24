@@ -39,7 +39,6 @@ public final class FABButton: UIView {
   public init() {
     super.init(frame: .zero)
     setupViewHierarchy()
-    isHidden = !AppProperties.isAdmin
   }
   
   required init?(coder: NSCoder) {
