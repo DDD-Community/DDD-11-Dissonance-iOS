@@ -17,7 +17,7 @@ public struct DataAssembly: DependencyAssemblable {
   // MARK: - Methods
   public func assemble(container: DIContainer) {
     container.register(type: LoginRepositoryType.self) { _ in LoginRepository() }
-    
     container.register(type: PostRepositoryType.self) { _ in PostRepository() }
+    container.register(type: UserRepositoryType.self) { _ in UserRepository() }
   }
 }
