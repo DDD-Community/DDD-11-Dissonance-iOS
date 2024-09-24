@@ -49,8 +49,11 @@ final class MyPageCoordinator: MyPageCoordinatorType {
 // MARK: - Private
 private extension MyPageCoordinator {
   func myPageViewController() -> MyPageViewController {
-    //TODO: 추후 구현
-    let reactor: MyPageReactor = .init()
+    guard let myPageUseCase = DIContainer.shared.resolve(type: MyPageUseCaseType.self) else {
+      fatalError()
+    }
+    
+    let reactor: MyPageReactor = .init(useCase: myPageUseCase)
     let viewController: MyPageViewController = .init(reactor: reactor)
     viewController.coordinator = self
     return viewController

@@ -13,10 +13,8 @@ import ReactorKit
 final class MyPageReactor: Reactor {
   
   // MARK: - Properties
+  private let useCase: MyPageUseCaseType
   var initialState: State = .init()
-  
-  // TODO: 추후 구현
-  //  private let useCase: useCaseType
   
   enum TableViewSections {
     case profile, services
@@ -50,12 +48,12 @@ final class MyPageReactor: Reactor {
   }
   
   // MARK: - Initializer
-  // TODO: 추후 구현
-  init() { }
+  init(useCase: MyPageUseCaseType) {
+    self.useCase = useCase
+  }
   
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
-    // TODO: 추후 구현
     switch action {
     case .didTapLogoutButton:        return .just(.setLogoutState(true))
     case .didTapDeleteAccountButton: return .just(.setLogoutState(true))
