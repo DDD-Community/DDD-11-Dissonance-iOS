@@ -35,4 +35,16 @@ public struct AppProperties {
     guard let providerData = AuthManager.load(authInfoType: .provider) else { return .init() }
     return String(decoding: providerData, as: UTF8.self)
   }
+  
+  public static var questionURLString: String {
+    return "https://forms.gle/2ioTW82MZW8cQQf96"
+  }
+  
+  public static var privacyPolicyURLString: String {
+    return "https://mozip-cx.notion.site/10aad2225910808d9226e7ac52fcb4c7"
+  }
+  
+  public static var termsOfUseURLString: String {
+    return "https://mozip-cx.notion.site/e66935e610364c41bd8bbd7019e303ad"
+  }
 }

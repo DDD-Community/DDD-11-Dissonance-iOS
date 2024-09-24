@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import UIKit
 import AuthenticationServices
 import DesignSystem
@@ -194,16 +195,14 @@ private extension LoginViewController {
     privacyPolicyButton.rx.tap
       .asSignal()
       .emit(with: self) { owner, _ in
-        // TODO: 노션 - 개인정보 처리방침 페이지로 이동
-        owner.openURL("https://www.naver.com")
+        owner.coordinator?.pushWebView(urlString: AppProperties.privacyPolicyURLString)
       }
       .disposed(by: disposeBag)
       
     termsOfUseButton.rx.tap
       .asSignal()
       .emit(with: self) { owner, _ in
-        // TODO: 노션 - 이용약관 페이지로 이동
-        owner.openURL("https://www.naver.com")
+        owner.coordinator?.pushWebView(urlString: AppProperties.termsOfUseURLString)
       }
       .disposed(by: disposeBag)
   }

@@ -10,7 +10,9 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-protocol LoginCoordinatorType: CoordinatorType {}
+protocol LoginCoordinatorType: CoordinatorType {
+  func pushWebView(urlString: String)
+}
 
 final class LoginCoordinator: LoginCoordinatorType {
 
@@ -33,6 +35,12 @@ final class LoginCoordinator: LoginCoordinatorType {
   func didFinish() {
     navigationController.popViewController(animated: true)
     parentCoordinator?.removeChild(self)
+  }
+  
+  func pushWebView(urlString: String) {
+    let webViewController: WebViewController = .init(urlString: urlString)
+    webViewController.modalPresentationStyle = .fullScreen
+    navigationController.present(webViewController, animated: true)
   }
 }
 
