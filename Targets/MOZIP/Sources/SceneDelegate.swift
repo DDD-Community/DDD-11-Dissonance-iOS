@@ -31,6 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window = UIWindow(windowScene: windowScene)
     
     let navigationController: UINavigationController = MozipNavigationController()
+    navigationController.navigationBar.isHidden = true
     self.navigationController = navigationController
     window?.rootViewController = navigationController
     window?.makeKeyAndVisible()
