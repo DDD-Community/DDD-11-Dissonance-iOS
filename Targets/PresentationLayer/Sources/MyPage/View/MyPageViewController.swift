@@ -99,6 +99,12 @@ final class MyPageViewController: BaseViewController<MyPageReactor>, Coordinatab
   }
   
   // MARK: - LifeCycle
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    coordinator?.disappear()
+  }
+  
   override func viewDidLayoutSubviews() {
     setupLayoutConstraints()
   }

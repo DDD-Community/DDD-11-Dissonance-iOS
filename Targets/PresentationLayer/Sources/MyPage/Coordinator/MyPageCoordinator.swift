@@ -33,9 +33,14 @@ final class MyPageCoordinator: MyPageCoordinatorType {
     navigationController.pushViewController(myPageViewController, animated: true)
   }
   
+  func disappear() {
+    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
+      parentCoordinator?.removeChild(self)
+    }
+  }
+  
   func didFinish() {
     navigationController.popViewController(animated: true)
-    parentCoordinator?.removeChild(self)
   }
 
   func pushWebView(urlString: String) {

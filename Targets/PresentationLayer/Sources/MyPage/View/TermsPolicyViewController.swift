@@ -46,6 +46,12 @@ final class TermsPolicyViewController: UIViewController, Coordinatable {
     bind()
   }
   
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    coordinator?.disappear()
+  }
+  
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     

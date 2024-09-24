@@ -91,6 +91,12 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
   }
   
   // MARK: - Methods
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    coordinator?.disappear()
+  }
+  
   override func viewDidLayoutSubviews() {
     setupLayer()
   }

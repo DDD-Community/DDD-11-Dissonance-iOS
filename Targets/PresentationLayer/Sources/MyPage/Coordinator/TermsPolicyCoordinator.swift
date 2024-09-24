@@ -32,9 +32,14 @@ final class TermsPolicyCoordinator: TermsPolicyCoordinatorType {
     navigationController.pushViewController(termsPolicyViewController, animated: true)
   }
   
+  func disappear() {
+    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
+      parentCoordinator?.removeChild(self)
+    }
+  }
+  
   func didFinish() {
     navigationController.popViewController(animated: true)
-    parentCoordinator?.removeChild(self)
   }
   
   func pushWebView(urlString: String) {

@@ -37,9 +37,14 @@ final class PostListCoordinator: PostListCoordinatorType {
     navigationController.pushViewController(vc, animated: true)
   }
 
+  func disappear() {
+    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
+      parentCoordinator?.removeChild(self)
+    }
+  }
+  
   func didFinish() {
     navigationController.popViewController(animated: true)
-    parentCoordinator?.removeChild(self)
   }
   
   func pushPostDetail(id: Int) {

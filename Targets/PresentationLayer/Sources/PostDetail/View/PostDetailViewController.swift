@@ -110,6 +110,12 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   }
   
   // MARK: - LifeCycle
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    coordinator?.disappear()
+  }
+  
   override func viewDidLayoutSubviews() {
     navigationBar.pin.top().left().right()
     bottomShadowView.pin.bottom().left().right().height(Metric.bottomShadowViewHeightRatio)
