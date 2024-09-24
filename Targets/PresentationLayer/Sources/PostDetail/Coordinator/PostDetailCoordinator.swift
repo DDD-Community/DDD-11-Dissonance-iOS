@@ -14,6 +14,7 @@ protocol PostDetailCoordinatorType: CoordinatorType {
   func start(postID: Int)
   func pushWebView(urlString: String)
   func pushErrorView()
+  func pushLoginPage()
 }
 
 final class PostDetailCoordinator: PostDetailCoordinatorType {
@@ -45,6 +46,17 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
     let webViewController: WebViewController = .init(urlString: urlString)
     webViewController.modalPresentationStyle = .fullScreen
     navigationController.present(webViewController, animated: true)
+  }
+  
+  func pushLoginPage() {
+    guard let loginCoordinator = DIContainer.shared.resolve(type: LoginCoordinatorType.self)
+            as? LoginCoordinator else {
+      return
+    }
+    
+    loginCoordinator.parentCoordinator = self
+    addChild(loginCoordinator)
+    loginCoordinator.start()
   }
   
   //TODO: 에러 뷰 구현 필요

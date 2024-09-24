@@ -62,9 +62,14 @@ extension PostAPI: TargetType {
   public var headers: [String : String]? {
     var headers: [String : String] = [:]
     
-    if case .upload = self {
-      headers["Content-Type"] = "multipart/form-data"
+    switch self {
+    case .upload:
       headers["Authorization"] = AppProperties.accessToken
+      headers["Content-Type"] = "multipart/form-data"
+    case .report:
+      headers["Authorization"] = AppProperties.accessToken
+    default: 
+      return headers
     }
     
     return headers

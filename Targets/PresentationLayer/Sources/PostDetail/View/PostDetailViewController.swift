@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import DesignSystem
 import DomainLayer
 import UIKit
@@ -196,6 +197,10 @@ private extension PostDetailViewController {
     Observable.merge([reportButton.rx.tap.asObservable(), reportActionSheetSubject])
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, reportAction in
+        if AppProperties.accessToken == .init() {
+          owner.coordinator?.pushLoginPage()
+          return
+        }
         owner.presentAlert(type: .report, rightButtonAction: { owner.reactor?.action.onNext(.didTapReportButton) })
       })
       .disposed(by: disposeBag)
