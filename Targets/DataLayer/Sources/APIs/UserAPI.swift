@@ -49,7 +49,7 @@ extension UserAPI: TargetType {
   }
 
   public var headers: [String : String]? {
-    ["Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoc2FuZ2ppbjAyMDdAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfQURNSU4iLCJpYXQiOjE3MjcwMjM5MjQsImV4cCI6MTcyNzAyNzUyNH0.dLKoNvCGQf5n-hkm3fBA7BP53NgxV9iEO7BPR8BisBo"]
+    return ["Authorization": AppProperties.accessToken]
   }
 
   public var task: Task {
