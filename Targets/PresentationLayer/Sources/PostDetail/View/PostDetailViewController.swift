@@ -95,8 +95,8 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   }()
   
   // MARK: - Initializer
-  init(categoryTitle: String, reactor: PostDetailReactor) {
-    navigationBar = .init(title: categoryTitle, backgroundColor: .white)
+  init(reactor: PostDetailReactor) {
+    navigationBar = .init(title: " ", backgroundColor: .white)
     navigationBar.setRightButtons([shareButton, ellipsisButton])
     super.init()
     
@@ -174,6 +174,7 @@ private extension PostDetailViewController {
   
   var postBinder: Binder<Post> {
     return .init(self) { owner, post in
+      owner.navigationBar.setNavigationTitle(post.category)
       owner.imageView.image = UIImage(data: post.imageData)
       owner.titleValueLabel.text = post.title
       owner.organizationValueLabel.text = post.organization

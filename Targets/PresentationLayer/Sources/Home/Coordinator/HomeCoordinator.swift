@@ -68,8 +68,14 @@ final class HomeCoordinator: HomeCoordinatorType {
   }
   
   func pushPostDetail(id: Int) {
-    // TODO: 공고 상세페이지로 이동
-    print("TODO: 공고(\(id)) 상세페이지로 이동")
+    guard let postDetailCoordinator = DIContainer.shared.resolve(type: PostDetailCoordinatorType.self)
+            as? PostDetailCoordinator else {
+      return
+    }
+    
+    postDetailCoordinator.parentCoordinator = self
+    addChild(postDetailCoordinator)
+    postDetailCoordinator.start(postID: id)
   }
   
   func pushPostRegister() {
