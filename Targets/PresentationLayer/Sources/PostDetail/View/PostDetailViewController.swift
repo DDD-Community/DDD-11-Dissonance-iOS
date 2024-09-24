@@ -15,10 +15,11 @@ import PinLayout
 import ReactorKit
 import RxCocoa
 
-final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coordinatable {
+final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coordinatable, Alertable {
   
   // MARK: - Properties
   weak var coordinator: PostDetailCoordinator?
+  private let reportActionSheetSubject: PublishSubject<Void> = .init()
   
   private enum Metric {
     static let bottomShadowViewHeightRatio: Percent = 12.7%
@@ -64,6 +65,21 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     button.setUnderline()
     return button
   }()
+  
+  private var reportAlertAction: UIAlertAction {
+    .init(title: "공고 신고", style: .destructive, handler: { [weak self] _ in
+      self?.reportActionSheetSubject.onNext(())
+    })
+  }
+  
+  private let cancelAlertAction: UIAlertAction = .init(title: "취소", style: .cancel)
+  
+  private var alertController: UIAlertController {
+    let alertController: UIAlertController = .init()
+    alertController.addAction(reportAlertAction)
+    alertController.addAction(cancelAlertAction)
+    return alertController
+  }
   
   private let shareButton: UIButton = {
     let button: UIButton = .init()
@@ -161,41 +177,76 @@ private extension PostDetailViewController {
       owner.imageView.image = UIImage(data: post.imageData)
       owner.titleValueLabel.text = post.title
       owner.organizationValueLabel.text = post.organization
-      owner.recruitDateValueLabel.text = post.recruitStartDate + "~" + post.recruitEndDate
+      owner.recruitDateValueLabel.text = post.recruitStartDate + " ~ " + post.recruitEndDate
       owner.addTagLabel(post.jobGroups)
-      owner.activityDateValueLabel.text = post.activityStartDate + "~" + post.activityEndDate
+      owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
       owner.activityContentsValueLabel.text = post.activityContents
+      owner.updateLayout()
     }
   }
   
   // MARK: Methods
   func bindAction(reactor: PostDetailReactor) {
     rx.viewDidLoad
-      .map { Action.fetchData }
+      .map { Action.fetchPost }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
-    reportButton.rx.tap
-      .map { Action.didTapReportButton }
-      .bind(to: reactor.action)
+    Observable.merge([reportButton.rx.tap.asObservable(), reportActionSheetSubject])
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, reportAction in
+        owner.presentAlert(type: .report, rightButtonAction: { owner.reactor?.action.onNext(.didTapReportButton) })
+      })
       .disposed(by: disposeBag)
   }
   
   func bindState(reactor: PostDetailReactor) {
     reactor.state
       .map { $0.post }
+      .filter { !$0.title.isEmpty }
+      .distinctUntilChanged()
       .asSignal(onErrorSignalWith: .empty())
       .emit(to: postBinder)
       .disposed(by: disposeBag)
     
     reactor.state
       .map { $0.isSuccessReport }
+      .distinctUntilChanged()
       .filter { $0 }
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
-        // TODO: 토스트 팝업
+        owner.view.showToast(message: "신고가 성공적으로 접수되었습니다.")
       })
       .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isErrorReport }
+      .filter { $0.isError }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, errorState in
+        owner.view.showToast(message: errorState.message)
+      })
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isLoading }
+      .distinctUntilChanged()
+      .filter { $0 }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        // TODO: 스켈레톤 적용
+      })
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isFetchError }
+      .filter { $0 }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        owner.coordinator?.pushErrorView()
+      })
+      .disposed(by: disposeBag)
+    
   }
   
   func bind() {
@@ -203,6 +254,13 @@ private extension PostDetailViewController {
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
         owner.coordinator?.didFinish()
+      })
+      .disposed(by: disposeBag)
+    
+    ellipsisButton.rx.tap
+      .asSignal()
+      .emit(with: self, onNext: { owner, _ in
+        owner.present(owner.alertController, animated: true)
       })
       .disposed(by: disposeBag)
   }
@@ -216,5 +274,13 @@ private extension PostDetailViewController {
         $0.addItem(tagLabel).height(36).marginTop(8).marginRight(8)
       }
     }
+  }
+  
+  func updateLayout() {
+    [titleValueLabel, organizationValueLabel, activityContentsValueLabel, rootContainer].forEach {
+      $0.flex.layout(mode: .adjustHeight)
+    }
+    
+    scrollView.contentSize = rootContainer.frame.size
   }
 }

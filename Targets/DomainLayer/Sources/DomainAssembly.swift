@@ -30,5 +30,8 @@ public struct DomainAssembly: DependencyAssemblable {
     container.register(type: FetchBannerUseCaseType.self) { container in
       return FetchBannerUseCase(postRepository: container.resolve(type: PostRepositoryType.self)!)
     }
+    container.register(type: PostDetailUseCaseType.self) { container in
+      return PostDetailUseCase(postRepository: container.resolve(type: PostRepositoryType.self)!)
+    }
   }
 }
