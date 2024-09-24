@@ -55,7 +55,18 @@ public final class PostRepository: PostRepositoryType {
   public func fetchPost(id: Int) -> Single<(isSuccess: Bool, post: Post)> {
     return provider.rx.request(.fetchPost(id: id))
       .map(APIResponse<PostDetailResponse>.self)
-      .map { (isSuccess: $0.isSuccess, post: ($0.data?.toPost() ?? .init())) }
+      .flatMap { response -> Single<(isSuccess: Bool, post: Post)> in
+        guard let responseData = response.data else {
+          return .just((isSuccess: response.isSuccess, post: .init()))
+        }
+        
+        return .create { single in
+          responseData.toPost { post in
+            single(.success((isSuccess: response.isSuccess, post: post)))
+          }
+          return Disposables.create()
+        }
+      }
   }
   
   public func report(id: Int) -> Single<(isSuccess: Bool, message: String?)> {
