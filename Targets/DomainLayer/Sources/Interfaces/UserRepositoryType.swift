@@ -12,7 +12,7 @@ public protocol UserRepositoryType {
   
   // MARK: Methods
   func regenerate() -> Single<UserToken>
-  func information() -> Single<(isAdmin: Bool, provider: String)>
+  func fetchInformation() -> Single<(isAdmin: Bool, provider: String)>
   func delete() -> Single<Void>
   func logout() -> Single<Void>
 }

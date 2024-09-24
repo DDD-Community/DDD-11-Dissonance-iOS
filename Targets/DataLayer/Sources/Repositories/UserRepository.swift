@@ -23,7 +23,7 @@ public final class UserRepository: UserRepositoryType {
   }
   
   // MARK: - Methods
-  public func information() -> Single<(isAdmin: Bool, provider: String)> {
+  public func fetchInformation() -> Single<(isAdmin: Bool, provider: String)> {
     return provider.rx.request(.information)
       .map(APIResponse<UserInformationResponse>.self)
       .map { (isAdmin: $0.data?.isAdmin ?? false, provider: $0.data?.provider ?? "") }
