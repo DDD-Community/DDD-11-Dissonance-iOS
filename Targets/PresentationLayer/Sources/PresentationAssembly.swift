@@ -46,5 +46,9 @@ public struct PresentationAssembly: DependencyAssemblable {
     container.register(type: MyPageCoordinatorType.self.self) { _ in
       MyPageCoordinator(navigationController: navigationController)
     }
+    
+    container.register(type: TermsPolicyCoordinatorType.self) { _ in
+      TermsPolicyCoordinator(navigationController: navigationController)
+    }
   }
 }

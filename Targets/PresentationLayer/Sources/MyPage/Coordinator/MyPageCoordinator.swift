@@ -10,12 +10,9 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-enum MyPageServices {
-  case question, policy
-}
-
 protocol MyPageCoordinatorType: CoordinatorType {
-  func pushWebView(_ service: MyPageServices)
+  func pushWebView(urlString: String)
+  func pushTermsPolicyPage()
 }
 
 final class MyPageCoordinator: MyPageCoordinatorType {
@@ -41,8 +38,22 @@ final class MyPageCoordinator: MyPageCoordinatorType {
     parentCoordinator?.removeChild(self)
   }
 
-  //TODO: 웹 뷰 디자인 문의 후 구현
-  func pushWebView(_ service: MyPageServices) {}
+  func pushWebView(urlString: String) {
+    let webViewController: WebViewController = .init(urlString: urlString)
+    webViewController.modalPresentationStyle = .fullScreen
+    navigationController.present(webViewController, animated: true)
+  }
+  
+  func pushTermsPolicyPage() {
+    guard let termsPolicyCoordinator = DIContainer.shared.resolve(type: TermsPolicyCoordinatorType.self)
+            as? TermsPolicyCoordinator else {
+      return
+    }
+    
+    termsPolicyCoordinator.parentCoordinator = self
+    addChild(termsPolicyCoordinator)
+    termsPolicyCoordinator.start()
+  }
 }
 
 // MARK: - Private

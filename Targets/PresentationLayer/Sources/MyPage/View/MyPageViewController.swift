@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import DesignSystem
 import DomainLayer
 import UIKit
@@ -145,9 +146,9 @@ private extension MyPageViewController {
     return .init(self) { owner, row in
       switch row {
       case 0:
-        owner.coordinator?.pushWebView(.question)
+        owner.coordinator?.pushWebView(urlString: AppProperties.questionURLString)
       case 1:
-        owner.coordinator?.pushWebView(.policy)
+        owner.coordinator?.pushTermsPolicyPage()
       case 3:
         owner.presentAlert(type: .logout, rightButtonAction: {
           owner.reactor?.action.onNext(.didTapLogoutButton)
