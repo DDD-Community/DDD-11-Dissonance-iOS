@@ -167,10 +167,9 @@ private extension PostUploadViewController {
       case .success:
         owner.coordinator?.didFinish()
         
-      // TODO: 에러 팝업 적용 예정
       case .error(let message):
-//        owner.presentAlert(type: <#T##AlertType#>, rightButtonAction: <#T##() -> Void#>)
-        return
+        guard let message else { return }
+        owner.view.showToast(message: message)
       }
     }
   }
