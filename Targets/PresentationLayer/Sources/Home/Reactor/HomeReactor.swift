@@ -15,23 +15,27 @@ import ReactorKit
 final class HomeReactor: Reactor {
 
   // MARK: - Properties
-  // TODO: 추후 UseCase 주입
+  // TODO: 배포 이후 개선
   private let fetchPostListUseCase: FetchPostListUseCaseType
   private let fetchBannerUseCase: FetchBannerUseCaseType
+  private let userUseCase: UserUseCaseType
   var initialState: State = .init()
 
   // MARK: - Initializer
   init(
     fetchPostListUseCase: FetchPostListUseCaseType,
-    fetchBannerUseCase: FetchBannerUseCaseType
+    fetchBannerUseCase: FetchBannerUseCaseType,
+    userUseCase: UserUseCaseType
   ) {
     self.fetchPostListUseCase = fetchPostListUseCase
     self.fetchBannerUseCase = fetchBannerUseCase
+    self.userUseCase = userUseCase
   }
 
   enum Action {
     case fetchPosts
     case fetchBanners
+    case fetchUserInfo
     case tapCell(indexPath: IndexPath)
   }
 
@@ -39,6 +43,7 @@ final class HomeReactor: Reactor {
     case setPosts(data: [PostSection])
     case setBanners(data: [BannerCellData])
     case setSelectedCell(data: PostCellData)
+    case setUserInfo(isAdmin: Bool, provider:String)
   }
 
   struct State {
@@ -78,6 +83,8 @@ final class HomeReactor: Reactor {
           // FIXME: 에러 종류 확인 후 필요하면 VC 까지 넘겨주도록 구현
         })
         .map { .setBanners(data: $0) }
+    case .fetchUserInfo:
+      return fetchUserInfo()
     case .tapCell(let indexPath):
       return fetchCellData(from: indexPath).map { .setSelectedCell(data: $0) }
     }
@@ -96,6 +103,8 @@ final class HomeReactor: Reactor {
       newState.isSuccessBannerFetch = true
     case let .setSelectedCell(data):
       newState.selectedCell = data
+    case let .setUserInfo(isAdmin, provider):
+      saveUserInfo(isAdmin: isAdmin, provider: provider)
     }
     return newState
   }
@@ -104,5 +113,19 @@ final class HomeReactor: Reactor {
     let postSections = self.currentState.postSections
     let cell = postSections[indexPath.section].items[indexPath.row]
     return Observable.just(cell)
+  }
+  
+  private func fetchUserInfo() -> Observable<Mutation> {
+    userUseCase.fetchUserInformation()
+      .flatMap { Observable<Mutation>.just(.setUserInfo(isAdmin: $0.isAdmin, provider: $0.provider)) }
+  }
+  
+  private func saveUserInfo(isAdmin: Bool, provider: String) {
+    guard let isAdminData = "\(isAdmin)".data(using: .utf8),
+          let providerData = provider.data(using: .utf8)
+    else { fatalError() }
+    
+    AuthManager.save(authInfoType: .isAdmin, data: isAdminData)
+    AuthManager.save(authInfoType: .provider, data: providerData)
   }
 }

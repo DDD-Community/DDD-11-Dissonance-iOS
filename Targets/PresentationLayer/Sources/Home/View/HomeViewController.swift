@@ -120,6 +120,11 @@ private extension HomeViewController {
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
+    rx.viewDidLoad
+      .map { Action.fetchUserInfo }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
     collectionView.cellTapObservable
       .asSignal(onErrorJustReturn: IndexPath())
       .map { Action.tapCell(indexPath: $0) }
