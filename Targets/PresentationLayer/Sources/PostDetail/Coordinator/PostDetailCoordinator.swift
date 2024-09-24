@@ -12,7 +12,7 @@ import UIKit
 
 protocol PostDetailCoordinatorType: CoordinatorType {
   func start(postID: Int)
-  func pushWebView()
+  func pushWebView(urlString: String)
   func pushErrorView()
 }
 
@@ -41,8 +41,11 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
     navigationController.popViewController(animated: true)
   }
 
-  //TODO: 웹 뷰 디자인 문의 후 구현
-  func pushWebView() {}
+  func pushWebView(urlString: String) {
+    let webViewController: WebViewController = .init(urlString: urlString)
+    webViewController.modalPresentationStyle = .fullScreen
+    navigationController.present(webViewController, animated: true)
+  }
   
   //TODO: 에러 뷰 구현 필요
   func pushErrorView() {}

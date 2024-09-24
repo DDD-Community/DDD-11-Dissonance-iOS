@@ -264,6 +264,14 @@ private extension PostDetailViewController {
         owner.present(owner.alertController, animated: true)
       })
       .disposed(by: disposeBag)
+    
+    showMoreButton.tapObservable
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        guard let reactor = owner.reactor else { return }
+        owner.coordinator?.pushWebView(urlString: reactor.currentState.post.postUrlString)
+      })
+      .disposed(by: disposeBag)
   }
   
   func addTagLabel(_ jobGroups: [JobInformation]) {
