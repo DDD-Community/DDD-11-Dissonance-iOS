@@ -10,7 +10,7 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-protocol HomeCoordinatorType: CoordinatorType {
+public protocol HomeCoordinatorType: CoordinatorType {
   func pushPostList(code: String)
   func pushMyPage()
   func pushPostDetail(id: Int)
@@ -57,8 +57,14 @@ final class HomeCoordinator: HomeCoordinatorType {
   }
   
   func pushPostRegister() {
-    // TODO: 공고 등록화면으로 이동
-    print("TODO: 공고 등록 화면으로 이동")
+    guard let postUploadCoordinator = DIContainer.shared.resolve(type: PostUploadCoordinatorType.self)
+            as? PostUploadCoordinator else {
+      return
+    }
+    
+    postUploadCoordinator.parentCoordinator = self
+    addChild(postUploadCoordinator)
+    postUploadCoordinator.start()
   }
 }
 
@@ -66,12 +72,14 @@ final class HomeCoordinator: HomeCoordinatorType {
 private extension HomeCoordinator {
   func homeViewController() -> HomeViewController {
     guard let fetchPostListUseCase = DIContainer.shared.resolve(type: FetchPostListUseCaseType.self),
-          let fetchBannerUseCase = DIContainer.shared.resolve(type: FetchBannerUseCaseType.self) else {
+          let fetchBannerUseCase = DIContainer.shared.resolve(type: FetchBannerUseCaseType.self),
+          let userUseCase = DIContainer.shared.resolve(type: UserUseCaseType.self) else {
       fatalError()
     }
     let reactor = HomeReactor(
       fetchPostListUseCase: fetchPostListUseCase,
-      fetchBannerUseCase: fetchBannerUseCase
+      fetchBannerUseCase: fetchBannerUseCase,
+      userUseCase: userUseCase
     )
     let viewController = HomeViewController(reactor: reactor)
     viewController.coordinator = self

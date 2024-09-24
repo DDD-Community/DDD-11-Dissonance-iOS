@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import UIKit
 
 import PinLayout
@@ -38,6 +39,7 @@ public final class FABButton: UIView {
   public init() {
     super.init(frame: .zero)
     setupViewHierarchy()
+    isHidden = !AppProperties.isAdmin
   }
   
   required init?(coder: NSCoder) {
