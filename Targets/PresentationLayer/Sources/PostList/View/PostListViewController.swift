@@ -171,6 +171,7 @@ private extension PostListViewController {
       .disposed(by: disposeBag)
     } else {
       postOrderControlView.orderRelay
+        .distinctUntilChanged()
         .withUnretained(self)
         .map { owner, order in
           let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
