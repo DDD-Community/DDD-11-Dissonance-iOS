@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   
   // MARK: - Properties
   var window: UIWindow?
-  private var mainCoordinator: MainCoordinatorType?
+  private var homeCoordinator: HomeCoordinatorType?
   private var navigationController: UINavigationController?
   
   // MARK: - Methods
@@ -31,13 +31,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window = UIWindow(windowScene: windowScene)
     
     let navigationController: UINavigationController = MozipNavigationController()
+    navigationController.navigationBar.isHidden = true
     self.navigationController = navigationController
     window?.rootViewController = navigationController
     window?.makeKeyAndVisible()
     
     assemble()
-    self.mainCoordinator = MainCoordinator(navigationController: navigationController)
-    mainCoordinator?.start()
+    startScene()
   }
   
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
@@ -62,13 +62,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 // MARK: - Private Extenion
 private extension SceneDelegate {
   func assemble() {
-    guard let navigationController = navigationController else {
-      return
-    }
-    
+    guard let navigationController else { return }
     let container: DIContainer = .shared
+    
     DataAssembly().assemble(container: container)
     DomainAssembly().assemble(container: container)
     PresentationAssembly(navigationController: navigationController).assemble(container: container)
+  }
+  
+  func startScene() {
+    guard let homeCoordinator = DIContainer.shared.resolve(type: HomeCoordinatorType.self) else { return }
+    self.homeCoordinator = homeCoordinator
+    homeCoordinator.start()
   }
 }

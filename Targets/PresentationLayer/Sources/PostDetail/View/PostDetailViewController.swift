@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import DesignSystem
 import DomainLayer
 import UIKit
@@ -95,8 +96,8 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   }()
   
   // MARK: - Initializer
-  init(categoryTitle: String, reactor: PostDetailReactor) {
-    navigationBar = .init(title: categoryTitle, backgroundColor: .white)
+  init(reactor: PostDetailReactor) {
+    navigationBar = .init(title: " ", backgroundColor: .white)
     navigationBar.setRightButtons([shareButton, ellipsisButton])
     super.init()
     
@@ -109,6 +110,12 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   }
   
   // MARK: - LifeCycle
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    coordinator?.disappear()
+  }
+  
   override func viewDidLayoutSubviews() {
     navigationBar.pin.top().left().right()
     bottomShadowView.pin.bottom().left().right().height(Metric.bottomShadowViewHeightRatio)
@@ -174,6 +181,7 @@ private extension PostDetailViewController {
   
   var postBinder: Binder<Post> {
     return .init(self) { owner, post in
+      owner.navigationBar.setNavigationTitle(post.category)
       owner.imageView.image = UIImage(data: post.imageData)
       owner.titleValueLabel.text = post.title
       owner.organizationValueLabel.text = post.organization
@@ -195,6 +203,10 @@ private extension PostDetailViewController {
     Observable.merge([reportButton.rx.tap.asObservable(), reportActionSheetSubject])
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, reportAction in
+        if AppProperties.accessToken == .init() {
+          owner.coordinator?.pushLoginPage()
+          return
+        }
         owner.presentAlert(type: .report, rightButtonAction: { owner.reactor?.action.onNext(.didTapReportButton) })
       })
       .disposed(by: disposeBag)
@@ -261,6 +273,14 @@ private extension PostDetailViewController {
       .asSignal()
       .emit(with: self, onNext: { owner, _ in
         owner.present(owner.alertController, animated: true)
+      })
+      .disposed(by: disposeBag)
+    
+    showMoreButton.tapObservable
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        guard let reactor = owner.reactor else { return }
+        owner.coordinator?.pushWebView(urlString: reactor.currentState.post.postUrlString)
       })
       .disposed(by: disposeBag)
   }

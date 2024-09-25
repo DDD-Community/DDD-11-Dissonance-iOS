@@ -9,6 +9,8 @@
 import DomainLayer
 import Foundation
 
+import Kingfisher
+
 public struct PostDetailResponse: Decodable {
   let imageURL: String
   let title: String
@@ -36,32 +38,41 @@ public struct PostDetailResponse: Decodable {
 }
 
 public extension PostDetailResponse {
-  func toPost() -> Post {
+  func toPost(completion: @escaping (Post) -> Void) {
     var post: Post = .init()
     
-    post.imageData = postImageData()
-    post.title = title
-    post.category = category
-    post.organization = organization
-    (post.recruitStartDate, post.recruitEndDate) = periodComponents(recruitmentPeriod)
-    post.jobGroups = jobGroups
-    (post.activityStartDate, post.activityEndDate) = periodComponents(activityPeriod)
-    post.activityContents = content
-    post.postUrlString = postUrlString
-    
-    return post
+    postImageData { imageData in
+      post.imageData = imageData
+      post.title = self.title
+      post.category = self.category
+      post.organization = self.organization
+      (post.recruitStartDate, post.recruitEndDate) = self.periodComponents(self.recruitmentPeriod)
+      post.jobGroups = self.jobGroups
+      (post.activityStartDate, post.activityEndDate) = self.periodComponents(self.activityPeriod)
+      post.activityContents = self.content
+      post.postUrlString = self.postUrlString
+      
+      completion(post)
+    }
   }
 }
 
 private extension PostDetailResponse {
-  func postImageData() -> Data {
-    // TODO: KingFisher 적용 예정
-    guard let imageURL = URL(string: imageURL),
-          let imageData = try? Data(contentsOf: imageURL) else {
-      return .init()
+  func postImageData(completion: @escaping (Data) -> Void) {
+    guard  let imageURL = URL(string: imageURL) else {
+      completion(.init())
+      return
     }
     
-    return imageData
+    KingfisherManager.shared.downloader.downloadImage(with: imageURL) { result in
+      switch result {
+      case .success(let value):
+        let imageData = value.image.pngData() ?? Data()
+        completion(imageData)
+      case .failure:
+        completion(.init())
+      }
+    }
   }
   
   func periodComponents(_ period: String) -> (startDate: String, endDate: String) {

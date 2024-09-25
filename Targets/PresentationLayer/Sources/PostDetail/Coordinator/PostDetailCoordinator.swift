@@ -11,9 +11,10 @@ import DomainLayer
 import UIKit
 
 protocol PostDetailCoordinatorType: CoordinatorType {
-  func start(categoryTitle: String, postID: Int)
-  func pushWebView()
+  func start(postID: Int)
+  func pushWebView(urlString: String)
   func pushErrorView()
+  func pushLoginPage()
 }
 
 final class PostDetailCoordinator: PostDetailCoordinatorType {
@@ -31,19 +32,37 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
   // MARK: - Methods
   func start() {}
   
-  func start(categoryTitle: String, postID: Int) {
-    //TODO: 추후 구현
-    let vc = postDetailViewController(categoryTitle: categoryTitle, postID: postID)
-    navigationController.setViewControllers([vc], animated: false)
+  func start(postID: Int) {
+    let postDetailViewController = postDetailViewController(postID: postID)
+    navigationController.pushViewController(postDetailViewController, animated: true)
+  }
+  
+  func disappear() {
+    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
+      parentCoordinator?.removeChild(self)
+    }
   }
   
   func didFinish() {
-    parentCoordinator?.removeChild(self)
     navigationController.popViewController(animated: true)
   }
 
-  //TODO: 웹 뷰 디자인 문의 후 구현
-  func pushWebView() {}
+  func pushWebView(urlString: String) {
+    let webViewController: WebViewController = .init(urlString: urlString)
+    webViewController.modalPresentationStyle = .fullScreen
+    navigationController.present(webViewController, animated: true)
+  }
+  
+  func pushLoginPage() {
+    guard let loginCoordinator = DIContainer.shared.resolve(type: LoginCoordinatorType.self)
+            as? LoginCoordinator else {
+      return
+    }
+    
+    loginCoordinator.parentCoordinator = self
+    addChild(loginCoordinator)
+    loginCoordinator.start()
+  }
   
   //TODO: 에러 뷰 구현 필요
   func pushErrorView() {}
@@ -51,13 +70,13 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
 
 // MARK: - Private
 private extension PostDetailCoordinator {
-  func postDetailViewController(categoryTitle: String, postID: Int) -> PostDetailViewController {
+  func postDetailViewController(postID: Int) -> PostDetailViewController {
     guard let postDetailUseCase = DIContainer.shared.resolve(type: PostDetailUseCaseType.self) else {
       fatalError()
     }
     
     let reactor = PostDetailReactor(postID: postID, postDetailUseCase: postDetailUseCase)
-    let viewController = PostDetailViewController(categoryTitle: categoryTitle, reactor: reactor)
+    let viewController = PostDetailViewController(reactor: reactor)
     viewController.coordinator = self
     return viewController
   }

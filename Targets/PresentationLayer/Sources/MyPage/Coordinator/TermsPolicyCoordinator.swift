@@ -1,8 +1,8 @@
 //
-//  LoginCoordinator.swift
+//  TermsPolicyCoordinator.swift
 //  PresentationLayer
 //
-//  Created by 한상진 on 2024/07/27.
+//  Created by 한상진 on 2024/09/25.
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
@@ -10,28 +10,28 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-protocol LoginCoordinatorType: CoordinatorType {
+protocol TermsPolicyCoordinatorType: CoordinatorType {
   func pushWebView(urlString: String)
 }
 
-final class LoginCoordinator: LoginCoordinatorType {
-
+final class TermsPolicyCoordinator: TermsPolicyCoordinatorType {
+  
   // MARK: - Properties
   weak var parentCoordinator: CoordinatorType?
   var childCoordinators: [CoordinatorType] = []
   var navigationController: UINavigationController
-
+  
   // MARK: - Initialize
   init(navigationController: UINavigationController) {
     self.navigationController = navigationController
   }
-
+  
   // MARK: - Methods
   func start() {
-    let loginViewController = loginViewController()
-    navigationController.pushViewController(loginViewController, animated: true)
+    let termsPolicyViewController = termsPolicyViewController()
+    navigationController.pushViewController(termsPolicyViewController, animated: true)
   }
-
+  
   func disappear() {
     if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
       parentCoordinator?.removeChild(self)
@@ -50,15 +50,9 @@ final class LoginCoordinator: LoginCoordinatorType {
 }
 
 // MARK: - Private
-private extension LoginCoordinator {
-  func loginViewController() -> LoginViewController {
-    guard let loginUseCase = DIContainer.shared.resolve(type: LoginUseCaseType.self),
-          let userUseCase = DIContainer.shared.resolve(type: UserUseCaseType.self) else {
-      fatalError()
-    }
-    
-    let reactor = LoginReactor(loginUseCase: loginUseCase, userUseCase: userUseCase)
-    let viewController = LoginViewController(reactor: reactor)
+private extension TermsPolicyCoordinator {
+  func termsPolicyViewController() -> TermsPolicyViewController {
+    let viewController: TermsPolicyViewController = .init()
     viewController.coordinator = self
     return viewController
   }

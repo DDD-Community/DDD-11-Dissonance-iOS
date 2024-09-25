@@ -57,14 +57,14 @@ public final class LoginRepository: LoginRepositoryType {
 private extension LoginRepository {
   func requestKakaoLogin(accessToken: String) -> Single<UserToken> {
     provider.rx.request(.tryKakaoLogin(accessToken: accessToken))
-      .map(LoginResponse.self)
-      .map { $0.makeUserToken() }
+      .map(APIResponse<LoginResponse>.self)
+      .map { $0.data?.makeUserToken() ?? .init(accessToken: "", refreshToken: "") }
   }
   
   func requestAppleLogin(jwt: String) -> Single<UserToken> {
     provider.rx.request(.tryAppleLogin(jwt: jwt))
-      .map(LoginResponse.self)
-      .map { $0.makeUserToken() }
+      .map(APIResponse<LoginResponse>.self)
+      .map { $0.data?.makeUserToken() ?? .init(accessToken: "", refreshToken: "") }
   }
   
   func parseJWT(from authorization: ASAuthorization) -> String {

@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import UIKit
 import DesignSystem
 
@@ -48,6 +49,12 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    fabButton.isHidden = !AppProperties.isAdmin
   }
   
   // MARK: - Overrides
@@ -120,6 +127,11 @@ private extension HomeViewController {
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
+    rx.viewDidLoad
+      .map { Action.fetchUserInfo }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
     collectionView.cellTapObservable
       .asSignal(onErrorJustReturn: IndexPath())
       .map { Action.tapCell(indexPath: $0) }
@@ -176,7 +188,7 @@ private extension HomeViewController {
     navigationBar.myPageButtonTapObservable
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
-        owner.coordinator?.pushMyPage()
+        AppProperties.accessToken == .init() ? owner.coordinator?.pushLoginPage() : owner.coordinator?.pushMyPage()
       }
       .disposed(by: disposeBag)
     

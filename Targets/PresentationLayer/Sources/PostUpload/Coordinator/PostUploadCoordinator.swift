@@ -10,9 +10,7 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-protocol PostUploadCoordinatorType: CoordinatorType {
-  func didSuccessUpload()
-}
+protocol PostUploadCoordinatorType: CoordinatorType {}
 
 final class PostUploadCoordinator: PostUploadCoordinatorType {
   
@@ -28,17 +26,14 @@ final class PostUploadCoordinator: PostUploadCoordinatorType {
   
   // MARK: - Methods
   func start() {
-    //TODO: 추후 구현
-//    let vc = postUploadViewController()
-//    navigationController.setViewControllers([vc], animated: false)
+    let postUploadViewController = postUploadViewController()
+    navigationController.pushViewController(postUploadViewController, animated: true)
   }
 
   func didFinish() {
+    navigationController.popViewController(animated: true)
     parentCoordinator?.removeChild(self)
   }
-
-  //TODO: 추후 구현
-  func didSuccessUpload() { }
 }
 
 // MARK: - Private

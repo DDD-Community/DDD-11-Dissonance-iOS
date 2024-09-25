@@ -10,12 +10,9 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-enum MyPageServices {
-  case question, policy
-}
-
 protocol MyPageCoordinatorType: CoordinatorType {
-  func pushWebView(_ service: MyPageServices)
+  func pushWebView(urlString: String)
+  func pushTermsPolicyPage()
 }
 
 final class MyPageCoordinator: MyPageCoordinatorType {
@@ -32,25 +29,46 @@ final class MyPageCoordinator: MyPageCoordinatorType {
   
   // MARK: - Methods
   func start() {
-    //TODO: 추후 구현
-    let vc = myPageViewController()
-    navigationController.setViewControllers([vc], animated: false)
+    let myPageViewController = myPageViewController()
+    navigationController.pushViewController(myPageViewController, animated: true)
+  }
+  
+  func disappear() {
+    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
+      parentCoordinator?.removeChild(self)
+    }
   }
   
   func didFinish() {
-    parentCoordinator?.removeChild(self)
     navigationController.popViewController(animated: true)
   }
 
-  //TODO: 웹 뷰 디자인 문의 후 구현
-  func pushWebView(_ service: MyPageServices) {}
+  func pushWebView(urlString: String) {
+    let webViewController: WebViewController = .init(urlString: urlString)
+    webViewController.modalPresentationStyle = .fullScreen
+    navigationController.present(webViewController, animated: true)
+  }
+  
+  func pushTermsPolicyPage() {
+    guard let termsPolicyCoordinator = DIContainer.shared.resolve(type: TermsPolicyCoordinatorType.self)
+            as? TermsPolicyCoordinator else {
+      return
+    }
+    
+    termsPolicyCoordinator.parentCoordinator = self
+    addChild(termsPolicyCoordinator)
+    termsPolicyCoordinator.start()
+  }
 }
 
 // MARK: - Private
 private extension MyPageCoordinator {
   func myPageViewController() -> MyPageViewController {
-    //TODO: 추후 구현
-    let reactor: MyPageReactor = .init()
+    guard let myPageUseCase = DIContainer.shared.resolve(type: MyPageUseCaseType.self) else {
+      fatalError()
+    }
+    
+    let reactor: MyPageReactor = .init(useCase: myPageUseCase)
     let viewController: MyPageViewController = .init(reactor: reactor)
     viewController.coordinator = self
     return viewController

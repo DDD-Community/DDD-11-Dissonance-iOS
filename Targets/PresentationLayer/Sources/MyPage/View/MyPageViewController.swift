@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import DesignSystem
 import DomainLayer
 import UIKit
@@ -68,8 +69,7 @@ final class MyPageViewController: BaseViewController<MyPageReactor>, Coordinatab
       
       switch indexPath.section {
       case 0:
-        // TODO: 연결된 소셜 로그인 타입을 서버에서 받아 파라미터로 넘길 예정
-        cell.configure(socialType: .apple)
+        cell.configure()
         return cell
         
       default:
@@ -99,6 +99,12 @@ final class MyPageViewController: BaseViewController<MyPageReactor>, Coordinatab
   }
   
   // MARK: - LifeCycle
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    coordinator?.disappear()
+  }
+  
   override func viewDidLayoutSubviews() {
     setupLayoutConstraints()
   }
@@ -146,19 +152,17 @@ private extension MyPageViewController {
     return .init(self) { owner, row in
       switch row {
       case 0:
-        owner.coordinator?.pushWebView(.question)
+        owner.coordinator?.pushWebView(urlString: AppProperties.questionURLString)
       case 1:
-        owner.coordinator?.pushWebView(.policy)
+        owner.coordinator?.pushTermsPolicyPage()
       case 3:
         owner.presentAlert(type: .logout, rightButtonAction: {
           owner.reactor?.action.onNext(.didTapLogoutButton)
         })
-        owner.coordinator?.didFinish()
       case 4:
         owner.presentAlert(type: .deleteAccount, rightButtonAction: {
           owner.reactor?.action.onNext(.didTapDeleteAccountButton)
         })
-        owner.coordinator?.didFinish()
       default:
         return
       }
@@ -174,7 +178,7 @@ private extension MyPageViewController {
       .distinctUntilChanged()
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, isLoggedOut in
-        // TODO: 로그아웃 또는 회원탈퇴한 경우 '연결된 계정'을 어떻게 보여줄지 문의 후 구현
+        owner.coordinator?.didFinish()
       })
       .disposed(by: disposeBag)
   }

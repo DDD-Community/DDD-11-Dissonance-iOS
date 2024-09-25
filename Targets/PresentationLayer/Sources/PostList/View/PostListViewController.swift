@@ -57,6 +57,13 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
     fatalError("init(coder:) has not been implemented")
   }
   
+  // MARK: - LifeCycle
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    coordinator?.disappear()
+  }
+  
   // MARK: - Overrides
   override func bind(reactor: PostListReactor) {
     bindAction(reactor: reactor)

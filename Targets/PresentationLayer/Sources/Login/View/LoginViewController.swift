@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import UIKit
 import AuthenticationServices
 import DesignSystem
@@ -90,6 +91,12 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
   }
   
   // MARK: - Methods
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    coordinator?.disappear()
+  }
+  
   override func viewDidLayoutSubviews() {
     setupLayer()
   }
@@ -169,8 +176,16 @@ private extension LoginViewController {
       .map { $0.isSuccessLogin }
       .distinctUntilChanged()
       .filter { $0 }
+      .map { _ in Action.fetchUserInfo }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.didFinish }
+      .distinctUntilChanged()
+      .filter { $0 }
       .bind(with: self, onNext: { owner, _ in
-        owner.coordinator?.didSuccessLogin()
+        owner.coordinator?.didFinish()
       })
       .disposed(by: disposeBag)
   }
@@ -179,23 +194,21 @@ private extension LoginViewController {
     navigationBar.backButtonTapObservable
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
-        // TODO: 뒤로가기 수행
+        owner.coordinator?.didFinish()
       }
       .disposed(by: disposeBag)
     
     privacyPolicyButton.rx.tap
       .asSignal()
       .emit(with: self) { owner, _ in
-        // TODO: 노션 - 개인정보 처리방침 페이지로 이동
-        owner.openURL("https://www.naver.com")
+        owner.coordinator?.pushWebView(urlString: AppProperties.privacyPolicyURLString)
       }
       .disposed(by: disposeBag)
       
     termsOfUseButton.rx.tap
       .asSignal()
       .emit(with: self) { owner, _ in
-        // TODO: 노션 - 이용약관 페이지로 이동
-        owner.openURL("https://www.naver.com")
+        owner.coordinator?.pushWebView(urlString: AppProperties.termsOfUseURLString)
       }
       .disposed(by: disposeBag)
   }

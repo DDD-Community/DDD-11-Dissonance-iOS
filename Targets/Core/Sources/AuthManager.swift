@@ -12,10 +12,11 @@ import Security
 public enum AuthManager {
 
   // MARK: - Properties
-  public enum AuthInfoType: String {
+  public enum AuthInfoType: String, CaseIterable {
     case accessToken = "accessToken"
     case refreshToken = "refreshToken"
-    case isFirstLogin = "isFirstLogin"
+    case isAdmin = "isAdmin"
+    case provider = "provider"
   }
 
   // MARK: - Methods
@@ -56,7 +57,7 @@ public enum AuthManager {
   }
 
   public static func deleteTokens() {
-    [AuthInfoType.accessToken, AuthInfoType.refreshToken].forEach {
+    AuthInfoType.allCases.forEach {
       let query: NSDictionary = .init(dictionary: [
         kSecClass: kSecClassGenericPassword,
         kSecAttrAccount: $0.rawValue
@@ -64,14 +65,5 @@ public enum AuthManager {
 
       SecItemDelete(query)
     }
-  }
-
-  public static func deleteLoginLog() {
-    let query: NSDictionary = .init(dictionary: [
-      kSecClass: kSecClassGenericPassword,
-      kSecAttrAccount: "isFirstLogin"
-    ])
-
-    SecItemDelete(query)
   }
 }

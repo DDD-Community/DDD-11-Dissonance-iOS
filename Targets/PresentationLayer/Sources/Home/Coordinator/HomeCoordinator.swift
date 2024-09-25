@@ -10,8 +10,9 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-protocol HomeCoordinatorType: CoordinatorType {
+public protocol HomeCoordinatorType: CoordinatorType {
   func pushPostList(code: String)
+  func pushLoginPage()
   func pushMyPage()
   func pushPostDetail(id: Int)
   func pushPostRegister()
@@ -35,9 +36,7 @@ final class HomeCoordinator: HomeCoordinatorType {
     navigationController.pushViewController(vc, animated: true)
   }
 
-  func didFinish() {
-    parentCoordinator?.removeChild(self)
-  }
+  func didFinish() {}
 
   func pushPostList(code: String) {
     let coordinator = PostListCoordinator(navigationController: navigationController)
@@ -46,19 +45,48 @@ final class HomeCoordinator: HomeCoordinatorType {
     self.addChild(coordinator)
   }
   
+  func pushLoginPage() {
+    guard let loginCoordinator = DIContainer.shared.resolve(type: LoginCoordinatorType.self)
+            as? LoginCoordinator else {
+      return
+    }
+    
+    loginCoordinator.parentCoordinator = self
+    addChild(loginCoordinator)
+    loginCoordinator.start()
+  }
+  
   func pushMyPage() {
-    // TODO: 마이페이지로 이동
-    print("TODO: 마이페이지로 이동")
+    guard let myPageCoordinator = DIContainer.shared.resolve(type: MyPageCoordinatorType.self)
+            as? MyPageCoordinator else {
+      return
+    }
+    
+    myPageCoordinator.parentCoordinator = self
+    addChild(myPageCoordinator)
+    myPageCoordinator.start()
   }
   
   func pushPostDetail(id: Int) {
-    // TODO: 공고 상세페이지로 이동
-    print("TODO: 공고(\(id)) 상세페이지로 이동")
+    guard let postDetailCoordinator = DIContainer.shared.resolve(type: PostDetailCoordinatorType.self)
+            as? PostDetailCoordinator else {
+      return
+    }
+    
+    postDetailCoordinator.parentCoordinator = self
+    addChild(postDetailCoordinator)
+    postDetailCoordinator.start(postID: id)
   }
   
   func pushPostRegister() {
-    // TODO: 공고 등록화면으로 이동
-    print("TODO: 공고 등록 화면으로 이동")
+    guard let postUploadCoordinator = DIContainer.shared.resolve(type: PostUploadCoordinatorType.self)
+            as? PostUploadCoordinator else {
+      return
+    }
+    
+    postUploadCoordinator.parentCoordinator = self
+    addChild(postUploadCoordinator)
+    postUploadCoordinator.start()
   }
 }
 
@@ -66,12 +94,14 @@ final class HomeCoordinator: HomeCoordinatorType {
 private extension HomeCoordinator {
   func homeViewController() -> HomeViewController {
     guard let fetchPostListUseCase = DIContainer.shared.resolve(type: FetchPostListUseCaseType.self),
-          let fetchBannerUseCase = DIContainer.shared.resolve(type: FetchBannerUseCaseType.self) else {
+          let fetchBannerUseCase = DIContainer.shared.resolve(type: FetchBannerUseCaseType.self),
+          let userUseCase = DIContainer.shared.resolve(type: UserUseCaseType.self) else {
       fatalError()
     }
     let reactor = HomeReactor(
       fetchPostListUseCase: fetchPostListUseCase,
-      fetchBannerUseCase: fetchBannerUseCase
+      fetchBannerUseCase: fetchBannerUseCase,
+      userUseCase: userUseCase
     )
     let viewController = HomeViewController(reactor: reactor)
     viewController.coordinator = self

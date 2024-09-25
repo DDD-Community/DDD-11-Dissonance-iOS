@@ -63,7 +63,7 @@ private extension DatePickerAccessoryView {
     distribution = .fillProportionally
     alignment = .center
     spacing = 1
-    backgroundColor = MozipColor.gray200
+    backgroundColor = MozipColor.gray50
     frame.size.height = 44
     addArrangedSubview(cancelButton)
     addArrangedSubview(dividerView)

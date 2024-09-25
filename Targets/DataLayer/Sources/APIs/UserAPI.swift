@@ -1,8 +1,8 @@
 //
-//  LoginAPI.swift
+//  UserAPI.swift
 //  DataLayer
 //
-//  Created by 한상진 on 2024/07/27.
+//  Created by 한상진 on 2024/09/23.
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
@@ -11,30 +11,37 @@ import Foundation
 
 import Moya
 
-enum LoginAPI {
-  case tryKakaoLogin(accessToken: String)
-  case tryAppleLogin(jwt: String)
+enum UserAPI {
+  case information
+  case regenerate
+  case delete
+  case logout
 }
 
 // MARK: - TargetType
-extension LoginAPI: TargetType {
+extension UserAPI: TargetType {
   var baseURL: URL {
     URL(string: AppProperties.baseURL)!
   }
 
   var path: String {
-    let basePath = "/oauth"
+    let basePath = "/users"
 
     switch self {
-    case .tryKakaoLogin:
-      return basePath + "/kakao"
-    case .tryAppleLogin:
-      return basePath + "/apple"
+    case .information: return basePath
+    case .regenerate: return basePath + "/reissue"
+    case .delete: return basePath
+    case .logout: return basePath + "/logout"
     }
   }
 
   var method: Moya.Method {
-    return .post
+    switch self {
+    case .information: return .get
+    case .regenerate: return .post
+    case .delete: return .delete
+    case .logout: return .get
+    }
   }
 
   public var sampleData: Data {
@@ -42,7 +49,7 @@ extension LoginAPI: TargetType {
   }
 
   public var headers: [String : String]? {
-    return [:]
+    return ["Authorization": AppProperties.accessToken]
   }
 
   public var task: Task {
@@ -62,10 +69,9 @@ extension LoginAPI: TargetType {
 
   private var parameters: [String: Any]? {
     switch self {
-    case .tryKakaoLogin(let accessToken):
-      return ["accessToken": accessToken]
-    case .tryAppleLogin(let jwt):
-      return ["accessToken": jwt]
+    case .regenerate: return ["refreshToken": AppProperties.refreshToken]
+    case .logout: return ["Authorization": AppProperties.accessToken]
+    default: return nil
     }
   }
 }

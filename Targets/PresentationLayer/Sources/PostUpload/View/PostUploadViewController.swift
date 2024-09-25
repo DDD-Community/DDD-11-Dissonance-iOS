@@ -20,6 +20,8 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
   
   // MARK: - Properties
   weak var coordinator: PostUploadCoordinator?
+  private let navigationBar: MozipNavigationBar
+  private var isEnableComplete: Bool = false
   
   private let scrollView: UIScrollView = {
     let scrollView: UIScrollView = .init()
@@ -66,6 +68,7 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
   
   // MARK: - Initializer
   init(reactor: PostUploadReactor) {
+    navigationBar = .init(title: "공고 등록", backgroundColor: .white)
     super.init()
     
     self.reactor = reactor
@@ -102,7 +105,8 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
   }
   
   override func viewDidLayoutSubviews() {
-    scrollView.pin.all(view.pin.safeArea)
+    navigationBar.pin.top().left().right()
+    scrollView.pin.top(to: navigationBar.edge.bottom).left().right().bottom(to: bottomShadowView.edge.top)
     rootContainer.pin.top().left().right()
     rootContainer.flex.layout(mode: .adjustHeight)
     scrollView.contentSize = rootContainer.frame.size
@@ -147,6 +151,7 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
         $0.addItem(postUrlTextFieldView).marginTop(32).marginHorizontal(20).height(90).marginBottom(bottomBlankHeight)
       }
     rootContainer.addSubview(categoryView)
+    view.addSubview(navigationBar)
   }
 }
 
@@ -161,12 +166,10 @@ private extension PostUploadViewController {
       switch uploadResult {
       case .success:
         owner.coordinator?.didFinish()
-        owner.coordinator?.didSuccessUpload()
         
-      // TODO: 에러 팝업 적용 예정
       case .error(let message):
-//        owner.presentAlert(type: <#T##AlertType#>, rightButtonAction: <#T##() -> Void#>)
-        return
+        guard let message else { return }
+        owner.view.showToast(message: message)
       }
     }
   }
@@ -224,7 +227,18 @@ private extension PostUploadViewController {
       .disposed(by: disposeBag)
     
     completionButton.rx.tap
-      .map { Action.didTapCompletionButton }
+      .withUnretained(self)
+      .filter { owner, _ in !owner.isEnableComplete }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit { (owner, _) in
+        owner.view.showToast(message: "모든 항목을 입력해 주세요.")
+      }
+      .disposed(by: disposeBag)
+    
+    completionButton.rx.tap
+      .withUnretained(self)
+      .filter { owner, _ in owner.isEnableComplete }
+      .map { _ in Action.didTapCompletionButton }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
   }
@@ -234,7 +248,9 @@ private extension PostUploadViewController {
       .map { $0.isEnableComplete }
       .distinctUntilChanged()
       .bind(with: self, onNext: { owner, isEnable in
-        owner.updateCompletionButtonState(isEnable)
+        let color = isEnable ? MozipColor.primary500 : MozipColor.gray200
+        owner.completionButton.backgroundColor = color
+        owner.isEnableComplete = isEnable
       })
       .disposed(by: disposeBag)
     
@@ -255,6 +271,13 @@ private extension PostUploadViewController {
   }
   
   func bind() {
+    navigationBar.backButtonTapObservable
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        owner.coordinator?.didFinish()
+      })
+      .disposed(by: disposeBag)
+    
     scrollView.rxGesture.tap
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
@@ -266,7 +289,7 @@ private extension PostUploadViewController {
     imageUploadView.uploadButtonTapObservable
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
-        owner.present(owner.phPicker, animated: true)
+        owner.checkPhotoLibraryPermission()
       })
       .disposed(by: disposeBag)
     
@@ -308,11 +331,6 @@ private extension PostUploadViewController {
     scrollView.contentSize = rootContainer.frame.size
     categoryView.pin.below(of: categoryTextFieldView).marginTop(12).horizontally(20).height(274)
   }
-  
-  func updateCompletionButtonState(_ isEnable: Bool) {
-    completionButton.backgroundColor = isEnable ? MozipColor.primary500 : MozipColor.gray200
-    completionButton.isEnabled = isEnable
-  }
 }
   
 // MARK: - DatePicker Extenion
@@ -323,6 +341,10 @@ private extension PostUploadViewController {
     datePicker.preferredDatePickerStyle = .wheels
     datePicker.locale = Locale(identifier: "ko_KR")
     datePicker.minimumDate = Date()
+    
+    if let backgroundView = datePicker.subviews.first?.subviews.first {
+      backgroundView.backgroundColor = .white
+    }
     
     textFieldView.textField.inputView = datePicker
     setupDatePickerAccessory(textFieldView)
@@ -393,6 +415,37 @@ private extension PostUploadViewController {
       y: 24 - keyboardHeight
     )
   }
+  
+  func checkPhotoLibraryPermission() {
+    let status = PHPhotoLibrary.authorizationStatus()
+    
+    switch status {
+    case .notDetermined:        requestPhotoAuthorization()
+    case .authorized, .limited: present(phPicker, animated: true)
+    case .denied, .restricted:  showPermissionDeniedAlert()
+    default: break
+    }
+  }
+  
+  func requestPhotoAuthorization() {
+    PHPhotoLibrary.requestAuthorization { newStatus in
+      DispatchQueue.main.async { [weak self] in
+        if newStatus == .authorized || newStatus == .limited {
+          guard let self else { return }
+          present(phPicker, animated: true)
+        } else {
+          self?.showPermissionDeniedAlert()
+        }
+      }
+    }
+  }
+  
+  func showPermissionDeniedAlert() {
+    presentAlert(type: .photoPermissionDenied, rightButtonAction: {
+      guard let appSettings = URL(string: UIApplication.openSettingsURLString) else { return }
+      UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+    })
+  }
 }
 
 // MARK: - PHPicker Extenion
@@ -409,6 +462,18 @@ extension PostUploadViewController: PHPickerViewControllerDelegate {
       guard let self = self,
             let image = image as? UIImage,
             let imageData = image.jpegData(compressionQuality: 0.5) else {
+        return
+      }
+      
+      guard imageData.count < 10 * 1024 * 1024 else {
+        DispatchQueue.main.async { [weak self] in
+          self?.presentAlert(type: .imageSizeOver, rightButtonAction: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+              guard let self else { return }
+              present(phPicker, animated: true)
+            }
+          })
+        }
         return
       }
       

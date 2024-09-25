@@ -6,6 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import Core
 import DomainLayer
 
 import ReactorKit
@@ -13,10 +14,8 @@ import ReactorKit
 final class MyPageReactor: Reactor {
   
   // MARK: - Properties
+  private let useCase: MyPageUseCaseType
   var initialState: State = .init()
-  
-  // TODO: 추후 구현
-  //  private let useCase: useCaseType
   
   enum TableViewSections {
     case profile, services
@@ -50,15 +49,15 @@ final class MyPageReactor: Reactor {
   }
   
   // MARK: - Initializer
-  // TODO: 추후 구현
-  init() { }
+  init(useCase: MyPageUseCaseType) {
+    self.useCase = useCase
+  }
   
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
-    // TODO: 추후 구현
     switch action {
-    case .didTapLogoutButton:        return .just(.setLogoutState(true))
-    case .didTapDeleteAccountButton: return .just(.setLogoutState(true))
+    case .didTapLogoutButton:        return logout()
+    case .didTapDeleteAccountButton: return deleteAccount()
     }
   }
   
@@ -68,8 +67,23 @@ final class MyPageReactor: Reactor {
     switch mutation {
     case .setLogoutState(let isLoggedOut):
       newState.isLoggedOut = isLoggedOut
+      AuthManager.deleteTokens()
     }
     
     return newState
+  }
+}
+
+// MARK: - Private Extenion
+private extension MyPageReactor {
+  //TODO: 추후 에러 처리
+  func logout() -> Observable<Mutation> {
+    useCase.logout()
+      .flatMap { _ in Observable<Mutation>.just(.setLogoutState(true)) }
+  }
+  
+  func deleteAccount() -> Observable<Mutation> {
+    useCase.deleteAccount()
+      .flatMap { _ in Observable<Mutation>.just(.setLogoutState(true)) }
   }
 }
