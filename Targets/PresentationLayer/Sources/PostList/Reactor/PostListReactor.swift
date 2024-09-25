@@ -65,6 +65,7 @@ final class PostListReactor: Reactor {
     switch mutation {
     case .setLoading:
       newState.isLoading = true
+      newState.selectedCell = nil
     case let .setPosts(data):
       newState.posts = data
       newState.isLoading = false
