@@ -21,6 +21,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   // MARK: - Properties
   weak var coordinator: PostDetailCoordinator?
   private let reportActionSheetSubject: PublishSubject<Void> = .init()
+  private var postURL: String?
   
   private enum Metric {
     static let bottomShadowViewHeightRatio: Percent = 12.7%
@@ -181,6 +182,7 @@ private extension PostDetailViewController {
   
   var postBinder: Binder<Post> {
     return .init(self) { owner, post in
+      owner.postURL = post.postUrlString
       owner.navigationBar.setNavigationTitle(post.category)
       owner.imageView.image = UIImage(data: post.imageData)
       owner.titleValueLabel.text = post.title
@@ -276,6 +278,13 @@ private extension PostDetailViewController {
       })
       .disposed(by: disposeBag)
     
+    shareButton.rx.tap
+      .asSignal()
+      .emit(with: self, onNext: { owner, _ in
+        owner.showActivityController()
+      })
+      .disposed(by: disposeBag)
+    
     showMoreButton.tapObservable
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
@@ -302,5 +311,14 @@ private extension PostDetailViewController {
     }
     
     scrollView.contentSize = rootContainer.frame.size
+  }
+  
+  func showActivityController() {
+    let item = postURL ?? "공고 URL이 존재하지 않습니다."
+    let activityVC = UIActivityViewController(
+      activityItems: [item],
+      applicationActivities: nil
+    )
+    self.present(activityVC, animated: true, completion: nil)
   }
 }
