@@ -18,6 +18,10 @@ public final class PostCell: UICollectionViewCell {
   private enum Metric {
     static let verticalSpacing: CGFloat = 8
     static let imageCornerRadius: CGFloat = 8
+    static let lightBackgroundColor: UIColor = MozipColor.gray10
+    static let lightTextColor: UIColor = MozipColor.gray500
+    static let darkBackgroundColor: UIColor = MozipColor.gray400
+    static let darkTextColor: UIColor = MozipColor.white
   }
   
   // MARK: - UI
@@ -30,7 +34,8 @@ public final class PostCell: UICollectionViewCell {
   }()
   
   private let titleLabel = MozipLabel(style: .body3, color: MozipColor.gray800)
-  private let remainDayTag = RemainDayTag()
+  private let remainDayTagBackground = UIView()
+  private let remainDayTag = MozipLabel(style: .body4, color: MozipColor.gray500)
   
   // MARK: - Initializers
   public override init(frame: CGRect) {
@@ -47,7 +52,7 @@ public final class PostCell: UICollectionViewCell {
     super.prepareForReuse()
     thumbnailImage.image = nil
     titleLabel.text = nil
-    // FIXME: remainDayTag 초기화 수행
+    remainDayTag.text = nil
   }
   
   public override func layoutSubviews() {
@@ -72,7 +77,7 @@ public final class PostCell: UICollectionViewCell {
     titleLabel.updateTextKeepingAttributes(data.title)
     titleLabel.flex.markDirty()
     
-    remainDayTag.setText(data.remainTag, mode: data.remainTag == "마감" ? .dark : .light) // FIXME: 추후 수정
+    setRemainDayTag(data.remainTag, mode: data.remainTag == "마감" ? .dark : .light)
     remainDayTag.flex.markDirty()
     
     setNeedsLayout()
@@ -86,11 +91,39 @@ public final class PostCell: UICollectionViewCell {
       .define { flex in
         flex.addItem(thumbnailImage).width(100%).aspectRatio(1)
         flex.addItem(titleLabel)
-        flex.addItem(remainDayTag)
+        flex.addItem(remainDayTagBackground)
+          .backgroundColor(MozipColor.gray10)
+          .cornerRadius(12)
+          .define { flex in
+            flex.addItem(remainDayTag)
+              .marginHorizontal(8)
+              .marginVertical(2)
+          }
       }
   }
   
   private func setupLayout() {
     contentView.flex.layout()
+  }
+}
+
+// RemainDayTag 설정
+private extension PostCell {
+  enum Mode {
+    case light
+    case dark
+  }
+  
+  func setRemainDayTag(_ text: String, mode: Mode = .light) {
+    remainDayTag.updateTextKeepingAttributes(text)
+    setMode(mode)
+  }
+  
+  func setMode(_ mode: Mode) {
+    let backgroundColor = (mode == .light ? Metric.lightBackgroundColor : Metric.darkBackgroundColor)
+    let textColor = (mode == .light ? Metric.lightTextColor : Metric.darkTextColor)
+    
+    remainDayTagBackground.backgroundColor = backgroundColor
+    remainDayTag.updateColorKeepingAttributed(textColor)
   }
 }
