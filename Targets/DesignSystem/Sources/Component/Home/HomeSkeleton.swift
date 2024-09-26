@@ -67,7 +67,7 @@ public final class HomeSkeleton: UIView {
   private func makeBanner(from flex: Flex) -> Flex {
     flex.addItem().direction(.column).define { flex in
       flex.addFakeView().width(130).height(20).marginTop(32)
-      flex.addFakeView().width(350).height(154).marginTop(24)
+      flex.addFakeView().width(Device.width-40).aspectRatio(2).marginTop(24)
     }
   }
   

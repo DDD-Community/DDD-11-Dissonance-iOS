@@ -16,7 +16,6 @@ import Kingfisher
 public final class BannerCell: UICollectionViewCell {
   
   private enum Metric {
-    static let imageHeight: CGFloat = 154
     static let horizontalPadding: CGFloat = 20
   }
   
@@ -66,7 +65,7 @@ public final class BannerCell: UICollectionViewCell {
       .define { flex in
         flex.addItem(bannerImage)
           .width(Device.width - Metric.horizontalPadding*2)
-          .height(Metric.imageHeight)
+          .aspectRatio(2)
       }
   }
   

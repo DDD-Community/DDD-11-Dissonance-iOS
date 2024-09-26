@@ -16,7 +16,6 @@ final class BannerCollectionView: UICollectionView {
   private enum Metric {
     static let delaySecond: Double = 1.0
     static let horizontalMargin: CGFloat = 20
-    static let height: CGFloat = 154
     static let cornerRadius: CGFloat = 8
     static let firstSection: Int = 0
     static let minimumLineSpacing: CGFloat = 0
@@ -149,7 +148,7 @@ private extension BannerCollectionView {
     flowLayout.minimumLineSpacing = Metric.minimumLineSpacing
     flowLayout.itemSize = .init(
       width: Device.width - Metric.horizontalMargin*2,
-      height: Metric.height
+      height: (Device.width - Metric.horizontalMargin*2)/2
     )
     self.setCollectionViewLayout(flowLayout, animated: false)
   }
