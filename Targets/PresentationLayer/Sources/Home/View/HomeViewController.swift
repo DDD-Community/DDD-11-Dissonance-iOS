@@ -86,7 +86,7 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
       .justifyContent(.start)
       .define { flex in
         flex.addItem(recommandingTitleLabel).marginLeft(20).marginTop(32)
-        flex.addItem(bannerView).height(154).marginTop(24).marginLeft(20).marginRight(20)
+        flex.addItem(bannerView).width(Device.width-40).aspectRatio(2).marginTop(24).marginLeft(20).marginRight(20)
         flex.addItem(collectionView).marginTop(32).grow(1).markDirty()
       }
   }
