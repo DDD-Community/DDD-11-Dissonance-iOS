@@ -56,7 +56,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   private let activityContentsLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "활동 내용")
   private let activityContentsValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
   private let bottomShadowView: BottomShadowView = .init()
-  private let showMoreButton: RectangleButton = .init(title: "자세히 보기", fontStyle: .heading1, titleColor: .white, backgroundColor: MozipColor.primary500)
+  private let showMoreButton: RectangleButton = .init(title: "지원하기", fontStyle: .heading1, titleColor: .white, backgroundColor: MozipColor.primary500)
   
   private let reportButton: UIButton = {
     let button: UIButton = .init()
