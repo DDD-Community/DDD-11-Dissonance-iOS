@@ -340,7 +340,6 @@ private extension PostUploadViewController {
     datePicker.datePickerMode = .date
     datePicker.preferredDatePickerStyle = .wheels
     datePicker.locale = Locale(identifier: "ko_KR")
-    datePicker.minimumDate = Date()
     
     if let backgroundView = datePicker.subviews.first?.subviews.first {
       backgroundView.backgroundColor = .white
