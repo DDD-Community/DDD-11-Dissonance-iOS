@@ -18,7 +18,7 @@ public final class RecruitJobGroupView: UIView {
   
   // MARK: - Properties
   private let rootContainer: UIView = .init()
-  private let titleLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 직군")
+  private let titleLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 대상")
   
   private enum StackViewConstants {
     static let rowHeight: Int = 56
@@ -35,7 +35,7 @@ public final class RecruitJobGroupView: UIView {
   
   private let addJobButton: UIButton = {
     let button: UIButton = .init()
-    button.setTitle("모집 직군 추가하기", for: .normal)
+    button.setTitle("모집 대상 추가하기", for: .normal)
     button.setTitleColor(MozipColor.gray500, for: .normal)
     button.titleLabel?.font = MozipFontStyle.body1.font
     return button

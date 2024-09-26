@@ -49,7 +49,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   private let organizationValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
   private let recruitDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 기간")
   private let recruitDateValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
-  private let recruitJobLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 직군")
+  private let recruitJobLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 대상")
   private let tagLabelAreaView: UIView = .init()
   private let activityDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "활동 기간")
   private let activityDateValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
