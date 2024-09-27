@@ -18,6 +18,7 @@ extension FetchPostListUseCaseType {
   func execute(categoryId: Int, pageable: Pageable) -> Observable<[PostCellData]> {
     postRepository.fetchPostList(categoryId: categoryId, pageable: pageable)
       .asObservable()
+      .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
   }
 }
 

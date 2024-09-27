@@ -34,6 +34,7 @@ final class PostListReactor: Reactor {
     case setLoading
     case setPosts(data: [PostCellData])
     case setSelectedCell(data: PostCellData)
+    case deleteSelectedCell
   }
 
   struct State {
@@ -56,7 +57,13 @@ final class PostListReactor: Reactor {
         .map { .setPosts(data: $0) }
       ])
     case let .tapCell(indexPath):
-      return fetchCellData(at: indexPath).map { .setSelectedCell(data: $0) }
+      return fetchCellData(at: indexPath)
+        .flatMap { a -> Observable<Mutation> in // FIXME: 추후 정리
+          Observable.concat([
+            .just(.setSelectedCell(data: a)),
+            .just(.deleteSelectedCell)
+          ])
+        }
     }
   }
 
@@ -71,6 +78,8 @@ final class PostListReactor: Reactor {
       newState.isLoading = false
     case let .setSelectedCell(data):
       newState.selectedCell = data
+    case .deleteSelectedCell: // FIXME: 추후 정리
+      newState.selectedCell = nil
     }
     return newState
   }

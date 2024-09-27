@@ -43,6 +43,7 @@ final class HomeReactor: Reactor {
     case setPosts(data: [PostSection])
     case setBanners(data: [BannerCellData])
     case setSelectedCell(data: PostCellData)
+    case deleteSelectedCell
     case setUserInfo(isAdmin: Bool, provider:String)
   }
 
@@ -86,7 +87,13 @@ final class HomeReactor: Reactor {
     case .fetchUserInfo:
       return fetchUserInfo()
     case .tapCell(let indexPath):
-      return fetchCellData(from: indexPath).map { .setSelectedCell(data: $0) }
+      return fetchCellData(from: indexPath)
+        .flatMap { a -> Observable<Mutation> in // FIXME: 추후 정리
+          Observable.concat([
+            .just(.setSelectedCell(data: a)),
+            .just(.deleteSelectedCell)
+          ])
+        }
     }
   }
 
@@ -103,6 +110,8 @@ final class HomeReactor: Reactor {
       newState.isSuccessBannerFetch = true
     case let .setSelectedCell(data):
       newState.selectedCell = data
+    case .deleteSelectedCell: // FIXME: 추후 정리
+      newState.selectedCell = nil
     case let .setUserInfo(isAdmin, provider):
       saveUserInfo(isAdmin: isAdmin, provider: provider)
     }
