@@ -195,7 +195,7 @@ private extension HomeViewController {
     bannerView.bannerTapObservable
       .asSignal(onErrorJustReturn: .stub())
       .emit(with: self) { owner, banner in
-        owner.coordinator?.pushPostDetail(id: banner.featuredPostID)
+        owner.coordinator?.pushPostDetail(id: banner.infoPostID)
       }
       .disposed(by: disposeBag)
     
