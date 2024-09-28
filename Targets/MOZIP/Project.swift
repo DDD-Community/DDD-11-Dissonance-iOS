@@ -9,8 +9,8 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 private let infoPlist: [String: Plist.Value] = [
-    "CFBundleShortVersionString": "1.0",
-    "CFBundleVersion": "0",
+    "CFBundleShortVersionString": "1.2",
+    "CFBundleVersion": "8",
     "CFBundleIconName": "AppIcon",
     "CFBundleDisplayName": "$(PRODUCT_NAME)",
     "UILaunchStoryboardName": "LaunchScreen",

@@ -41,7 +41,7 @@ public extension Project {
     ) -> Project {
         let app: Target = .target(
             name: name,
-            destinations: .iOS,
+            destinations: [.iPhone],
             product: product,
             bundleId: "run.ddd.\(name)",
             deploymentTargets: deploymentTarget,
@@ -54,7 +54,7 @@ public extension Project {
 
         let test: Target = .target(
             name: "\(name)Tests",
-            destinations: .iOS,
+            destinations: [.iPhone],
             product: .unitTests,
             bundleId: "run.ddd.\(name)Tests",
             deploymentTargets: deploymentTarget,
