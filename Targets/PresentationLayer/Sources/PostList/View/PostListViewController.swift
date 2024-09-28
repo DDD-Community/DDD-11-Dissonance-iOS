@@ -205,7 +205,7 @@ private extension PostListViewController {
     reactor.state
       .map { $0.posts }
       .distinctUntilChanged()
-      .filter { !$0.isEmpty }
+//      .filter { !$0.isEmpty }
       .asSignal(onErrorJustReturn: [])
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
