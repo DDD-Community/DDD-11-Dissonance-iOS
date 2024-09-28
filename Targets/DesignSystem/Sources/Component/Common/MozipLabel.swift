@@ -11,9 +11,9 @@ import UIKit
 public final class MozipLabel: UILabel {
   
   // MARK: - Initializer
-  public init(style: MozipFontStyle, color: UIColor, text: String = " ") {
+  public init(style: MozipFontStyle, color: UIColor, text: String = " ", numberOfLines: Int = 0) {
     super.init(frame: .zero)
-    numberOfLines = 0
+    self.numberOfLines = numberOfLines
     
     setTextWithLineHeight(style: style, textColor: color, text: text)
   }

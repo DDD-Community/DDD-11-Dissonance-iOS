@@ -33,7 +33,7 @@ public final class PostCell: UICollectionViewCell {
     return imageView
   }()
   
-  private let titleLabel = MozipLabel(style: .body3, color: MozipColor.gray800)
+  private let titleLabel = MozipLabel(style: .body3, color: MozipColor.gray800, numberOfLines: 2)
   private let remainDayTagBackground = UIView()
   private let remainDayTag = MozipLabel(style: .body4, color: MozipColor.gray500)
   
