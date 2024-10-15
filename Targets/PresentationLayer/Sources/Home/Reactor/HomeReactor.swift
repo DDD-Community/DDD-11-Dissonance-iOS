@@ -15,7 +15,6 @@ import ReactorKit
 final class HomeReactor: Reactor {
 
   // MARK: - Properties
-  // TODO: 배포 이후 개선
   private let fetchPostListUseCase: FetchPostListUseCaseType
   private let fetchBannerUseCase: FetchBannerUseCaseType
   private let userUseCase: UserUseCaseType
@@ -42,8 +41,7 @@ final class HomeReactor: Reactor {
   enum Mutation {
     case setPosts(data: [PostSection])
     case setBanners(data: [BannerCellData])
-    case setSelectedCell(data: PostCellData)
-    case deleteSelectedCell
+    case setSelectedCell(data: PostCellData?)
     case setUserInfo(isAdmin: Bool, provider:String)
   }
 
@@ -60,40 +58,10 @@ final class HomeReactor: Reactor {
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
-    case .fetchPosts:
-      return Observable.zip(
-        fetchPostListUseCase.execute(categoryId: 1, pageable: .defaultValue),
-        fetchPostListUseCase.execute(categoryId: 2, pageable: .defaultValue),
-        fetchPostListUseCase.execute(categoryId: 3, pageable: .defaultValue)
-      )
-      .do(onError: { error in
-        print(error.localizedDescription)
-        // FIXME: 에러 종류 확인 후 필요하면 VC 까지 넘겨주도록 구현
-      })
-      .map { (firstGroup, secondGroup, thirdGroup) in
-          .setPosts(data: [
-            firstGroup.toPostSection(header: "공모전"),
-            secondGroup.toPostSection(header: "해커톤"),
-            thirdGroup.toPostSection(header: "동아리")
-          ])
-      }
-    case .fetchBanners:
-      return fetchBannerUseCase.execute()
-        .do(onError: { error in
-          print(error.localizedDescription)
-          // FIXME: 에러 종류 확인 후 필요하면 VC 까지 넘겨주도록 구현
-        })
-        .map { .setBanners(data: $0) }
-    case .fetchUserInfo:
-      return fetchUserInfo()
-    case .tapCell(let indexPath):
-      return fetchCellData(from: indexPath)
-        .flatMap { a -> Observable<Mutation> in // FIXME: 추후 정리
-          Observable.concat([
-            .just(.setSelectedCell(data: a)),
-            .just(.deleteSelectedCell)
-          ])
-        }
+    case .fetchPosts:             return fetchPosts()
+    case .fetchBanners:           return fetchBanners()
+    case .fetchUserInfo:          return fetchUserInfo()
+    case .tapCell(let indexPath): return tapCell(at: indexPath)
     }
   }
 
@@ -110,18 +78,45 @@ final class HomeReactor: Reactor {
       newState.isSuccessBannerFetch = true
     case let .setSelectedCell(data):
       newState.selectedCell = data
-    case .deleteSelectedCell: // FIXME: 추후 정리
-      newState.selectedCell = nil
     case let .setUserInfo(isAdmin, provider):
       saveUserInfo(isAdmin: isAdmin, provider: provider)
     }
     return newState
   }
   
-  private func fetchCellData(from indexPath: IndexPath) -> Observable<PostCellData> {
+  private func tapCell(at indexPath: IndexPath) -> Observable<Mutation> {
     let postSections = self.currentState.postSections
     let cell = postSections[indexPath.section].items[indexPath.row]
-    return Observable.just(cell)
+    
+    return Observable.concat([
+      .just(.setSelectedCell(data: cell)),
+      .just(.setSelectedCell(data: nil))
+    ])
+  }
+  
+  private func fetchPosts() -> Observable<Mutation> {
+    return Observable.zip(
+      fetchPostListUseCase.execute(categoryId: 1, pageable: .defaultValue),
+      fetchPostListUseCase.execute(categoryId: 2, pageable: .defaultValue),
+      fetchPostListUseCase.execute(categoryId: 3, pageable: .defaultValue)
+    )
+    .map { (firstGroup, secondGroup, thirdGroup) in
+        .setPosts(data: [
+          firstGroup.toPostSection(header: "공모전"),
+          secondGroup.toPostSection(header: "해커톤"),
+          thirdGroup.toPostSection(header: "동아리")
+        ])
+    }
+    // TODO: .catch { error in ... } 에러처리 필요.
+  }
+  
+  private func fetchBanners() -> Observable<Mutation> {
+    return fetchBannerUseCase.execute()
+      .do(onError: { error in
+        print(error.localizedDescription)
+      })
+      .map { .setBanners(data: $0) }
+      // TODO: .catch { error in ... } 에러처리 필요.
   }
   
   private func fetchUserInfo() -> Observable<Mutation> {
