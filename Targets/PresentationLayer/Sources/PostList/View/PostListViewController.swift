@@ -22,11 +22,11 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
     case 동아리 = "동아리"
   }
   
-  // MARK: - Properties
+  // MARK: Properties
   weak var coordinator: PostListCoordinator?
   private let postkind: PostKind
   
-  // MARK: - UI
+  // MARK: UI
   private let scrollView = UIScrollView()
   private let contentView = UIView()
   private let jobCategoryView = JobCategoryView()
@@ -44,7 +44,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
     return .lightContent
   }
   
-  // MARK: - Initializer
+  // MARK: Initializer
   init(reactor: PostListReactor, code: String) {
     self.postkind = PostKind.init(rawValue: code) ?? .공모전
     
@@ -57,14 +57,14 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
     fatalError("init(coder:) has not been implemented")
   }
   
-  // MARK: - LifeCycle
+  // MARK: LifeCycle
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     
     coordinator?.disappear()
   }
   
-  // MARK: - Overrides
+  // MARK: Overrides
   override func bind(reactor: PostListReactor) {
     bindAction(reactor: reactor)
     bindState(reactor: reactor)
@@ -81,38 +81,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
     setupViewLayout()
   }
   
-  // MARK: - Methods
-  private func setupViewHierarchy() {
-    view.addSubview(navigationBar)
-    if postkind == .공모전 {
-      view.addSubview(jobCategoryView)
-    }
-    view.addSubview(postListSkeleton)
-    view.addSubview(scrollView)
-    scrollView.addSubview(contentView)
-    
-    contentView.flex.direction(.column).justifyContent(.start).define { flex in
-      flex.addItem(postOrderControlView)
-      flex.addItem(collectionView)
-    }
-  }
-  
-  private func setupViewLayout() {
-    navigationBar.pin.top().left().right().sizeToFit(.content)
-    if postkind == .공모전 {
-      jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit()
-      postListSkeleton.pin.top(to: jobCategoryView.edge.bottom).left().right().bottom()
-      scrollView.pin.left().right().bottom().top(to: jobCategoryView.edge.bottom)
-    } else {
-      postListSkeleton.pin.top(to: navigationBar.edge.bottom).left().right().bottom()
-      scrollView.pin.left().right().bottom().top(to: navigationBar.edge.bottom)
-    }
-    contentView.pin.top().left().right()
-    contentView.flex.layout(mode: .adjustHeight)
-    scrollView.contentSize = contentView.frame.size
-    collectionView.flex.markDirty()
-  }
-  
+  // MARK: Methods
   private func setupNavigationBar() {
     navigationBar.backButtonTapObservable
       .bind(with: self) { owner, _ in
@@ -186,13 +155,11 @@ private extension PostListViewController {
     reactor.state
       .map { $0.isLoading }
       .distinctUntilChanged()
-      .asSignal(onErrorJustReturn: true)
+      .take(2)
+      .asSignal(onErrorJustReturn: false)
       .emit(with: self, onNext: { owner, isLoading in
         if isLoading {
-          // 로딩뷰
-          UIView.animate(withDuration: 0.5) {
-            owner.scrollView.alpha = 0
-          }
+          // TODO: 추후 로딩화면 Skeleton 적용
         } else {
           UIView.animate(withDuration: 0.5) {
             owner.scrollView.alpha = 1
@@ -205,7 +172,6 @@ private extension PostListViewController {
     reactor.state
       .map { $0.posts }
       .distinctUntilChanged()
-//      .filter { !$0.isEmpty }
       .asSignal(onErrorJustReturn: [])
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
@@ -226,5 +192,39 @@ private extension PostListViewController {
   
   private func bind() {
     
+  }
+}
+
+// MARK: - Layout
+private extension PostListViewController {
+  private func setupViewHierarchy() {
+    view.addSubview(navigationBar)
+    if postkind == .공모전 {
+      view.addSubview(jobCategoryView)
+    }
+    view.addSubview(postListSkeleton)
+    view.addSubview(scrollView)
+    scrollView.addSubview(contentView)
+    
+    contentView.flex.direction(.column).justifyContent(.start).define { flex in
+      flex.addItem(postOrderControlView)
+      flex.addItem(collectionView)
+    }
+  }
+  
+  private func setupViewLayout() {
+    navigationBar.pin.top().left().right().sizeToFit(.content)
+    if postkind == .공모전 {
+      jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit()
+      postListSkeleton.pin.top(to: jobCategoryView.edge.bottom).left().right().bottom()
+      scrollView.pin.left().right().bottom().top(to: jobCategoryView.edge.bottom)
+    } else {
+      postListSkeleton.pin.top(to: navigationBar.edge.bottom).left().right().bottom()
+      scrollView.pin.left().right().bottom().top(to: navigationBar.edge.bottom)
+    }
+    contentView.pin.top().left().right()
+    contentView.flex.layout(mode: .adjustHeight)
+    scrollView.contentSize = contentView.frame.size
+    collectionView.flex.markDirty()
   }
 }
