@@ -20,7 +20,6 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   
   // MARK: Properties
   weak var coordinator: HomeCoordinator?
-  private let refreshRelay: PublishRelay<Bool> = .init()
   
   // MARK: UI
   private let scrollView = UIScrollView()
@@ -88,7 +87,9 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   }
   
   @objc private func pullToRefresh(_ sender: UIRefreshControl) {
-    refreshRelay.accept(true)
+    reactor?.action.onNext(.fetchPosts)
+    reactor?.action.onNext(.fetchBanners)
+    
     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
       sender.endRefreshing()
     }
@@ -123,18 +124,6 @@ private extension HomeViewController {
       .asSignal(onErrorJustReturn: IndexPath())
       .map { Action.tapCell(indexPath: $0) }
       .emit(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    refreshRelay
-      .filter { $0 }
-      .map { _ in Action.fetchPosts }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    refreshRelay
-      .filter { $0 }
-      .map { _ in Action.fetchBanners }
-      .bind(to: reactor.action)
       .disposed(by: disposeBag)
   }
   
