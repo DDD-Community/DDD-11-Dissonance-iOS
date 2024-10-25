@@ -197,7 +197,7 @@ private extension PostListViewController {
 
 // MARK: - Layout
 private extension PostListViewController {
-  private func setupViewHierarchy() {
+  func setupViewHierarchy() {
     view.addSubview(navigationBar)
     if postkind == .공모전 {
       view.addSubview(jobCategoryView)
@@ -212,7 +212,7 @@ private extension PostListViewController {
     }
   }
   
-  private func setupViewLayout() {
+  func setupViewLayout() {
     navigationBar.pin.top().left().right().sizeToFit(.content)
     if postkind == .공모전 {
       jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit()
