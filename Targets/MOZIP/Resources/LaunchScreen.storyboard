@@ -16,15 +16,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="launch_logo" translatesAutoresizingMaskIntoConstraints="NO" id="dCx-jh-24d">
-                                <rect key="frame" x="78.666666666666686" y="319" width="236" height="89"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="launchlogo" translatesAutoresizingMaskIntoConstraints="NO" id="dCx-jh-24d">
+                                <rect key="frame" x="77" y="209" width="239" height="267"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" red="0.27897334099999999" green="0.41750362520000001" blue="0.867829144" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
-                            <constraint firstItem="dCx-jh-24d" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="9xd-Tg-YuE"/>
-                            <constraint firstItem="dCx-jh-24d" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="260" id="ALd-6f-17F"/>
+                            <constraint firstItem="dCx-jh-24d" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="150" id="ALd-6f-17F"/>
+                            <constraint firstItem="dCx-jh-24d" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" constant="-77" id="IeW-zi-ygu"/>
+                            <constraint firstItem="dCx-jh-24d" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="77" id="bbt-By-Vev"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -34,6 +35,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="launch_logo" width="236" height="89"/>
+        <image name="launchlogo" width="708" height="267"/>
     </resources>
 </document>

@@ -60,6 +60,7 @@ private extension MozipLabel {
     paragraphStyle.alignment = .left
     paragraphStyle.minimumLineHeight = lineHeight
     paragraphStyle.maximumLineHeight = lineHeight
+    paragraphStyle.lineBreakMode = .byTruncatingTail
     
     let attributes: [NSAttributedString.Key: Any] = [
       .paragraphStyle: paragraphStyle,

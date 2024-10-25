@@ -7,8 +7,9 @@
 //
 
 import Core
-import UIKit
 import DesignSystem
+import DomainLayer
+import UIKit
 
 import FlexLayout
 import PinLayout
@@ -17,10 +18,10 @@ import RxCocoa
 
 final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   
-  // MARK: - Properties
+  // MARK: Properties
   weak var coordinator: HomeCoordinator?
   
-  // MARK: - UI
+  // MARK: UI
   private let scrollView = UIScrollView()
   private let contentView = UIView()
   private let navigationBar = HomeNavigationBar()
@@ -39,7 +40,7 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
     return .lightContent
   }
   
-  // MARK: - Initializer
+  // MARK: Initializer
   init(reactor: HomeReactor) {
     super.init()
     
@@ -51,13 +52,13 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
     fatalError("init(coder:) has not been implemented")
   }
   
+  // MARK: Overrides
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
     fabButton.isHidden = !AppProperties.isAdmin
   }
   
-  // MARK: - Overrides
   override func bind(reactor: HomeReactor) {
     bindAction(reactor: reactor)
     bindState(reactor: reactor)
@@ -65,7 +66,8 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   
   override func setupViews() {
     super.setupViews()
-    bind()
+    
+    bindView()
     setupInitialState()
   }
   
@@ -73,42 +75,28 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
     setupViewLayout()
   }
   
-  // MARK: - Methods
-  private func setupViewHierarchy() {
-    view.addSubview(navigationBar)
-    view.addSubview(homeSkeleton)
-    view.addSubview(scrollView)
-    view.addSubview(fabButton) // TODO: 관리자 로그인의 경우만 표출
-    scrollView.addSubview(contentView)
-    
-    contentView.flex
-      .direction(.column)
-      .justifyContent(.start)
-      .define { flex in
-        flex.addItem(recommandingTitleLabel).marginLeft(20).marginTop(32)
-        flex.addItem(bannerView).width(Device.width-40).aspectRatio(2).marginTop(24).marginLeft(20).marginRight(20)
-        flex.addItem(collectionView).marginTop(32).grow(1).markDirty()
-      }
-  }
-  
-  private func setupViewLayout() {
-    navigationBar.pin.top().left().right().sizeToFit()
-    homeSkeleton.pin.top(to: navigationBar.edge.bottom).left().right().bottom()
-    scrollView.pin.left().right().bottom().top(to: navigationBar.edge.bottom)
-    fabButton.pin.right(21).bottom(51).sizeToFit()  // TODO: 관리자 로그인의 경우만 표출
-    contentView.pin.top().left().right()
-    contentView.flex.layout(mode: .adjustHeight)
-    scrollView.contentSize = contentView.frame.size
-    collectionView.flex.markDirty()
-  }
-  
-  private func setupInitialState() {
+  // MARK: Methods
+  func setupInitialState() {
     scrollView.alpha = 0
-    // TODO: 관리자 인지 여부에 따라 FAB 버튼 노출
+    scrollView.refreshControl = UIRefreshControl()
+    scrollView.refreshControl?.addTarget(
+      self,
+      action: #selector(pullToRefresh(_:)),
+      for: .valueChanged
+    )
+  }
+  
+  @objc private func pullToRefresh(_ sender: UIRefreshControl) {
+    reactor?.action.onNext(.fetchPosts)
+    reactor?.action.onNext(.fetchBanners)
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+      sender.endRefreshing()
+    }
   }
 }
 
-// MARK: - Private Extenion
+// MARK: - Rx Bind
 private extension HomeViewController {
   
   // MARK: Properties
@@ -117,12 +105,12 @@ private extension HomeViewController {
   
   // MARK: Methods
   func bindAction(reactor: HomeReactor) {
-    rx.viewWillAppear
+    rx.viewDidLoad
       .map { Action.fetchPosts }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
-    rx.viewWillAppear
+    rx.viewDidLoad
       .map { Action.fetchBanners }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
@@ -184,7 +172,7 @@ private extension HomeViewController {
       .disposed(by: disposeBag)
   }
   
-  func bind() {
+  func bindView() {
     navigationBar.myPageButtonTapObservable
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
@@ -214,5 +202,36 @@ private extension HomeViewController {
         owner.coordinator?.pushPostRegister()
       }
       .disposed(by: disposeBag)
+  }
+}
+
+// MARK: - Layout
+private extension HomeViewController {
+  func setupViewHierarchy() {
+    view.addSubview(navigationBar)
+    view.addSubview(homeSkeleton)
+    view.addSubview(scrollView)
+    view.addSubview(fabButton)
+    scrollView.addSubview(contentView)
+    
+    contentView.flex
+      .direction(.column)
+      .justifyContent(.start)
+      .define { flex in
+        flex.addItem(recommandingTitleLabel).marginLeft(20).marginTop(32)
+        flex.addItem(bannerView).width(Device.width-40).aspectRatio(2).marginTop(24).marginLeft(20).marginRight(20)
+        flex.addItem(collectionView).marginTop(32).grow(1).markDirty()
+      }
+  }
+  
+  func setupViewLayout() {
+    navigationBar.pin.top().left().right().sizeToFit()
+    homeSkeleton.pin.top(to: navigationBar.edge.bottom).left().right().bottom()
+    scrollView.pin.left().right().bottom().top(to: navigationBar.edge.bottom)
+    fabButton.pin.right(21).bottom(51).sizeToFit()
+    contentView.pin.top().left().right()
+    contentView.flex.layout(mode: .adjustHeight)
+    scrollView.contentSize = contentView.frame.size
+    collectionView.flex.markDirty()
   }
 }
