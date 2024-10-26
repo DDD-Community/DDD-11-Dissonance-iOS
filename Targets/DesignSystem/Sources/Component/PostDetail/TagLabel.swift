@@ -28,6 +28,7 @@ public final class TagLabel: UILabel {
 private extension TagLabel {
   func setupView() {
     clipsToBounds = true
+    numberOfLines = 0
     backgroundColor = MozipColor.gray10
     font = MozipFontStyle.body4.font
     textColor = MozipColor.gray500

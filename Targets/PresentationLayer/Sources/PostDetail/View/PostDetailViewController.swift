@@ -300,7 +300,7 @@ private extension PostDetailViewController {
       tagLabel.text = "\(jobGroup.name) • \(jobGroup.count)명"
       
       tagLabelAreaView.flex.define {
-        $0.addItem(tagLabel).height(36).marginTop(8).marginRight(8)
+        $0.addItem(tagLabel).marginTop(8).marginRight(8)
       }
     }
   }
