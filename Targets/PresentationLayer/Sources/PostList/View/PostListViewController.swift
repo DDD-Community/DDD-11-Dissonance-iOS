@@ -58,8 +58,8 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   }
   
   // MARK: LifeCycle
-  override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(animated)
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
     
     coordinator?.disappear()
   }

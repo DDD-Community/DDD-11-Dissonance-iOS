@@ -98,8 +98,8 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
     registerKeyboardNotification()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(animated)
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
     
     removeKeyboardNotification()
     coordinator?.didFinish()
