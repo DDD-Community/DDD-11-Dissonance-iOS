@@ -22,7 +22,8 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
   weak var coordinator: PostUploadCoordinator?
   private let navigationBar: MozipNavigationBar
   private var isEnableComplete: Bool = false
-  
+  private var originalCenter: CGPoint?
+
   private let scrollView: UIScrollView = {
     let scrollView: UIScrollView = .init()
     scrollView.bounces = false
@@ -97,8 +98,8 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
     registerKeyboardNotification()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(animated)
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
     
     removeKeyboardNotification()
     coordinator?.didFinish()
@@ -387,6 +388,7 @@ private extension PostUploadViewController {
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
         owner.view.transform = .identity
+        owner.view.center = owner.originalCenter ?? .zero
       })
       .disposed(by: disposeBag)
   }
@@ -401,7 +403,8 @@ private extension PostUploadViewController {
           let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else {
       return
     }
-    
+
+    originalCenter = view.center
     let textAreaY = textAreaView.convert(textAreaView.bounds, to: view).origin.y
     let keyboardHeight = keyboardFrame.cgRectValue.height
     
