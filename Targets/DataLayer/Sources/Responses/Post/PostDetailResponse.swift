@@ -17,7 +17,7 @@ public struct PostDetailResponse: Decodable {
   let category: String
   let organization: String
   let recruitmentPeriod: String
-  let jobGroups: [JobInformation]
+  let jobGroups: [String]
   let activityPeriod: String
   let content: String
   let postUrlString: String

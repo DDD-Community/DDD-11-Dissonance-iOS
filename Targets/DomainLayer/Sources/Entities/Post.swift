@@ -17,7 +17,7 @@ public struct Post: Equatable {
   public var organization: String = .init()
   public var recruitStartDate: String = .init()
   public var recruitEndDate: String = .init()
-  public var jobGroups: [JobInformation] = []
+  public var jobGroups: [String] = []
   public var activityStartDate: String = .init()
   public var activityEndDate: String = .init()
   public var activityContents: String = .init()

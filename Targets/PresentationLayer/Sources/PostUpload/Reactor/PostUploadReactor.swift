@@ -25,7 +25,7 @@ final class PostUploadReactor: Reactor {
     case inputOrganization(String)
     case inputRecruitStartDate(String)
     case inputRecruitEndDate(String)
-    case inputJobGroup([(String, Int)])
+    case inputJobGroup([String])
     case inputActivityStartDate(String)
     case inputActivityEndDate(String)
     case inputActivityContents(String)
@@ -40,7 +40,7 @@ final class PostUploadReactor: Reactor {
     case setOrganization(String)
     case setRecruitStartDate(String)
     case setRecruitEndDate(String)
-    case setJobGroup([(String, Int)])
+    case setJobGroup([String])
     case setActivityStartDate(String)
     case setActivityEndDate(String)
     case setActivityContents(String)
@@ -109,9 +109,9 @@ private extension PostUploadReactor {
       return false
     }
     
-    for jobGroup in post.jobGroups where jobGroup.name.isEmpty {
-      return false
-    }
+//    for jobGroup in post.jobGroups where jobGroup.name.isEmpty {
+//      return false
+//    }
     
     let isEnable = ![
       post.title, post.category, post.organization, post.recruitStartDate, post.recruitEndDate,
@@ -121,11 +121,11 @@ private extension PostUploadReactor {
     return isEnable
   }
   
-  func setupJobGroup(_ jobGroups: [(job: String, count: Int)]) -> [JobInformation] {
-    var jobInformationArray: [JobInformation] = []
+  func setupJobGroup(_ jobGroups: [String]) -> [String] {
+    var jobInformationArray: [String] = []
     
     jobGroups.forEach {
-      jobInformationArray.append(.init(job: $0.job, count: $0.count))
+      jobInformationArray.append($0)
     }
     
     return jobInformationArray

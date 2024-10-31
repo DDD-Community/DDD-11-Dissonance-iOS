@@ -16,7 +16,7 @@ public struct PostUploadRequestDTO: Encodable {
   public var organization: String
   public var recruitStartDate: String
   public var recruitEndDate: String
-  public var jobGroups: [JobInformation]
+  public var jobGroups: [String]
   public var activityStartDate: String
   public var activityEndDate: String
   public var activityContents: String
