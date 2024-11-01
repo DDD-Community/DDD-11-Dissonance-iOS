@@ -55,7 +55,16 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   private let activityDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "활동 기간")
   private let activityDateValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
   private let activityContentsLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "활동 내용")
-  private let activityContentsValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
+  private let activityContentsValueTextView: UITextView = {
+    let textView = UITextView()
+    textView.isEditable = false
+    textView.isSelectable = true
+    textView.isScrollEnabled = false
+    textView.dataDetectorTypes = .link
+    textView.font = DesignSystemFontFamily.Pretendard.medium.font(size: 14)
+    textView.textColor = MozipColor.gray500
+    return textView
+  }()
   private let bottomShadowView: BottomShadowView = .init()
   private let showMoreButton: RectangleButton = .init(title: "지원하기", fontStyle: .heading1, titleColor: .white, backgroundColor: MozipColor.primary500)
   
@@ -167,7 +176,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
             $0.addItem(activityDateLabel).marginTop(24)
             $0.addItem(activityDateValueLabel).marginTop(8)
             $0.addItem(activityContentsLabel).marginTop(24)
-            $0.addItem(activityContentsValueLabel).marginTop(8)
+            $0.addItem(activityContentsValueTextView).marginTop(8)
             $0.addItem(reportButton).marginTop(24).width(80).marginBottom(23)
           }
       }
@@ -190,7 +199,7 @@ private extension PostDetailViewController {
       owner.recruitDateValueLabel.text = post.recruitStartDate + " ~ " + post.recruitEndDate
       owner.addTagLabel(post.jobGroups)
       owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
-      owner.activityContentsValueLabel.text = post.activityContents
+      owner.activityContentsValueTextView.text = post.activityContents
       owner.updateLayout()
     }
   }
@@ -306,7 +315,7 @@ private extension PostDetailViewController {
   }
   
   func updateLayout() {
-    [titleValueLabel, organizationValueLabel, activityContentsValueLabel, rootContainer].forEach {
+    [titleValueLabel, organizationValueLabel, activityContentsValueTextView, rootContainer].forEach {
       $0.flex.layout(mode: .adjustHeight)
     }
     
