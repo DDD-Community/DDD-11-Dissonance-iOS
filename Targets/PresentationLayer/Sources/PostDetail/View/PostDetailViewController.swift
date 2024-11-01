@@ -41,6 +41,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     let imageView: UIImageView = .init()
     imageView.backgroundColor = MozipColor.gray10
     imageView.contentMode = .scaleAspectFit
+    imageView.isUserInteractionEnabled = true
     imageView.layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 4, blur: 8, spread: 0)
     return imageView
   }()
@@ -103,6 +104,13 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     let button: UIButton = .init()
     button.setImage(DesignSystemAsset.verticalEllipsisIcon.image, for: .normal)
     return button
+  }()
+  
+  private let imageViewController: ImageViewController = {
+    let vc = ImageViewController()
+    vc.modalPresentationStyle = .fullScreen
+    vc.modalTransitionStyle = .crossDissolve
+    return vc
   }()
   
   // MARK: - Initializer
@@ -194,6 +202,7 @@ private extension PostDetailViewController {
       owner.postURL = post.postUrlString
       owner.navigationBar.setNavigationTitle(post.category)
       owner.imageView.image = UIImage(data: post.imageData)
+      owner.imageViewController.setImage(UIImage(data: post.imageData)!) // TODO: 추후 placeholder 이미지 적용
       owner.titleValueLabel.text = post.title
       owner.organizationValueLabel.text = post.organization
       owner.recruitDateValueLabel.text = post.recruitStartDate + " ~ " + post.recruitEndDate
@@ -208,6 +217,16 @@ private extension PostDetailViewController {
   func bindAction(reactor: PostDetailReactor) {
     rx.viewDidLoad
       .map { Action.fetchPost }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
+    imageView.rxGesture.tap
+      .map { _ in Action.didTapImageView }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
+    imageViewController.dismissRelay
+      .map { Action.dismissImageViewController }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -259,6 +278,19 @@ private extension PostDetailViewController {
       .emit(with: self, onNext: { owner, _ in
         // TODO: 스켈레톤 적용
       })
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.isPresentFullImage)
+      .distinctUntilChanged()
+      .asSignal(onErrorJustReturn: false)
+      .emit(with: self) { owner, isPresent in
+        if isPresent {
+          owner.present(owner.imageViewController, animated: true)
+        } else {
+          owner.dismiss(animated: true)
+        }
+      }
       .disposed(by: disposeBag)
     
     reactor.state

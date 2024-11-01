@@ -78,6 +78,11 @@ public final class MozipNavigationBar: UIView {
       }
   }
   
+  public func setLeftButton(image: UIImage, color: UIColor) {
+    backButton.setImage(image, for: .normal)
+    backButton.tintColor = color
+  }
+  
   public func setNavigationTitle(_ title: String) {
     titleLabel.updateTextKeepingAttributes(title)
   }
