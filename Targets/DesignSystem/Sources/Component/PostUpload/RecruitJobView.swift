@@ -50,9 +50,9 @@ public final class RecruitJobGroupView: UIView {
     return button
   }()
   
-  private let jobGroupRelay: BehaviorRelay<[BehaviorSubject<(job: String, count: Int)>]> = .init(value: [])
+  private let jobGroupRelay: BehaviorRelay<[BehaviorSubject<String>]> = .init(value: [])
   
-  public var allValueObservable: Observable<[(job: String, count: Int)]> {
+  public var allValueObservable: Observable<[String]> {
     jobGroupRelay
       .flatMapLatest {
         Observable.combineLatest($0)

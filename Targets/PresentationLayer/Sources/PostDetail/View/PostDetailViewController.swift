@@ -41,6 +41,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     let imageView: UIImageView = .init()
     imageView.backgroundColor = MozipColor.gray10
     imageView.contentMode = .scaleAspectFit
+    imageView.isUserInteractionEnabled = true
     imageView.layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 4, blur: 8, spread: 0)
     return imageView
   }()
@@ -55,7 +56,16 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   private let activityDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "활동 기간")
   private let activityDateValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
   private let activityContentsLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "활동 내용")
-  private let activityContentsValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
+  private let activityContentsValueTextView: UITextView = {
+    let textView = UITextView()
+    textView.isEditable = false
+    textView.isSelectable = true
+    textView.isScrollEnabled = false
+    textView.dataDetectorTypes = .link
+    textView.font = DesignSystemFontFamily.Pretendard.medium.font(size: 14)
+    textView.textColor = MozipColor.gray500
+    return textView
+  }()
   private let bottomShadowView: BottomShadowView = .init()
   private let showMoreButton: RectangleButton = .init(title: "지원하기", fontStyle: .heading1, titleColor: .white, backgroundColor: MozipColor.primary500)
   
@@ -94,6 +104,13 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     let button: UIButton = .init()
     button.setImage(DesignSystemAsset.verticalEllipsisIcon.image, for: .normal)
     return button
+  }()
+  
+  private let imageViewController: ImageViewController = {
+    let vc = ImageViewController()
+    vc.modalPresentationStyle = .fullScreen
+    vc.modalTransitionStyle = .crossDissolve
+    return vc
   }()
   
   // MARK: - Initializer
@@ -167,7 +184,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
             $0.addItem(activityDateLabel).marginTop(24)
             $0.addItem(activityDateValueLabel).marginTop(8)
             $0.addItem(activityContentsLabel).marginTop(24)
-            $0.addItem(activityContentsValueLabel).marginTop(8)
+            $0.addItem(activityContentsValueTextView).marginTop(8)
             $0.addItem(reportButton).marginTop(24).width(80).marginBottom(23)
           }
       }
@@ -185,12 +202,13 @@ private extension PostDetailViewController {
       owner.postURL = post.postUrlString
       owner.navigationBar.setNavigationTitle(post.category)
       owner.imageView.image = UIImage(data: post.imageData)
+      owner.imageViewController.setImage(UIImage(data: post.imageData)!) // TODO: 추후 placeholder 이미지 적용
       owner.titleValueLabel.text = post.title
       owner.organizationValueLabel.text = post.organization
       owner.recruitDateValueLabel.text = post.recruitStartDate + " ~ " + post.recruitEndDate
       owner.addTagLabel(post.jobGroups)
       owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
-      owner.activityContentsValueLabel.text = post.activityContents
+      owner.activityContentsValueTextView.text = post.activityContents
       owner.updateLayout()
     }
   }
@@ -199,6 +217,16 @@ private extension PostDetailViewController {
   func bindAction(reactor: PostDetailReactor) {
     rx.viewDidLoad
       .map { Action.fetchPost }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
+    imageView.rxGesture.tap
+      .map { _ in Action.didTapImageView }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
+    imageViewController.dismissRelay
+      .map { Action.dismissImageViewController }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -253,6 +281,19 @@ private extension PostDetailViewController {
       .disposed(by: disposeBag)
     
     reactor.state
+      .map(\.isPresentFullImage)
+      .distinctUntilChanged()
+      .asSignal(onErrorJustReturn: false)
+      .emit(with: self) { owner, isPresent in
+        if isPresent {
+          owner.present(owner.imageViewController, animated: true)
+        } else {
+          owner.dismiss(animated: true)
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
       .map { $0.isFetchError }
       .filter { $0 }
       .asSignal(onErrorSignalWith: .empty())
@@ -294,10 +335,10 @@ private extension PostDetailViewController {
       .disposed(by: disposeBag)
   }
   
-  func addTagLabel(_ jobGroups: [JobInformation]) {
+  func addTagLabel(_ jobGroups: [String]) {
     for jobGroup in jobGroups {
       let tagLabel: TagLabel = .init()
-      tagLabel.text = "\(jobGroup.name) • \(jobGroup.count)명"
+      tagLabel.text = "\(jobGroup)"
       
       tagLabelAreaView.flex.define {
         $0.addItem(tagLabel).marginTop(8).marginRight(8)
@@ -306,7 +347,7 @@ private extension PostDetailViewController {
   }
   
   func updateLayout() {
-    [titleValueLabel, organizationValueLabel, activityContentsValueLabel, rootContainer].forEach {
+    [titleValueLabel, organizationValueLabel, activityContentsValueTextView, rootContainer].forEach {
       $0.flex.layout(mode: .adjustHeight)
     }
     

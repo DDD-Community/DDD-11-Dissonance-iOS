@@ -17,7 +17,7 @@ public final class TextFieldWithCountView: UIView {
   private let rootContainer: UIView = .init()
   private let textField: MozipTextField = .init(placeHolder: "모집 대상을 입력해주세요.")
   private let numberCountView: NumberCountView = .init()
-  public let valueSubject: BehaviorSubject<(job: String, count: Int)> = .init(value: (job: .init(), count: .init()))
+  public let valueSubject: BehaviorSubject<String> = .init(value: .init())
   private let disposeBag: DisposeBag = .init()
   
   // MARK: - Initializer
@@ -56,7 +56,7 @@ private extension TextFieldWithCountView {
   }
   
   func bind() {
-    Observable.combineLatest(textField.rx.text.orEmpty, numberCountView.numberCountSubject)
+    textField.rx.text.orEmpty
       .map { $0 }
       .bind(to: valueSubject)
       .disposed(by: disposeBag)

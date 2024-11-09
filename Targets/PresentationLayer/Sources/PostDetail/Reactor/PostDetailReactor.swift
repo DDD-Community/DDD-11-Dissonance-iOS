@@ -20,11 +20,14 @@ final class PostDetailReactor: Reactor {
   enum Action {
     case fetchPost
     case didTapReportButton
+    case didTapImageView
+    case dismissImageViewController
   }
   
   enum Mutation {
     case setPost(Post)
     case setLoading(Bool)
+    case setIsPresentFullImage(Bool)
     case setFetchError(Bool)
     case setReportState(Bool)
     case setReportError(isError: Bool, message: String)
@@ -33,6 +36,7 @@ final class PostDetailReactor: Reactor {
   struct State {
     var post: Post = .init()
     var isLoading: Bool = false
+    var isPresentFullImage: Bool = false
     var isFetchError: Bool = false
     var isSuccessReport: Bool = false
     var isErrorReport: (isError: Bool, message: String) = (false, "")
@@ -49,6 +53,8 @@ final class PostDetailReactor: Reactor {
     switch action {
     case .fetchPost: return .concat([.just(.setLoading(true)), fetchPost(id: postID), .just(.setLoading(false))])
     case .didTapReportButton: return .concat([.just(.setLoading(true)), reportPost(id: postID), .just(.setLoading(false))])
+    case .didTapImageView: return .just(.setIsPresentFullImage(true))
+    case .dismissImageViewController: return .just(.setIsPresentFullImage(false))
     }
   }
   
@@ -59,6 +65,7 @@ final class PostDetailReactor: Reactor {
     switch mutation {
     case .setPost(let post):          newState.post = post
     case .setLoading(let isLoading):  newState.isLoading = isLoading
+    case .setIsPresentFullImage(let isPresent): newState.isPresentFullImage = isPresent
     case .setFetchError(let isError): newState.isFetchError = isError
     case .setReportState(let isSuccess): newState.isSuccessReport = isSuccess
     case let .setReportError(isError, message): newState.isErrorReport = (isError: isError, message: message)
