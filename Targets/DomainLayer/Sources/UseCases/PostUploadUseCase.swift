@@ -14,7 +14,8 @@ public protocol PostUploadUseCaseType {
   var postRepository: PostRepositoryType { get }
   
   // MARK: - Methods
-  func execute(with post: Post) -> Observable<MozipNetworkResult>
+  func upload(with post: Post) -> Observable<MozipNetworkResult>
+  func edit(id: Int, with post: Post) -> Observable<MozipNetworkResult>
 }
 
 final class PostUploadUseCase: PostUploadUseCaseType {
@@ -28,8 +29,17 @@ final class PostUploadUseCase: PostUploadUseCaseType {
   }
   
   // MARK: - Methods
-  func execute(with post: Post) -> Observable<MozipNetworkResult> {
+  func upload(with post: Post) -> Observable<MozipNetworkResult> {
     return postRepository.upload(post)
+      .asObservable()
+      .map { (isSuccess, message) -> MozipNetworkResult in
+        isSuccess ? .success : .error(message: message)
+      }
+      .catchAndReturnNetworkError()
+  }
+  
+  func edit(id: Int, with post: Post) -> Observable<MozipNetworkResult> {
+    return postRepository.edit(id: id, post: post)
       .asObservable()
       .map { (isSuccess, message) -> MozipNetworkResult in
         isSuccess ? .success : .error(message: message)
