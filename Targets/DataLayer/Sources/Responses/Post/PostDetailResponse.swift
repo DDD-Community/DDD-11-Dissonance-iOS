@@ -44,7 +44,7 @@ public extension PostDetailResponse {
     postImageData { imageData in
       post.imageData = imageData
       post.title = self.title
-      post.category = self.category
+      post.categoryTitle = self.category
       post.organization = self.organization
       (post.recruitStartDate, post.recruitEndDate) = self.periodComponents(self.recruitmentPeriod)
       post.jobGroups = self.jobGroups
