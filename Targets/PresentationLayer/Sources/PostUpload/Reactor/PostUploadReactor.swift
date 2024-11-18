@@ -15,7 +15,8 @@ final class PostUploadReactor: Reactor {
 
   // MARK: - Properties
   private let postUploadUseCase: PostUploadUseCaseType
-  private var post: Post = .init()
+  private(set) var post: Post
+  private let originID: Int? 
   var initialState: State = .init()
 
   enum Action {
@@ -56,8 +57,10 @@ final class PostUploadReactor: Reactor {
   }
   
   // MARK: - Initializer
-  init(postUploadUseCase: PostUploadUseCaseType) {
+  init(postUploadUseCase: PostUploadUseCaseType, originID: Int? = nil, originPost: Post? = nil) {
     self.postUploadUseCase = postUploadUseCase
+    self.originID = originID
+    self.post = originPost ?? .init()
   }
 
   // MARK: - Methods
@@ -74,7 +77,12 @@ final class PostUploadReactor: Reactor {
     case .inputActivityEndDate(let endDate):     return .just(.setActivityEndDate(endDate))
     case .inputActivityContents(let contents):   return .just(.setActivityContents(contents))
     case .inputPostUrlString(let urlString):     return .just(.setPostUrlString(urlString))
-    case .didTapCompletionButton:                return .concat([.just(.setLoading(true)), uploadPost(), .just(.setLoading(false))])
+    case .didTapCompletionButton:                
+      return .concat([
+        .just(.setLoading(true)), 
+        originID == nil ? uploadPost() : editPost(), 
+        .just(.setLoading(false))
+      ])
     }
   }
 
@@ -84,7 +92,7 @@ final class PostUploadReactor: Reactor {
     switch mutation {
     case .setImage(let imageData):             post.imageData = imageData
     case .setTitle(let title):                 post.title = title
-    case .setCategory(let category):           post.category = category
+    case .setCategory(let category):           post.categoryTitle = category
     case .setOrganization(let organization):   post.organization = organization
     case .setRecruitStartDate(let startDate):  post.recruitStartDate = startDate
     case .setRecruitEndDate(let endDate):      post.recruitEndDate = endDate
@@ -109,13 +117,12 @@ private extension PostUploadReactor {
       return false
     }
     
-//    for jobGroup in post.jobGroups where jobGroup.name.isEmpty {
-//      return false
-//    }
+    for jobGroup in post.jobGroups where jobGroup.isEmpty {
+      return false
+    }
     
     let isEnable = ![
-      post.title, post.category, post.organization, post.recruitStartDate, post.recruitEndDate,
-      post.activityStartDate, post.activityEndDate, post.activityContents, post.postUrlString
+      post.title, post.categoryTitle, post.organization, post.recruitEndDate, post.activityContents, post.postUrlString
     ].contains(.init())
     
     return isEnable
@@ -132,7 +139,14 @@ private extension PostUploadReactor {
   }
   
   func uploadPost() -> Observable<Mutation> {
-    postUploadUseCase.execute(with: post)
+    postUploadUseCase.upload(with: post)
+      .flatMap { Observable<Mutation>.just(.setUploadResult($0)) }
+  }
+  
+  func editPost() -> Observable<Mutation> {
+    guard let originID else { return .empty() }
+    
+    return postUploadUseCase.edit(id: originID, with: post)
       .flatMap { Observable<Mutation>.just(.setUploadResult($0)) }
   }
 }
