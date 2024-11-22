@@ -57,7 +57,6 @@ private extension MozipTextField {
   
   func bind() {
     rx.text.orEmpty
-      .map { $0 }
       .bind(to: valueSubject)
       .disposed(by: disposeBag)
     
