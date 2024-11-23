@@ -78,18 +78,32 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     return button
   }()
   
-  private var reportAlertAction: UIAlertAction {
-    .init(title: "공고 신고", style: .destructive, handler: { [weak self] _ in
-      self?.reportActionSheetSubject.onNext(())
-    })
-  }
-  
-  private let cancelAlertAction: UIAlertAction = .init(title: "취소", style: .cancel)
-  
   private var alertController: UIAlertController {
     let alertController: UIAlertController = .init()
-    alertController.addAction(reportAlertAction)
-    alertController.addAction(cancelAlertAction)
+    
+    let actions: [UIAlertAction] = [
+      .makeAction(type: .postEdit, action: { [weak self] in 
+        let originID = self?.reactor?.postID ?? .init()
+        let originPost = self?.reactor?.currentState.post ?? .init()
+        self?.coordinator?.pushEditView(id: originID, post: originPost) 
+      }),
+      
+      .makeAction(type: .postDelete, action: { [weak self] in
+        self?.presentAlert(type: .deletePost, rightButtonAction: { [weak self] in
+          self?.reactor?.action.onNext(.didTapDeleteButton)
+        })
+      }),
+      
+      .makeAction(type: .postReport, action: { [weak self] in
+        self?.reportActionSheetSubject.onNext(())
+      }),
+      
+      .makeAction(type: .cancel)
+    ]
+    
+    actions.forEach {
+      alertController.addAction($0)
+    }
     return alertController
   }
   
@@ -200,7 +214,7 @@ private extension PostDetailViewController {
   var postBinder: Binder<Post> {
     return .init(self) { owner, post in
       owner.postURL = post.postUrlString
-      owner.navigationBar.setNavigationTitle(post.category)
+      owner.navigationBar.setNavigationTitle(post.categoryTitle)
       owner.imageView.image = UIImage(data: post.imageData)
       owner.imageViewController.setImage(UIImage(data: post.imageData)!) // TODO: 추후 placeholder 이미지 적용
       owner.titleValueLabel.text = post.title
@@ -249,6 +263,16 @@ private extension PostDetailViewController {
       .distinctUntilChanged()
       .asSignal(onErrorSignalWith: .empty())
       .emit(to: postBinder)
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isDeleted }
+      .filter { $0 }
+      .distinctUntilChanged()
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        owner.coordinator?.didFinish()
+      })
       .disposed(by: disposeBag)
     
     reactor.state

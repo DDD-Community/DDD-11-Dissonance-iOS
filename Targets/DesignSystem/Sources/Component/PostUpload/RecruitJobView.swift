@@ -29,7 +29,7 @@ public final class RecruitJobGroupView: UIView {
     let stackView: UIStackView = .init()
     stackView.axis = .vertical
     stackView.spacing = 12
-    stackView.distribution = .fillProportionally
+    stackView.distribution = .fillEqually
     return stackView
   }()
   
@@ -82,6 +82,22 @@ public final class RecruitJobGroupView: UIView {
     rootContainer.pin.all()
     rootContainer.flex.layout()
   }
+  
+  // MARK: - Methods
+  public func setEditMode() {
+    jobGroupStackView.arrangedSubviews.first?.removeFromSuperview()
+    jobGroupRelay.accept([])
+  }
+  
+  public func makeField(value: String = "") {
+    let textField: MozipTextField = .init(placeHolder: "모집 대상을 입력해주세요. (공백 포함 최대 25자)")
+    
+    if !value.isEmpty {
+      textField.rx.text.onNext(value)
+    }
+    jobGroupStackView.addArrangedSubview(textField)
+    jobGroupRelay.accept(jobGroupRelay.value + [BehaviorSubject(value: value)])
+  }
 }
 
 // MARK: - Private Extenion
@@ -105,12 +121,6 @@ private extension RecruitJobGroupView {
       }
   }
   
-  func makeField() {
-    let field: TextFieldWithCountView = .init()
-    jobGroupStackView.addArrangedSubview(field)
-    jobGroupRelay.accept(jobGroupRelay.value + [field.valueSubject])
-  }
-  
   func bind() {
     addJobButton.rx.tap
       .asSignal()
@@ -128,7 +138,7 @@ private extension RecruitJobGroupView {
       }
       .disposed(by: disposeBag)
     
-    Observable.merge(addJobButton.rx.tap.asObservable(), removeJobButton.rx.tap.asObservable())
+    jobGroupRelay
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
         owner.updatejobGroupStackViewHeight()

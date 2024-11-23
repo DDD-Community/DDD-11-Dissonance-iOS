@@ -17,17 +17,19 @@ public final class LabelWithTextFieldView: UIView {
   // MARK: - Properties
   private let rootContainer: UIView = .init()
   private let label: MozipLabel = .init(style: .heading3, color: MozipColor.gray800)
+  private let requiredLabel: MozipLabel = .init(style: .heading3, color: MozipColor.primary500, text: "*")
   public let textField: MozipTextField = .init()
   public var textObservable: Observable<String> {
     textField.rx.text.orEmpty.asObservable()
   }
   
   // MARK: - Initializer
-  public init(title: String, placeHolder: String) {
+  public init(title: String, placeHolder: String, isRequired: Bool = false) {
     super.init(frame: .zero)
     
     label.updateTextKeepingAttributes(title)
     textField.applyPlaceHolder(placeHolder)
+    requiredLabel.isHidden = !isRequired
     setupViews()
   }
   
@@ -49,7 +51,12 @@ private extension LabelWithTextFieldView {
   func setupViews() {
     rootContainer.flex
       .define {
-        $0.addItem(label)
+        $0.addItem()
+          .direction(.row)
+          .define {
+            $0.addItem(label)
+            $0.addItem(requiredLabel)
+          }
         $0.addItem(textField).marginTop(12).grow(1)
       }
     

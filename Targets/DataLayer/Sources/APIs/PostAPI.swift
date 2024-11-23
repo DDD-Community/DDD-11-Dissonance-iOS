@@ -14,6 +14,8 @@ import Moya
 
 enum PostAPI {
   case upload(_ post: Post)
+  case edit(id: Int, post: Post)
+  case delete(id: Int)
   case fetchPostList(PostListFetchRequestDTO)
   case fetchBanner
   case fetchPost(id: Int)
@@ -27,11 +29,14 @@ extension PostAPI: TargetType {
   }
   
   var path: String {
+    let adminPath: String = "/admin"
     let basePath: String = "/info-posts"
     
     switch self {
     case .upload:
       return basePath
+    case .edit(let id, _), .delete(let id):
+      return adminPath + basePath + "/\(id)"
     case let .fetchPostList(dto):
       return basePath + "/categories/\(dto.categoryID)/posts"
     case .fetchBanner:
@@ -48,6 +53,10 @@ extension PostAPI: TargetType {
     switch self {
     case .upload:
       return .post
+    case .edit:
+      return .put
+    case .delete:
+      return .delete
     case .fetchPostList, .fetchBanner, .fetchPost:
       return .get
     case .report: 
@@ -63,10 +72,10 @@ extension PostAPI: TargetType {
     var headers: [String : String] = [:]
     
     switch self {
-    case .upload:
+    case .upload, .edit:
       headers["Authorization"] = AppProperties.accessToken
       headers["Content-Type"] = "multipart/form-data"
-    case .report:
+    case .report, .delete:
       headers["Authorization"] = AppProperties.accessToken
     default: 
       return headers
@@ -77,6 +86,10 @@ extension PostAPI: TargetType {
   
   public var task: Task {
     if case .upload(let post) = self {
+      return .uploadMultipart(multipartFormData(post))
+    }
+    
+    if case .edit(_, let post) = self {
       return .uploadMultipart(multipartFormData(post))
     }
     

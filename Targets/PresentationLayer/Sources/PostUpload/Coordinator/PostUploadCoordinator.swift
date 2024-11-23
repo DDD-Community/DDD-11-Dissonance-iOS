@@ -10,7 +10,9 @@ import DIContainer
 import DomainLayer
 import UIKit
 
-protocol PostUploadCoordinatorType: CoordinatorType {}
+protocol PostUploadCoordinatorType: CoordinatorType {
+  func startEdit(originID: Int, originPost: Post)
+}
 
 final class PostUploadCoordinator: PostUploadCoordinatorType {
   
@@ -29,6 +31,11 @@ final class PostUploadCoordinator: PostUploadCoordinatorType {
     let postUploadViewController = postUploadViewController()
     navigationController.pushViewController(postUploadViewController, animated: true)
   }
+  
+  func startEdit(originID: Int, originPost: Post) {
+    let postUploadViewController = postUploadViewController(originID: originID, originPost: originPost)
+    navigationController.pushViewController(postUploadViewController, animated: true)
+  }
 
   func didFinish() {
     navigationController.popViewController(animated: true)
@@ -38,12 +45,12 @@ final class PostUploadCoordinator: PostUploadCoordinatorType {
 
 // MARK: - Private
 private extension PostUploadCoordinator {
-  func postUploadViewController() -> PostUploadViewController {
+  func postUploadViewController(originID: Int? = nil, originPost: Post? = nil) -> PostUploadViewController {
     guard let postUploadUseCase = DIContainer.shared.resolve(type: PostUploadUseCaseType.self) else {
       fatalError()
     }
     
-    let reactor = PostUploadReactor(postUploadUseCase: postUploadUseCase)
+    let reactor = PostUploadReactor(postUploadUseCase: postUploadUseCase, originID: originID, originPost: originPost)
     let viewController = PostUploadViewController(reactor: reactor)
     viewController.coordinator = self
     return viewController

@@ -28,6 +28,18 @@ public final class PostRepository: PostRepositoryType {
       .map(APIResponse<PostUploadResponse>.self)
       .map { (isSuccess: $0.isSuccess, message: $0.message) }
   }
+  
+  public func edit(id: Int, post: Post) -> Single<(isSuccess: Bool, message: String?)> {
+    return provider.rx.request(.edit(id: id, post: post), type: PostEditResponse.self)
+      .map(APIResponse<PostEditResponse>.self)
+      .map { (isSuccess: $0.isSuccess, message: $0.message) }
+  }
+  
+  public func delete(id: Int) -> Single<(isSuccess: Bool, message: String?)> {
+    return provider.rx.request(.delete(id: id))
+      .map(APIResponse<String>.self)
+      .map { (isSuccess: $0.isSuccess, message: $0.message) }
+  }
 
   public func fetchPostList(categoryId: Int, pageable: Pageable) -> Single<[PostCellData]> {
     let postListFetchRequestDTO = PostListFetchRequestDTO(

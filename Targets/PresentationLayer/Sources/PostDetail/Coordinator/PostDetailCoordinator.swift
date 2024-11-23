@@ -46,6 +46,17 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
   func didFinish() {
     navigationController.popViewController(animated: true)
   }
+  
+  func pushEditView(id: Int, post: Post) {
+    guard let postUploadCoordinator = DIContainer.shared.resolve(type: PostUploadCoordinatorType.self)
+            as? PostUploadCoordinator else {
+      return
+    }
+    
+    postUploadCoordinator.parentCoordinator = self
+    addChild(postUploadCoordinator)
+    postUploadCoordinator.startEdit(originID: id, originPost: post)
+  }
 
   func pushWebView(urlString: String) {
     let webViewController: WebViewController = .init(urlString: urlString)

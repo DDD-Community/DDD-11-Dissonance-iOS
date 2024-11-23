@@ -14,6 +14,7 @@ public final class MozipTextField: UITextField {
   
   // MARK: - Properties
   private let disposeBag: DisposeBag = .init()
+  public let valueSubject: BehaviorSubject<String> = .init(value: .init())
   
   // MARK: - Initializer
   public init(placeHolder: String = .init()) {
@@ -55,6 +56,10 @@ private extension MozipTextField {
   }
   
   func bind() {
+    rx.text.orEmpty
+      .bind(to: valueSubject)
+      .disposed(by: disposeBag)
+    
     rx.controlEvent(.editingDidBegin)
       .asSignal()
       .emit(with: self, onNext: { owner, _ in
