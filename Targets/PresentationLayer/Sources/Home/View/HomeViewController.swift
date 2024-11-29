@@ -33,8 +33,15 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   private let recommandingTitleLabel = MozipLabel(
     style: .heading1,
     color: MozipColor.gray800,
-    text: "오늘의 추천 공고"
+    text: "MD Pick 금주의 공고"
   )
+  
+  private let recommandingIcon: UIImageView = {
+    let imageView = UIImageView()
+    imageView.image = DesignSystemAsset.pin.image
+    imageView.contentMode = .scaleAspectFit
+    return imageView
+  }()
   
   override var preferredStatusBarStyle: UIStatusBarStyle {
     return .lightContent
@@ -218,7 +225,13 @@ private extension HomeViewController {
       .direction(.column)
       .justifyContent(.start)
       .define { flex in
-        flex.addItem(recommandingTitleLabel).marginLeft(20).marginTop(32)
+        flex.addItem()
+          .direction(.row)
+          .marginTop(32)
+          .define { flex in
+            flex.addItem(recommandingTitleLabel).marginLeft(20)
+            flex.addItem(recommandingIcon).size(17).marginLeft(8)
+          }
         flex.addItem(bannerView).width(Device.width-40).aspectRatio(2).marginTop(24).marginLeft(20).marginRight(20)
         flex.addItem(collectionView).marginTop(32).grow(1).markDirty()
       }
