@@ -10,6 +10,7 @@ import RxDataSources
 
 public struct PostSection: Equatable {
   public let header: String
+  public let summary: String
   public var items: [Item]
 }
 
@@ -26,7 +27,8 @@ extension PostSection: SectionModelType {
 
 public extension PostSection {
   static func stub(header: String = "공모전",
+                   summary: String = "커리어 성장을 위한 IT 공모전 모음",
                    items: [PostCellData] = [.stub(), .stub(), .stub(), .stub(), .stub()]) -> Self {
-    .init(header: header, items: items)
+    .init(header: header, summary: summary, items: items)
   }
 }

@@ -20,7 +20,7 @@ public final class PostCollectionView: UIView {
   private enum Metric {
     static let cellWidth: CGFloat = 148
     static let cellHeight: CGFloat = 236
-    static let headerHeight: CGFloat = 22
+    static let headerHeight: CGFloat = 92
     static let sectionTopMargin: CGFloat = 24
     static let sectionBottomMargin: CGFloat = 32
     static let horizontalMargin: CGFloat = 20
@@ -48,8 +48,8 @@ public final class PostCollectionView: UIView {
       let header: PostHeader = collectionView.dequeueReusableSupplementaryView(
         ofKind: UICollectionView.elementKindSectionHeader,
         for: indexPath)
-      let headerTitle = dataSource.sectionModels[indexPath.section].header
-      header.setTitle(headerTitle)
+      let sectionModel = dataSource.sectionModels[indexPath.section]
+      header.setData(title: sectionModel.header, summary: sectionModel.summary)
       header.tapObservable
         .map { indexPath }
         .bind(to: headerTapRelay)
@@ -76,7 +76,7 @@ public final class PostCollectionView: UIView {
   // MARK: - Overrides
   public override func sizeThatFits(_ size: CGSize) -> CGSize {
     let sectionsCount: CGFloat = CGFloat(sectionsRelay.value.count)
-    let height: CGFloat = (282*sectionsCount) + (32*(sectionsCount-1))
+    let height: CGFloat = 390*sectionsCount
     return CGSize(width: Device.width, height: height)
   }
   
@@ -165,7 +165,7 @@ public final class PostCollectionView: UIView {
   
   private func configureSectionHeaderLayout() -> NSCollectionLayoutBoundarySupplementaryItem {
     let headerFooterSize = NSCollectionLayoutSize(
-      widthDimension: .estimated(Device.width - Metric.horizontalMargin*2),
+      widthDimension: .estimated(Device.width),
       heightDimension: .estimated(Metric.headerHeight)
     )
     let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
