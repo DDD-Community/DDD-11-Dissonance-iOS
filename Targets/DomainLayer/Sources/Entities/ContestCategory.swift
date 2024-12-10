@@ -6,18 +6,20 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
+import UIKit
+
 public enum ContestCategory: String, CaseIterable {
   case all = "전체"
-  case idea = "아이디어·기획"
+  case develop = "개발"
   case design = "디자인"
-  case develop = "개발·IT"
+  case idea = "기획·아이디어"
   
   public var id: Int {
     switch self {
     case .all:     return 1
-    case .idea:    return 4
-    case .design:  return 5
     case .develop: return 6
+    case .design:  return 5
+    case .idea:    return 4
     }
   }
 }
