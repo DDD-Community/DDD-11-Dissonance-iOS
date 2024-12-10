@@ -9,7 +9,7 @@
 import DomainLayer
 
 public struct PostCellResponse: Decodable {
-  let id: Int
+  let id, viewCount: Int
   let imgUrl, title, remainingDays: String
 }
 
@@ -20,7 +20,8 @@ public extension PostCellResponse {
     .init(id: id,
           imageURL: imgUrl,
           title: title,
-          remainTag: remainingDays)
+          remainTag: remainingDays,
+          viewCount: viewCount)
   }
 }
 

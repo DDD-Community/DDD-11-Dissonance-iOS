@@ -80,6 +80,9 @@ public final class PostCell: UICollectionViewCell {
     setRemainDayTag(data.remainTag, mode: data.remainTag == "마감" ? .dark : .light)
     remainDayTag.flex.markDirty()
     
+    viewCountLabel.updateTextKeepingAttributes(String(data.viewCount))
+    viewCountLabel.flex.markDirty()
+    
     setNeedsLayout()
   }
   
