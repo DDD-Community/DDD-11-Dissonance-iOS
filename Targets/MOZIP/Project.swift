@@ -7,10 +7,15 @@
 
 import ProjectDescription
 import ProjectDescriptionHelpers
+import Foundation
 
-private let infoPlist: [String: Plist.Value] = [
-    "CFBundleShortVersionString": "1.3",
-    "CFBundleVersion": "10",
+// Fastlane에서 전달된 환경 변수
+let version = ProcessInfo.processInfo.environment["TUIST_VERSION_NUMBER"] ?? "1.0.0"
+let buildNumber = ProcessInfo.processInfo.environment["TUIST_BUILD_NUMBER"] ?? "1"
+
+private var infoPlist: [String: Plist.Value] = [
+    "CFBundleShortVersionString": .string(version),
+    "CFBundleVersion": .string(buildNumber),
     "CFBundleIconName": "AppIcon",
     "CFBundleDisplayName": "$(PRODUCT_NAME)",
     "UILaunchStoryboardName": "LaunchScreen",
