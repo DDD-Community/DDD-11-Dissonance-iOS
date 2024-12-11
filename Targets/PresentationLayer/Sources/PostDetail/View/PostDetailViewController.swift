@@ -47,6 +47,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   }()
   private let titleLabel: MozipLabel = .init(style: .heading1, color: MozipColor.gray800)
   private let organizationLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray500)
+  private let countView: ViewCountView = .init()
   private let recruitDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "모집 기간")
   private let recruitDateValueLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray700)
   private let recruitJobLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "모집 대상")
@@ -172,9 +173,19 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
         $0.addItem()
           .marginHorizontal(20)
           .define {
-            // 제목, 모집 기관
+            // 제목
             $0.addItem(titleLabel).marginTop(24)
-            $0.addItem(organizationLabel).marginTop(8)
+            
+            // 모집 기관, 조회수
+            $0.addItem()
+              .direction(.row)
+              .justifyContent(.spaceBetween)
+              .marginTop(8)
+              .define {
+                $0.addItem(organizationLabel).shrink(1)
+                $0.addItem(countView).marginLeft(16)
+              }
+            
             $0.addDivider(color: MozipColor.gray50).marginTop(16)
             
             // 모집 기간, 활동 기간
@@ -226,6 +237,7 @@ private extension PostDetailViewController {
       owner.imageViewController.setImage(UIImage(data: post.imageData)!) // TODO: 추후 placeholder 이미지 적용
       owner.titleLabel.text = post.title
       owner.organizationLabel.text = post.organization
+      owner.countView.setupCountLabel(post.viewCount)
       owner.recruitDateValueLabel.text = post.recruitStartDate + " ~ " + post.recruitEndDate
       owner.addTagLabel(post.jobGroups)
       owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
@@ -378,10 +390,12 @@ private extension PostDetailViewController {
   }
   
   func updateLayout() {
-    [titleLabel, organizationLabel, activityContentsValueTextView, rootContainer].forEach {
-      $0.flex.layout(mode: .adjustHeight)
+    [titleLabel, organizationLabel, activityContentsValueTextView].forEach {
+      $0.flex.markDirty()
     }
+    countView.markDirty()
     
+    rootContainer.flex.layout(mode: .adjustHeight)
     scrollView.contentSize = rootContainer.frame.size
   }
   
