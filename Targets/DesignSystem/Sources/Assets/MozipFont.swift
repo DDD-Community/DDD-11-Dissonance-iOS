@@ -11,6 +11,7 @@ import UIKit
 fileprivate typealias pretendard = DesignSystemFontFamily.Pretendard
 
 public enum MozipFontStyle {
+  case extraHeading
   case heading1
   case heading2
   case heading3
@@ -25,6 +26,7 @@ public enum MozipFontStyle {
   
   public var font: UIFont {
     switch self {
+    case .extraHeading: return pretendard.bold.font(size: 14)
     case .heading1: return pretendard.semiBold.font(size: 20)
     case .heading2: return pretendard.semiBold.font(size: 18)
     case .heading3: return pretendard.semiBold.font(size: 16)
@@ -41,6 +43,7 @@ public enum MozipFontStyle {
   
   public var lineHeightMultiplier: CGFloat {
     switch self {
+    case .extraHeading: return 1
     case .heading1: return 1
     case .heading2: return 1.4
     case .heading3: return 1.4
