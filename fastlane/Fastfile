@@ -35,7 +35,7 @@ platform :ios do
 
     build_app(
       scheme: "MOZIP",  
-      configuration: "Debug"
+      configuration: "Release"
     )
     upload_to_testflight
     # add actions here: https://docs.fastlane.tools/actions
