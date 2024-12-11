@@ -46,6 +46,7 @@ public extension PostDetailResponse {
       post.title = self.title
       post.categoryTitle = self.category
       post.organization = self.organization
+      post.viewCount = self.viewCount
       (post.recruitStartDate, post.recruitEndDate) = self.periodComponents(self.recruitmentPeriod)
       post.jobGroups = self.jobGroups
       (post.activityStartDate, post.activityEndDate) = self.periodComponents(self.activityPeriod)
