@@ -90,3 +90,10 @@ Dependencies/
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+
+# fastlane 환경변수 숨김
+/fastlane/.env
+TUQ46M4Y57.cer
+TUQ46M4Y57.certSigningRequest
+TUQ46M4Y57.p12
+AppStore_run.ddd.MOZIP.mobileprovision
