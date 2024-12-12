@@ -124,12 +124,12 @@ private extension HomeViewController {
   
   // MARK: Methods
   func bindAction(reactor: HomeReactor) {
-    rx.viewDidLoad
+    rx.viewWillAppear
       .map { Action.fetchPosts }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
-    rx.viewDidLoad
+    rx.viewWillAppear
       .map { Action.fetchBanners }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)

@@ -113,12 +113,10 @@ private extension PostListViewController {
   
   // MARK: Methods
   func bindAction(reactor: PostListReactor) {
-    rx.viewDidLoad
+    rx.viewWillAppear
       .withUnretained(self)
-      .map { owner, _ in
-        let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
-        return Action.fetchPosts(id: id, order: .latest)
-      }
+      .map { owner, _ in Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1 }
+      .map { Action.fetchPosts(id: $0, order: .latest) }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     

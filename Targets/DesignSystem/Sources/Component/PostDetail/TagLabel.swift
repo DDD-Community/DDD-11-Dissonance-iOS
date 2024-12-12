@@ -29,9 +29,9 @@ private extension TagLabel {
   func setupView() {
     clipsToBounds = true
     numberOfLines = 0
-    backgroundColor = MozipColor.gray10
-    font = MozipFontStyle.body4.font
-    textColor = MozipColor.gray500
+    backgroundColor = MozipColor.gray50
+    font = MozipFontStyle.extraHeading.font
+    textColor = MozipColor.gray600
     textAlignment = .center
     
     flex.paddingHorizontal(12).paddingVertical(8).cornerRadius(18)
