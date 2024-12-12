@@ -272,6 +272,7 @@ private extension PostDetailViewController {
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
         owner.coordinator?.didFinish()
+        owner.navigationController?.view.showToast(message: "공고를 삭제하였습니다.")
       })
       .disposed(by: disposeBag)
     
