@@ -45,38 +45,30 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     imageView.layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 4, blur: 8, spread: 0)
     return imageView
   }()
-  private let titleLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "제목")
-  private let titleValueLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800)
-  private let organizationLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "기관•단체")
-  private let organizationValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
-  private let recruitDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 기간")
-  private let recruitDateValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
-  private let recruitJobLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 대상")
+  private let titleLabel: MozipLabel = .init(style: .heading1, color: MozipColor.gray800)
+  private let organizationLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray500)
+  private let countView: ViewCountView = .init()
+  private let recruitDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "모집 기간")
+  private let recruitDateValueLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray700)
+  private let recruitJobLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "모집 대상")
   private let tagLabelAreaView: UIView = .init()
-  private let activityDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "활동 기간")
-  private let activityDateValueLabel: MozipLabel = .init(style: .body4, color: MozipColor.gray500)
-  private let activityContentsLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "활동 내용")
+  private let activityDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "활동 기간")
+  private let activityDateValueLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray700)
+  private let activityContentsLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "활동 내용")
   private let activityContentsValueTextView: UITextView = {
     let textView = UITextView()
     textView.isEditable = false
     textView.isSelectable = true
     textView.isScrollEnabled = false
     textView.dataDetectorTypes = .link
-    textView.font = DesignSystemFontFamily.Pretendard.medium.font(size: 14)
-    textView.textColor = MozipColor.gray500
+    textView.font = DesignSystemFontFamily.Pretendard.regular.font(size: 16)
+    textView.textColor = MozipColor.gray800
+    textView.backgroundColor = MozipColor.gray10
+    textView.textContainerInset = .init(top: 16, left: 16, bottom: 16, right: 16)
     return textView
   }()
   private let bottomShadowView: BottomShadowView = .init()
   private let showMoreButton: RectangleButton = .init(title: "지원하기", fontStyle: .heading1, titleColor: .white, backgroundColor: MozipColor.primary500)
-  
-  private let reportButton: UIButton = {
-    let button: UIButton = .init()
-    button.setTitle("이 공고 신고하기", for: .normal)
-    button.setTitleColor(MozipColor.gray400, for: .normal)
-    button.titleLabel?.font = MozipFontStyle.caption2.font
-    button.setUnderline()
-    return button
-  }()
   
   private var alertController: UIAlertController {
     let alertController: UIAlertController = .init()
@@ -88,17 +80,17 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
         self?.coordinator?.pushEditView(id: originID, post: originPost) 
       }),
       
-      .makeAction(type: .postDelete, action: { [weak self] in
-        self?.presentAlert(type: .deletePost, rightButtonAction: { [weak self] in
-          self?.reactor?.action.onNext(.didTapDeleteButton)
-        })
-      }),
+        .makeAction(type: .postDelete, action: { [weak self] in
+          self?.presentAlert(type: .deletePost, rightButtonAction: { [weak self] in
+            self?.reactor?.action.onNext(.didTapDeleteButton)
+          })
+        }),
       
-      .makeAction(type: .postReport, action: { [weak self] in
-        self?.reportActionSheetSubject.onNext(())
-      }),
+        .makeAction(type: .postReport, action: { [weak self] in
+          self?.reportActionSheetSubject.onNext(())
+        }),
       
-      .makeAction(type: .cancel)
+        .makeAction(type: .cancel)
     ]
     
     actions.forEach {
@@ -175,31 +167,57 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     
     rootContainer.flex
       .define {
+        // 썸네일 이미지뷰
         $0.addItem(imageView).aspectRatio(1)
         
         $0.addItem()
           .marginHorizontal(20)
           .define {
-            $0.addItem(titleLabel).marginTop(23)
-            $0.addItem(titleValueLabel).marginTop(8)
-            $0.addItem(organizationLabel).marginTop(23)
-            $0.addItem(organizationValueLabel).marginTop(8)
-            $0.addDivider().marginTop(24)
-            $0.addItem(recruitDateLabel).marginTop(24)
-            $0.addItem(recruitDateValueLabel).marginTop(8)
-            $0.addItem(recruitJobLabel).marginTop(23)
+            // 제목
+            $0.addItem(titleLabel).marginTop(24)
             
+            // 모집 기관, 조회수
+            $0.addItem()
+              .direction(.row)
+              .justifyContent(.spaceBetween)
+              .marginTop(8)
+              .define {
+                $0.addItem(organizationLabel).shrink(1)
+                $0.addItem(countView).marginLeft(16)
+              }
+            
+            $0.addDivider(color: MozipColor.gray50).marginTop(16)
+            
+            // 모집 기간, 활동 기간
+            $0.addItem()
+              .marginTop(24)
+              .define {
+                $0.addItem()
+                  .direction(.row)
+                  .define {
+                    $0.addItem(recruitDateLabel)
+                    $0.addItem(recruitDateValueLabel).marginLeft(34).grow(1)
+                  }
+                
+                $0.addItem()
+                  .marginTop(8)
+                  .direction(.row)
+                  .define {
+                    $0.addItem(activityDateLabel)
+                    $0.addItem(activityDateValueLabel).marginLeft(34).grow(1)
+                  }
+              }
+            
+            // 모집 대상
+            $0.addItem(recruitJobLabel).marginTop(32)
             $0.addItem(tagLabelAreaView)
               .direction(.row)
               .wrap(.wrap)
               .alignContent(.spaceBetween)
             
-            $0.addDivider().marginTop(24)
-            $0.addItem(activityDateLabel).marginTop(24)
-            $0.addItem(activityDateValueLabel).marginTop(8)
-            $0.addItem(activityContentsLabel).marginTop(24)
-            $0.addItem(activityContentsValueTextView).marginTop(8)
-            $0.addItem(reportButton).marginTop(24).width(80).marginBottom(23)
+            // 활동 내용
+            $0.addItem(activityContentsLabel).marginTop(32)
+            $0.addItem(activityContentsValueTextView).marginTop(12).marginBottom(30).cornerRadius(8)
           }
       }
   }
@@ -217,8 +235,9 @@ private extension PostDetailViewController {
       owner.navigationBar.setNavigationTitle(post.categoryTitle)
       owner.imageView.image = UIImage(data: post.imageData)
       owner.imageViewController.setImage(UIImage(data: post.imageData)!) // TODO: 추후 placeholder 이미지 적용
-      owner.titleValueLabel.text = post.title
-      owner.organizationValueLabel.text = post.organization
+      owner.titleLabel.text = post.title
+      owner.organizationLabel.text = post.organization
+      owner.countView.setupCountLabel(post.viewCount)
       owner.recruitDateValueLabel.text = post.recruitStartDate + " ~ " + post.recruitEndDate
       owner.addTagLabel(post.jobGroups)
       owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
@@ -244,7 +263,7 @@ private extension PostDetailViewController {
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
-    Observable.merge([reportButton.rx.tap.asObservable(), reportActionSheetSubject])
+    reportActionSheetSubject
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, reportAction in
         if AppProperties.accessToken == .init() {
@@ -371,10 +390,12 @@ private extension PostDetailViewController {
   }
   
   func updateLayout() {
-    [titleValueLabel, organizationValueLabel, activityContentsValueTextView, rootContainer].forEach {
-      $0.flex.layout(mode: .adjustHeight)
+    [titleLabel, organizationLabel, activityContentsValueTextView].forEach {
+      $0.flex.markDirty()
     }
+    countView.markDirty()
     
+    rootContainer.flex.layout(mode: .adjustHeight)
     scrollView.contentSize = rootContainer.frame.size
   }
   

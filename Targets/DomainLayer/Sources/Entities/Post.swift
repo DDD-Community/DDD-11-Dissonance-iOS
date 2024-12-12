@@ -15,6 +15,7 @@ public struct Post: Equatable {
   public var title: String = .init()
   public var categoryTitle: String = .init()
   public var organization: String = .init()
+  public var viewCount: Int = .init()
   public var recruitStartDate: String = .init()
   public var recruitEndDate: String = .init()
   public var jobGroups: [String] = []
