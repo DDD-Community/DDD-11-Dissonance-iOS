@@ -17,7 +17,7 @@ public final class LabelWithTextFieldView: UIView {
   // MARK: - Properties
   private let rootContainer: UIView = .init()
   private let label: MozipLabel = .init(style: .heading3, color: MozipColor.gray800)
-  private let requiredLabel: MozipLabel = .init(style: .heading3, color: MozipColor.primary500, text: "*")
+  private let requiredLabel: MozipLabel = .init(style: .heading3, color: MozipColor.primary500, text: " *")
   public let textField: MozipTextField = .init()
   public var textObservable: Observable<String> {
     textField.rx.text.orEmpty.asObservable()
