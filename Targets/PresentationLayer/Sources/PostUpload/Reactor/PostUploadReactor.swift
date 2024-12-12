@@ -16,7 +16,7 @@ final class PostUploadReactor: Reactor {
   // MARK: - Properties
   private let postUploadUseCase: PostUploadUseCaseType
   private(set) var post: Post
-  private let originID: Int? 
+  public let originID: Int? 
   var initialState: State = .init()
 
   enum Action {

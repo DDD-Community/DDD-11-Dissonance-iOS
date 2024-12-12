@@ -171,6 +171,10 @@ private extension PostUploadViewController {
       case .success:
         owner.coordinator?.didFinish()
         
+        if owner.reactor?.originID != nil {
+          owner.navigationController?.view.showToast(message: "공고 수정이 완료되었습니다.")
+        }
+        
       case .error(let message):
         guard let message else { return }
         owner.view.showToast(message: message)
