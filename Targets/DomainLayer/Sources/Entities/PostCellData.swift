@@ -47,7 +47,7 @@ public extension PostCellData {
 // MARK: - toPostSection
 
 public extension Array<PostCellData> {
-  func toPostSection(header: String) -> PostSection {
-    .init(header: header, items: self)
+  func toPostSection(header: String, summary: String) -> PostSection {
+    .init(header: header, summary: summary, items: self)
   }
 }

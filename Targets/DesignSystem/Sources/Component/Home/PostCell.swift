@@ -18,8 +18,8 @@ public final class PostCell: UICollectionViewCell {
   private enum Metric {
     static let verticalSpacing: CGFloat = 8
     static let imageCornerRadius: CGFloat = 8
-    static let lightBackgroundColor: UIColor = MozipColor.gray10
-    static let lightTextColor: UIColor = MozipColor.gray500
+    static let lightBackgroundColor: UIColor = MozipColor.primary50
+    static let lightTextColor: UIColor = MozipColor.primary400
     static let darkBackgroundColor: UIColor = MozipColor.gray400
     static let darkTextColor: UIColor = MozipColor.white
   }
@@ -36,6 +36,13 @@ public final class PostCell: UICollectionViewCell {
   private let titleLabel = MozipLabel(style: .body3, color: MozipColor.gray800, numberOfLines: 2)
   private let remainDayTagBackground = UIView()
   private let remainDayTag = MozipLabel(style: .body4, color: MozipColor.gray500)
+  private let viewCountIcon: UIImageView = {
+    let imageView = UIImageView()
+    imageView.image = DesignSystemAsset.look.image
+    imageView.contentMode = .scaleAspectFit
+    return imageView
+  }()
+  private let viewCountLabel = MozipLabel(style: .caption1, color: MozipColor.gray400, text: "349")
   
   // MARK: - Initializers
   public override init(frame: CGRect) {
@@ -94,13 +101,22 @@ public final class PostCell: UICollectionViewCell {
       .define { flex in
         flex.addItem(thumbnailImage).width(100%).aspectRatio(1)
         flex.addItem(titleLabel)
-        flex.addItem(remainDayTagBackground)
-          .backgroundColor(MozipColor.gray10)
-          .cornerRadius(12)
+        flex.addItem()
+          .width(100%)
+          .direction(.row)
+          .alignItems(.center)
           .define { flex in
-            flex.addItem(remainDayTag)
-              .marginHorizontal(8)
-              .marginVertical(2)
+            flex.addItem  (remainDayTagBackground)
+              .backgroundColor(MozipColor.gray10)
+              .cornerRadius(12)
+              .define { flex in
+                flex.addItem(remainDayTag)
+                  .marginHorizontal(8)
+                  .marginVertical(2)
+              }
+            flex.addItem().grow(1)
+            flex.addItem(viewCountIcon).width(12).height(7.5)
+            flex.addItem(viewCountLabel).marginLeft(4)
           }
       }
   }

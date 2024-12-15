@@ -30,14 +30,16 @@ public final class HomeNavigationBar: UIView {
   
   private let logoImageView: UIImageView = {
     let imageView = UIImageView()
-    imageView.image = DesignSystemAsset.logoMozip.image
+    let image = DesignSystemAsset.logoMozip.image
+    imageView.image = image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal)
     imageView.contentMode = .scaleAspectFit
     return imageView
   }()
   
   private let mypageButton: UIButton = {
     let button = UIButton()
-    button.setImage(DesignSystemAsset.personEmpty.image, for: .normal)
+    let image = DesignSystemAsset.personEmpty.image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal)
+    button.setImage(image, for: .normal)
     return button
   }()
   
@@ -64,7 +66,8 @@ public final class HomeNavigationBar: UIView {
   
   // MARK: - Methods
   private func setupInitialState() {
-    self.backgroundColor = MozipColor.primary500
+    self.backgroundColor = MozipColor.white
+    layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 8, blur: 8, spread: 0)
   }
   
   private func setupViewHierarchy() {

@@ -18,9 +18,17 @@ import RxCocoa
 final class PostListViewController: BaseViewController<PostListReactor>, Coordinatable {
   
   enum PostKind: String, CaseIterable {
-    case 공모전 = "공모전"
-    case 해커톤 = "해커톤"
-    case 동아리 = "동아리"
+    case 공모전 = "공모전 📑"
+    case 해커톤 = "해커톤 🏆"
+    case 동아리 = "IT 동아리 💻"
+    
+    var title: String {
+      switch self {
+      case .공모전: "공모전"
+      case .해커톤: "해커톤"
+      case .동아리: "동아리"
+      }
+    }
   }
   
   // MARK: Properties
