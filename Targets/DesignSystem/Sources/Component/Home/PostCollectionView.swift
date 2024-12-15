@@ -36,6 +36,7 @@ public final class PostCollectionView: UIView {
   
   private let sectionsRelay: BehaviorRelay<[PostSection]> = .init(value: [])
   private let disposeBag = DisposeBag()
+  private var headerDisposeBag = DisposeBag()
   
   private lazy var dataSource = RxCollectionViewSectionedReloadDataSource<PostSection>(
     configureCell: { (dataSource, collectionView, indexPath, item) in
@@ -53,7 +54,7 @@ public final class PostCollectionView: UIView {
       header.tapObservable
         .map { indexPath }
         .bind(to: headerTapRelay)
-        .disposed(by: disposeBag)
+        .disposed(by: headerDisposeBag)
       return header
     })
   
@@ -87,6 +88,7 @@ public final class PostCollectionView: UIView {
   
   // MARK: - Methods
   public func setupData(_ data: [PostSection]) {
+    headerDisposeBag = DisposeBag()
     sectionsRelay.accept(data)
   }
   

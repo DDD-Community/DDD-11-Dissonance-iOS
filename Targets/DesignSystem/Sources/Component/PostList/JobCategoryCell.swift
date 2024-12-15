@@ -18,19 +18,21 @@ public final class JobCategoryCell: UICollectionViewCell {
   }
   
   private enum Metric {
-    static let height: CGFloat = 32
-    static let cornerRadius: CGFloat = 16
-    static let horizontalMargin: CGFloat = 12
-    static let verticalMargin: CGFloat = 5
-    static let lightBackgroundColor: UIColor = MozipColor.white
-    static let lightTextColor: UIColor = MozipColor.gray800
+    static let cornerRadius: CGFloat = 20
+    static let lightBackgroundColor: UIColor = MozipColor.primary50
+    static let lightTextColor: UIColor = MozipColor.primary500
     static let darkBackgroundColor: UIColor = MozipColor.primary500
     static let darkTextColor: UIColor = MozipColor.gray10
   }
   
   // MARK: - UI
   private let rootFlexContainer = UIView()
-  private let tagLabel = MozipLabel(style: .body2, color: MozipColor.gray800)
+  private let tagLabel = MozipLabel(style: .heading3, color: MozipColor.primary500)
+  private let leftIconView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.contentMode = .scaleAspectFit
+    return imageView
+  }()
   
   // MARK: - Initializers
   public override init(frame: CGRect) {
@@ -55,7 +57,12 @@ public final class JobCategoryCell: UICollectionViewCell {
   }
   
   // MARK: - Methods
-  public func setText(_ text: String, mode: Mode = .light) {
+  public func setData(text: String, icon: UIImage?, mode: Mode = .light) {
+    if let iconImage = icon {
+      leftIconView.image = iconImage
+      leftIconView.flex.size(24).marginRight(8)
+      rootFlexContainer.flex.layout()
+    }
     tagLabel.updateTextKeepingAttributes(text)
     setMode(mode)
   }
@@ -71,22 +78,22 @@ public final class JobCategoryCell: UICollectionViewCell {
   private func setupViewHierarchy() {
     addSubview(rootFlexContainer)
     rootFlexContainer.flex
+      .direction(.row)
+      .alignItems(.center)
+      .justifyContent(.center)
       .define { flex in
+        flex.addItem(leftIconView)
         flex.addItem(tagLabel)
-          .marginHorizontal(Metric.horizontalMargin)
-          .marginVertical(Metric.verticalMargin)
       }
   }
   
   private func setupLayout() {
     rootFlexContainer.pin.all()
-    rootFlexContainer.flex.layout(mode: .adjustWidth)
+    rootFlexContainer.flex.layout(mode: .fitContainer)
   }
   
   private func setupInitialSetting() {
-    contentView.layer.borderWidth = 1
     contentView.layer.cornerRadius = Metric.cornerRadius
-    contentView.layer.borderColor = MozipColor.primary500.cgColor
     rootFlexContainer.layer.cornerRadius = Metric.cornerRadius
   }
 }

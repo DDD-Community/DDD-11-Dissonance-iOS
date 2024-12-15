@@ -8,6 +8,7 @@
 
 import UIKit
 import DesignSystem
+import DomainLayer
 
 import FlexLayout
 import PinLayout
@@ -33,6 +34,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   // MARK: Properties
   weak var coordinator: PostListCoordinator?
   private let postkind: PostKind
+  private let orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
   
   // MARK: UI
   private let scrollView = UIScrollView()
@@ -41,11 +43,12 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   private let postOrderControlView = PostOrderControlView()
   private let collectionView = PostListCollectionView()
   private let postListSkeleton = PostListSkeleton()
+  private let orderDropDownMenu = OrderDropDownMenu()
   
   private let navigationBar = MozipNavigationBar(
     title: "공모전",
-    tintColor: .white,
-    backgroundColor: MozipColor.primary500
+    tintColor: MozipColor.gray900,
+    backgroundColor: MozipColor.white
   )
   
   override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -100,6 +103,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   
   private func setupInitialState() {
     scrollView.alpha = 0
+    orderDropDownMenu.alpha = 0
     navigationBar.setNavigationTitle(postkind.title)
   }
 }
@@ -126,9 +130,28 @@ private extension PostListViewController {
       .emit(to: reactor.action)
       .disposed(by: disposeBag)
     
+    postOrderControlView.isOrderButtonTappedRelay
+      .asSignal(onErrorJustReturn: false)
+      .emit(with: self) { owner, bool in
+        UIView.animate(withDuration: 0.3) {
+          owner.updateOrderMenuLayout(bool)
+        }
+        owner.view.setNeedsLayout()
+      }
+      .disposed(by: disposeBag)
+    
+    orderDropDownMenu.isLatestOrder
+      .map { $0 ? .latest : .deadline }
+      .bind(with: self) { owner, order in
+        owner.orderRelay.accept(order)
+        owner.postOrderControlView.setOrder(order)
+        owner.postOrderControlView.isOrderButtonTappedRelay.accept(false)
+      }
+      .disposed(by: disposeBag)
+    
     if postkind == .공모전 {
       Observable.combineLatest(
-        postOrderControlView.orderRelay,
+        orderRelay,
         jobCategoryView.selectionRelay
       )
       .distinctUntilChanged { previous, current in
@@ -145,7 +168,7 @@ private extension PostListViewController {
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     } else {
-      postOrderControlView.orderRelay
+      orderRelay
         .distinctUntilChanged()
         .withUnretained(self)
         .map { owner, order in
@@ -211,17 +234,22 @@ private extension PostListViewController {
     view.addSubview(postListSkeleton)
     view.addSubview(scrollView)
     scrollView.addSubview(contentView)
+    scrollView.addSubview(orderDropDownMenu)
     
-    contentView.flex.direction(.column).justifyContent(.start).define { flex in
-      flex.addItem(postOrderControlView)
-      flex.addItem(collectionView)
-    }
+    contentView.flex
+      .direction(.column)
+      .justifyContent(.start)
+      .define { flex in
+        flex.addItem().width(100%).height(8).backgroundColor(MozipColor.gray10)
+        flex.addItem(postOrderControlView)
+        flex.addItem(collectionView)
+      }
   }
   
   func setupViewLayout() {
     navigationBar.pin.top().left().right().sizeToFit(.content)
     if postkind == .공모전 {
-      jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit()
+      jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit().marginTop(10)
       postListSkeleton.pin.top(to: jobCategoryView.edge.bottom).left().right().bottom()
       scrollView.pin.left().right().bottom().top(to: jobCategoryView.edge.bottom)
     } else {
@@ -232,5 +260,24 @@ private extension PostListViewController {
     contentView.flex.layout(mode: .adjustHeight)
     scrollView.contentSize = contentView.frame.size
     collectionView.flex.markDirty()
+    navigationBar.layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 4, blur: 8, spread: 0)
+    updateOrderMenuLayout(postOrderControlView.isOrderButtonTappedRelay.value)
+  }
+  
+  func updateOrderMenuLayout(_ isTapped: Bool) {
+    if isTapped {
+      orderDropDownMenu.pin
+        .topRight(to: postOrderControlView.anchor.bottomRight)
+        .right()
+        .marginRight(20)
+      orderDropDownMenu.alpha = 1
+    } else {
+      orderDropDownMenu.pin
+        .topRight(to: postOrderControlView.anchor.bottomRight)
+        .right()
+        .marginRight(20)
+        .marginTop(-10)
+      orderDropDownMenu.alpha = 0
+    }
   }
 }

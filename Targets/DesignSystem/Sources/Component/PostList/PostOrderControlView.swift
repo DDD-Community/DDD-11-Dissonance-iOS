@@ -21,21 +21,20 @@ public final class PostOrderControlView: UIView {
     static let verticalPadding: CGFloat = 16
   }
   
-  public var orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
+  public let isOrderButtonTappedRelay: BehaviorRelay<Bool> = .init(value: false)
   private var disposeBag = DisposeBag()
   
   // MARK: - UI
   private let rootFlexContainer = UIView()
   private let totalCountLabel = MozipLabel(style: .body2, color: MozipColor.gray600)
-  private let latestButton = SortButton(title: "최신순")
-  private let deadlineButton = SortButton(title: "마감순")
+  private let orderButton = OrderButton()
   
   // MARK: - Initializers
   public init() {
     super.init(frame: .zero)
     setupViewHierarchy()
     setupInitialSetting()
-    bindButton()
+    bind()
   }
   
   required init?(coder: NSCoder) {
@@ -55,6 +54,10 @@ public final class PostOrderControlView: UIView {
     setNeedsLayout()
   }
   
+  public func setOrder(_ order: PostOrder) {
+    orderButton.setTitle(text: order.title)
+  }
+  
   private func setupViewHierarchy() {
     addSubview(rootFlexContainer)
     rootFlexContainer.flex
@@ -65,8 +68,7 @@ public final class PostOrderControlView: UIView {
       .define { flex in
         flex.addItem(totalCountLabel)
         flex.addItem().grow(1)
-        flex.addItem(latestButton).width(57).height(32)
-        flex.addItem(deadlineButton).width(57).height(32).marginLeft(12)
+        flex.addItem(orderButton)
       }
   }
   
@@ -75,27 +77,13 @@ public final class PostOrderControlView: UIView {
     rootFlexContainer.flex.layout()
   }
   
-  private func setupInitialSetting() {
-    latestButton.setHighlight(true)
-  }
+  private func setupInitialSetting() {}
   
-  private func bindButton() {
-    latestButton.rx.tap
-      .map { PostOrder.latest }
-      .bind(to: orderRelay)
-      .disposed(by: disposeBag)
-    
-    deadlineButton.rx.tap
-      .map { PostOrder.deadline }
-      .bind(to: orderRelay)
-      .disposed(by: disposeBag)
-    
-    orderRelay
-      .distinctUntilChanged()
-      .asSignal(onErrorJustReturn: .latest)
-      .emit(with: self) { owner, order in
-        owner.latestButton.setHighlight(order == .latest)
-        owner.deadlineButton.setHighlight(order == .deadline)
+  private func bind() {
+    orderButton.rxGesture.tap
+      .bind(with: self) { owner, _ in
+        let currentValue = owner.isOrderButtonTappedRelay.value
+        owner.isOrderButtonTappedRelay.accept(!currentValue)
       }
       .disposed(by: disposeBag)
   }

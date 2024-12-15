@@ -9,4 +9,11 @@
 public enum PostOrder: String {
   case latest
   case deadline
+  
+  public var title: String {
+    switch self {
+    case .latest:   "최신순"
+    case .deadline: "마감순"
+    }
+  }
 }

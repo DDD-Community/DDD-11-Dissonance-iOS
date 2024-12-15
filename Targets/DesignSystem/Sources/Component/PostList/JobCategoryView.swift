@@ -15,6 +15,11 @@ import PinLayout
 import FlexLayout
 
 public final class JobCategoryView: UIView {
+  private enum Metric {
+    static let cellSpacing: CGFloat = 8
+  }
+  
+  // MARK: - Properties
   public let selectionRelay: BehaviorRelay<ContestCategory> = .init(value: .all)
   private let dataRelay: BehaviorRelay<[String]> = .init(value: ContestCategory.allCases.map { $0.rawValue })
   private let disposeBag = DisposeBag()
@@ -64,7 +69,7 @@ public final class JobCategoryView: UIView {
   private func configureCollectionViewFlowLayout() -> UICollectionViewFlowLayout {
     let flowLayout = UICollectionViewFlowLayout()
     flowLayout.scrollDirection = .horizontal
-    flowLayout.minimumLineSpacing = 17
+    flowLayout.minimumLineSpacing = Metric.cellSpacing
     flowLayout.sectionInset = .init(top: 0, left: 20, bottom: 0, right: 20)
     return flowLayout
   }
@@ -91,8 +96,11 @@ public final class JobCategoryView: UIView {
         to: collectionView.rx.items(
           cellIdentifier: JobCategoryCell.defaultReuseIdentifier,
           cellType: JobCategoryCell.self)
-      ) { index, item, cell in
-        cell.setText(item)
+      ) { [weak self] index, item, cell in
+        guard let self = self else { return }
+        let image = self.fetchImage(from: item)
+        let mode = self.fetchSelectedState(from: item)
+        cell.setData(text: item, icon: image, mode: mode)
       }
       .disposed(by: disposeBag)
     
@@ -112,6 +120,19 @@ public final class JobCategoryView: UIView {
       .bind(to: selectionRelay)
       .disposed(by: disposeBag)
   }
+  
+  private func fetchImage(from item: String) -> UIImage? {
+    switch item {
+    case "개발":       return DesignSystemAsset.developIcon.image
+    case "디자인":      return DesignSystemAsset.designIcon.image
+    case "기획·아이디어": return DesignSystemAsset.pmIcon.image
+    default:           return nil
+    }
+  }
+  
+  private func fetchSelectedState(from item: String) -> JobCategoryCell.Mode {
+    selectionRelay.value.rawValue == item ? .dark : .light
+  }
 }
 
 extension JobCategoryView: UICollectionViewDelegateFlowLayout {
@@ -120,9 +141,15 @@ extension JobCategoryView: UICollectionViewDelegateFlowLayout {
                              sizeForItemAt indexPath: IndexPath) -> CGSize {
     
     let label = MozipLabel(style: .body2, color: .black)
-    label.updateTextKeepingAttributes(dataRelay.value[indexPath.row])
+    let value = dataRelay.value[indexPath.row]
+    label.updateTextKeepingAttributes(value)
     label.sizeToFit()
-    let cellWidth = label.frame.width + 24
-    return CGSize(width: cellWidth, height: 32)
+    var cellWidth: CGFloat = .zero
+    if value == "전체" {
+      cellWidth = label.frame.width + 30 /// "전체" 셀의 너비
+    } else {
+      cellWidth = label.frame.width + 20 + 24 + 8 /// 아이콘을 포함하는 셀의 너비
+    }
+    return CGSize(width: cellWidth, height: 40)
   }
 }

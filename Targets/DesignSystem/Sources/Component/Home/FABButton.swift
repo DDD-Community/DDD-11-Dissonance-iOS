@@ -17,10 +17,7 @@ import RxRelay
 public final class FABButton: UIView {
   
   private enum Metric {
-    static let size: CGSize = .init(width: 163, height: 160)
     static let cornerRadius: CGFloat = 36
-    static let plusIconTopMargin: CGFloat = 10
-    static let textLabelTopMargin: CGFloat = 4
   }
   // MARK: - Properties
   private let disposeBag = DisposeBag()
@@ -28,7 +25,6 @@ public final class FABButton: UIView {
   
   // MARK: - UI
   private let rootFlexContainer = UIView()
-  private let plusButton = UIButton()
   
   private let plusIcon: UIImageView = {
     let imageView = UIImageView()
@@ -58,7 +54,7 @@ public final class FABButton: UIView {
   
   // MARK: - Methods
   private func bindButton() {
-    plusButton.rx.tap
+    self.rxGesture.tap
       .subscribe(with: self) { owner, _ in
         owner.isExpanded.accept(!owner.isExpanded.value)
       }
@@ -69,8 +65,7 @@ public final class FABButton: UIView {
     isExpanded
       .asDriver()
       .drive(with: self) { owner, bool in
-        owner.plusButton.flex.backgroundColor(bool ? MozipColor.white : MozipColor.primary500)
-        
+        owner.rootFlexContainer.flex.backgroundColor(bool ? MozipColor.white : MozipColor.primary500)
         owner.plusIcon.image = bool ?
         DesignSystemAsset.xmark.image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal) :
         DesignSystemAsset.plus.image.withTintColor(MozipColor.white, renderingMode: .alwaysOriginal)
@@ -85,20 +80,12 @@ public final class FABButton: UIView {
   private func setupViewHierarchy() {
     addSubview(rootFlexContainer)
     rootFlexContainer.flex
-      .alignItems(.end)
-      .justifyContent(.end)
+      .justifyContent(.center)
+      .alignItems(.center)
+      .cornerRadius(Metric.cornerRadius)
+      .backgroundColor(MozipColor.primary500)
       .define { flex in
-        flex.addItem(plusButton)
-          .size(72)
-          .marginTop(24)
-          .direction(.column)
-          .justifyContent(.center)
-          .alignItems(.center)
-          .cornerRadius(Metric.cornerRadius)
-          .backgroundColor(MozipColor.primary500)
-          .define { flex in
-            flex.addItem(plusIcon)
-          }
+        flex.addItem(plusIcon)
       }
   }
   
