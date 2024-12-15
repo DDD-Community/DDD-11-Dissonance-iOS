@@ -38,7 +38,7 @@ public final class PostCell: UICollectionViewCell {
   private let remainDayTag = MozipLabel(style: .body4, color: MozipColor.gray500)
   private let viewCountIcon: UIImageView = {
     let imageView = UIImageView()
-    imageView.image = DesignSystemAsset.look.image
+    imageView.image = DesignSystemAsset.viewCountIcon.image
     imageView.contentMode = .scaleAspectFit
     return imageView
   }()
