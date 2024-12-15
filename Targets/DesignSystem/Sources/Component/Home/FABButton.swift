@@ -11,34 +11,38 @@ import UIKit
 
 import PinLayout
 import FlexLayout
+import RxSwift
 import RxRelay
 
 public final class FABButton: UIView {
   
   private enum Metric {
-    static let size: CGSize = .init(width: 72, height: 72)
+    static let size: CGSize = .init(width: 163, height: 160)
     static let cornerRadius: CGFloat = 36
     static let plusIconTopMargin: CGFloat = 10
     static let textLabelTopMargin: CGFloat = 4
-    static let title: String = "공고등록"
   }
+  // MARK: - Properties
+  private let disposeBag = DisposeBag()
+  public private(set) var isExpanded: BehaviorRelay<Bool> = .init(value: false)
   
   // MARK: - UI
   private let rootFlexContainer = UIView()
+  private let plusButton = UIButton()
   
   private let plusIcon: UIImageView = {
     let imageView = UIImageView()
     imageView.contentMode = .scaleAspectFit
-    imageView.image = DesignSystemAsset.plus.image
+    imageView.image = DesignSystemAsset.plus.image.withTintColor(.white, renderingMode: .alwaysOriginal)
     return imageView
   }()
-  
-  private let textLabel = MozipLabel(style: .body4, color: MozipColor.white, text: Metric.title)
   
   // MARK: - Initializers
   public init() {
     super.init(frame: .zero)
     setupViewHierarchy()
+    bindButton()
+    bindState()
   }
   
   required init?(coder: NSCoder) {
@@ -49,28 +53,65 @@ public final class FABButton: UIView {
   public override func layoutSubviews() {
     super.layoutSubviews()
     setupLayer()
-  }
-  
-  public override func sizeThatFits(_ size: CGSize) -> CGSize {
-    return Metric.size
+    setupShadow()
   }
   
   // MARK: - Methods
+  private func bindButton() {
+    plusButton.rx.tap
+      .subscribe(with: self) { owner, _ in
+        owner.isExpanded.accept(!owner.isExpanded.value)
+      }
+      .disposed(by: disposeBag)
+  }
+  
+  private func bindState() {
+    isExpanded
+      .asDriver()
+      .drive(with: self) { owner, bool in
+        owner.plusButton.flex.backgroundColor(bool ? MozipColor.white : MozipColor.primary500)
+        
+        owner.plusIcon.image = bool ?
+        DesignSystemAsset.xmark.image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal) :
+        DesignSystemAsset.plus.image.withTintColor(MozipColor.white, renderingMode: .alwaysOriginal)
+
+        owner.rootFlexContainer.flex.layout()
+      }
+      .disposed(by: disposeBag)
+  }
+  
+  // MARK: - Layout
+  
   private func setupViewHierarchy() {
     addSubview(rootFlexContainer)
     rootFlexContainer.flex
-      .direction(.column)
-      .alignItems(.center)
-      .cornerRadius(Metric.cornerRadius)
-      .backgroundColor(MozipColor.red)
+      .alignItems(.end)
+      .justifyContent(.end)
       .define { flex in
-        flex.addItem(plusIcon).marginTop(Metric.plusIconTopMargin)
-        flex.addItem(textLabel).marginTop(Metric.textLabelTopMargin)
+        flex.addItem(plusButton)
+          .size(72)
+          .marginTop(24)
+          .direction(.column)
+          .justifyContent(.center)
+          .alignItems(.center)
+          .cornerRadius(Metric.cornerRadius)
+          .backgroundColor(MozipColor.primary500)
+          .define { flex in
+            flex.addItem(plusIcon)
+          }
       }
   }
   
   private func setupLayer() {
     rootFlexContainer.pin.all()
     rootFlexContainer.flex.layout()
+    pin.size(CGSize(width: 72, height: 72))
+  }
+  
+  private func setupShadow() {
+    layer.shadowColor = UIColor.black.cgColor
+    layer.shadowOpacity = 0.5
+    layer.shadowOffset = CGSize(width: 0, height: 2)
+    layer.shadowRadius = 4
   }
 }

@@ -28,16 +28,34 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   private let bannerView = RecommendingBanner()
   private let collectionView = PostCollectionView()
   private let fabButton = FABButton()
+  
+  private let fabSubButton = FABSubButton(
+    iconImage: DesignSystemAsset.registerPost.image,
+    title: "공고 등록"
+  )
+  
+  private let fabButtonDimmingView: UIView = {
+    let view = UIView()
+    view.backgroundColor = MozipColor.dim
+    return view
+  }()
   private let homeSkeleton = HomeSkeleton()
   
   private let recommandingTitleLabel = MozipLabel(
     style: .heading1,
     color: MozipColor.gray800,
-    text: "오늘의 추천 공고"
+    text: "MD Pick 금주의 공고"
   )
   
+  private let recommandingIcon: UIImageView = {
+    let imageView = UIImageView()
+    imageView.image = DesignSystemAsset.pin.image
+    imageView.contentMode = .scaleAspectFit
+    return imageView
+  }()
+  
   override var preferredStatusBarStyle: UIStatusBarStyle {
-    return .lightContent
+    return .darkContent
   }
   
   // MARK: Initializer
@@ -84,6 +102,7 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
       action: #selector(pullToRefresh(_:)),
       for: .valueChanged
     )
+    fabButtonDimmingView.isHidden = true
   }
   
   @objc private func pullToRefresh(_ sender: UIRefreshControl) {
@@ -196,10 +215,28 @@ private extension HomeViewController {
       }
       .disposed(by: disposeBag)
     
-    fabButton.rxGesture.tap
-      .asSignal(onErrorJustReturn: .init())
+    fabSubButton.rxGesture.tap
+      .asSignal(onErrorSignalWith: .empty())
       .emit(with: self) { owner, _ in
+        owner.fabButton.isExpanded.accept(false)
         owner.coordinator?.pushPostRegister()
+      }
+      .disposed(by: disposeBag)
+    
+    fabButtonDimmingView.rxGesture.tap
+      .asSignal(onErrorSignalWith: .empty())
+      .map { _ in false }
+      .emit(to: fabButton.isExpanded)
+      .disposed(by: disposeBag)
+    
+    fabButton.isExpanded
+      .asDriver()
+      .drive(with: self) { owner, bool in
+        UIView.animate(withDuration: 0.3) {
+          owner.fabButtonDimmingView.isHidden = !bool
+          owner.updateFABButtonLayout()
+        }
+        owner.view.setNeedsLayout()
       }
       .disposed(by: disposeBag)
   }
@@ -211,6 +248,8 @@ private extension HomeViewController {
     view.addSubview(navigationBar)
     view.addSubview(homeSkeleton)
     view.addSubview(scrollView)
+    view.addSubview(fabButtonDimmingView)
+    view.addSubview(fabSubButton)
     view.addSubview(fabButton)
     scrollView.addSubview(contentView)
     
@@ -218,7 +257,13 @@ private extension HomeViewController {
       .direction(.column)
       .justifyContent(.start)
       .define { flex in
-        flex.addItem(recommandingTitleLabel).marginLeft(20).marginTop(32)
+        flex.addItem()
+          .direction(.row)
+          .marginTop(32)
+          .define { flex in
+            flex.addItem(recommandingTitleLabel).marginLeft(20)
+            flex.addItem(recommandingIcon).size(17).marginLeft(8)
+          }
         flex.addItem(bannerView).width(Device.width-40).aspectRatio(2).marginTop(24).marginLeft(20).marginRight(20)
         flex.addItem(collectionView).marginTop(32).grow(1).markDirty()
       }
@@ -228,10 +273,27 @@ private extension HomeViewController {
     navigationBar.pin.top().left().right().sizeToFit()
     homeSkeleton.pin.top(to: navigationBar.edge.bottom).left().right().bottom()
     scrollView.pin.left().right().bottom().top(to: navigationBar.edge.bottom)
+    fabButtonDimmingView.pin.all()
     fabButton.pin.right(21).bottom(51).sizeToFit()
+    updateFABButtonLayout()
     contentView.pin.top().left().right()
     contentView.flex.layout(mode: .adjustHeight)
     scrollView.contentSize = contentView.frame.size
     collectionView.flex.markDirty()
+  }
+  
+  private func updateFABButtonLayout() {
+    if fabButton.isExpanded.value {
+      fabSubButton.pin
+        .bottom(to: fabButton.edge.top)
+        .right()
+        .marginRight(20)
+        .marginBottom(24)
+      fabSubButton.alpha = 1
+    } else {
+      fabSubButton.pin
+        .bottomRight(to: fabButton.anchor.topRight)
+      fabSubButton.alpha = 0
+    }
   }
 }
