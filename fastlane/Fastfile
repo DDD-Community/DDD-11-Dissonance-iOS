@@ -23,7 +23,7 @@ platform :ios do
     version_number = "1.2.1"
 
     # 빌드 번호 설정
-    build_number = "1"
+    build_number = "2"
 
     # Tuist 실행 시 환경 변수 전달
     Dir.chdir("/Users/leewonbeen/Desktop/Home/DDD_Project/DDD-11-Dissonance-iOS") do
