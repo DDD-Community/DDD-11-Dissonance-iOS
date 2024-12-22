@@ -55,6 +55,20 @@ public final class PostRepository: PostRepositoryType {
       }
   }
   
+  public func searchPostList(keyword: String, pageable: Pageable) -> Single<[PostCellData]> {
+    let postListSearchRequestDTO = PostListSearchRequestDTO(
+      keyword: keyword,
+      pageable: pageable
+    )
+    
+    return provider.rx.request(.searchPostList(postListSearchRequestDTO))
+      .map(APIResponse<PostCellListResponse>.self)
+      .map {
+        guard let data = $0.data else { return [] }
+        return data.toDomain()
+      }
+  }
+  
   public func fetchBanner() -> Single<[BannerCellData]> {
     provider.rx.request(.fetchBanner)
       .map(APIResponse<[BannerCellResponse]>.self)
