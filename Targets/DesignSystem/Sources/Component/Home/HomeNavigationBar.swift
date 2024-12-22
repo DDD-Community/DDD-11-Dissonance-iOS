@@ -25,6 +25,10 @@ public final class HomeNavigationBar: UIView {
     mypageButton.rx.tap.asObservable()
   }
   
+  public var searchButtonTapObservable: Observable<Void> {
+    searchButton.rx.tap.asObservable()
+  }
+  
   // MARK: - UI
   private let rootFlexContainer = UIView()
   
@@ -34,6 +38,13 @@ public final class HomeNavigationBar: UIView {
     imageView.image = image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal)
     imageView.contentMode = .scaleAspectFit
     return imageView
+  }()
+  
+  private let searchButton: UIButton = {
+    let button = UIButton()
+    let image = DesignSystemAsset.search.image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal)
+    button.setImage(image, for: .normal)
+    return button
   }()
   
   private let mypageButton: UIButton = {
@@ -73,12 +84,13 @@ public final class HomeNavigationBar: UIView {
   private func setupViewHierarchy() {
     addSubview(rootFlexContainer)
     rootFlexContainer.flex
-      .direction(.row)
       .marginHorizontal(Metric.horizontalPadding)
       .marginTop(Metric.statusBarHeight)
+      .direction(.row)
       .define { flex in
         flex.addItem(logoImageView)
         flex.addItem().grow(Metric.one)
+        flex.addItem(searchButton).size(24).marginRight(24).alignSelf(.center)
         flex.addItem(mypageButton)
       }
   }

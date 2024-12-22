@@ -72,6 +72,10 @@ public final class PostListCollectionView: UIView {
     self.dataRelay.accept(data)
   }
   
+  public func setScrollEnable(_ bool: Bool) {
+    collectionView.isScrollEnabled = bool
+  }
+  
   private func setupCollectionView() {
     let flowLayout = configureCollectionViewLayout()
     collectionView.setCollectionViewLayout(flowLayout, animated: false)
