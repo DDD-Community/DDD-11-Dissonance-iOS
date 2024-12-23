@@ -45,6 +45,13 @@ final class HomeCoordinator: HomeCoordinatorType {
     self.addChild(coordinator)
   }
   
+  func pushPostSearch() {
+    let coordinator = PostSearchCoordinator(navigationController: navigationController)
+    coordinator.parentCoordinator = self
+    coordinator.start()
+    self.addChild(coordinator)
+  }
+  
   func pushLoginPage() {
     guard let loginCoordinator = DIContainer.shared.resolve(type: LoginCoordinatorType.self)
             as? LoginCoordinator else {

@@ -199,6 +199,13 @@ private extension HomeViewController {
       }
       .disposed(by: disposeBag)
     
+    navigationBar.searchButtonTapObservable
+      .asSignal(onErrorJustReturn: ())
+      .emit(with: self) { owner, _ in
+        owner.coordinator?.pushPostSearch()
+      }
+      .disposed(by: disposeBag)
+    
     bannerView.bannerTapObservable
       .asSignal(onErrorJustReturn: .stub())
       .emit(with: self) { owner, banner in

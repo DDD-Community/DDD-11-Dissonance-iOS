@@ -9,6 +9,6 @@
 import DomainLayer
 
 public struct PostListFetchRequestDTO: Encodable {
-  public let categoryID: Int
+  public let categoryID: Int /// 1: 공모전, 2: 해커톤, 3: 동아리, 4: 아이디어기획, 5: 디자인, 6: 개발IT
   public let pageable: Pageable
 }
