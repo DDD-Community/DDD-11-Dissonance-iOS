@@ -26,6 +26,12 @@ final class PostSearchViewController: BaseViewController<PostSearchReactor>, Coo
   private let collectionView = PostListCollectionView()
   private let searchBar = MozipSearchBar()
   
+  private let emptyLabel: MozipLabel = {
+    let label = MozipLabel(style: .heading3, color: MozipColor.gray500, text: "검색 결과가 없습니다.")
+    label.textAlignment = .center
+    return label
+  }()
+  
   private let activityIndicator: UIActivityIndicatorView = {
     let indicator = UIActivityIndicatorView()
     indicator.style = .medium
@@ -122,6 +128,9 @@ private extension PostSearchViewController {
       .map { $0.posts }
       .distinctUntilChanged()
       .asSignal(onErrorJustReturn: [])
+      .do(onNext: { [weak self] data in
+        self?.emptyLabel.isHidden = !data.isEmpty
+      })
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
         owner.collectionView.pin.sizeToFit()
@@ -148,11 +157,13 @@ private extension PostSearchViewController {
     view.addSubview(searchBar)
     view.addSubview(collectionView)
     view.addSubview(activityIndicator)
+    view.addSubview(emptyLabel)
   }
   
   func setupViewLayout() {
     searchBar.pin.top().left().right().height(Device.statusBarFrame.height + 68)
     activityIndicator.pin.below(of: searchBar).width(100%).bottom()
+    emptyLabel.pin.all()
     collectionView.pin.below(of: searchBar).width(100%).bottom()
     collectionView.flex.markDirty()
   }
