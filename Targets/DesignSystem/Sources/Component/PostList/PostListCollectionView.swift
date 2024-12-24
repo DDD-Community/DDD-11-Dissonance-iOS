@@ -28,6 +28,10 @@ public final class PostListCollectionView: UIView {
     collectionView.rx.itemSelected.asObservable()
   }
   
+  public var scrollObervable: Observable<Void> {
+    collectionView.rx.didScroll.asObservable()
+  }
+  
   private let dataRelay = BehaviorRelay<[PostSection.Item]>.init(value: [])
   private let disposeBag = DisposeBag()
   

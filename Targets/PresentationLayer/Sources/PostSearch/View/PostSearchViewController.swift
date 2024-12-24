@@ -107,9 +107,19 @@ private extension PostSearchViewController {
       .emit(to: reactor.action)
       .disposed(by: disposeBag)
     
+    collectionView.scrollObervable
+      .asSignal(onErrorJustReturn: ())
+      .emit(with: self) { owner, _ in
+        owner.view.endEditing(true)
+      }
+      .disposed(by: disposeBag)
+    
     searchBar.searchTextObservable
+      .skip(1)
+      .distinctUntilChanged()
+      .compactMap { $0 }
       .debounce(.milliseconds(500), scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
-      .map { Action.searchPosts(keyword: $0!) } // optional 추후 처리
+      .map { Action.searchPosts(keyword: $0) }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
   }
