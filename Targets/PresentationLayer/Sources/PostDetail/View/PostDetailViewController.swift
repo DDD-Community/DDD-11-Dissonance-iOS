@@ -6,7 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
-import Core
+import MozipCore
 import DesignSystem
 import DomainLayer
 import UIKit
