@@ -15,6 +15,7 @@ public protocol PostRepositoryType {
   func edit(id: Int, post: Post) -> Single<(isSuccess: Bool, message: String?)>
   func delete(id: Int) -> Single<(isSuccess: Bool, message: String?)>
   func fetchPostList(categoryId: Int, pageable: Pageable) -> Single<[PostCellData]>
+  func searchPostList(keyword: String, pageable: Pageable) -> Single<[PostCellData]>
   func fetchBanner() -> Single<[BannerCellData]>
   func fetchPost(id: Int) -> Single<(isSuccess: Bool, post: Post)>
   func report(id: Int) -> Single<(isSuccess: Bool, message: String?)>

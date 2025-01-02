@@ -6,7 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
-import Core
+import MozipCore
 import DomainLayer
 import Foundation
 
@@ -17,6 +17,7 @@ enum PostAPI {
   case edit(id: Int, post: Post)
   case delete(id: Int)
   case fetchPostList(PostListFetchRequestDTO)
+  case searchPostList(PostListSearchRequestDTO)
   case fetchBanner
   case fetchPost(id: Int)
   case report(id: Int)
@@ -39,6 +40,8 @@ extension PostAPI: TargetType {
       return adminPath + basePath + "/\(id)"
     case let .fetchPostList(dto):
       return basePath + "/categories/\(dto.categoryID)/posts"
+    case .searchPostList:
+      return basePath + "/search"
     case .fetchBanner:
       return "/featured-posts"
     case .fetchPost(let id):
@@ -57,7 +60,7 @@ extension PostAPI: TargetType {
       return .put
     case .delete:
       return .delete
-    case .fetchPostList, .fetchBanner, .fetchPost:
+    case .fetchPostList, .fetchBanner, .fetchPost, .searchPostList:
       return .get
     case .report: 
       return .patch
@@ -111,6 +114,8 @@ extension PostAPI: TargetType {
     switch self {
     case let .fetchPostList(dto):
       return dto.pageable.toDictionary()
+    case let .searchPostList(dto):
+      return dto.toDictionary()
     default:
       return nil
     }

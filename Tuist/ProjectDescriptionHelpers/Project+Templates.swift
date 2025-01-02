@@ -10,7 +10,7 @@ import ProjectDescription
 public extension Project {
     enum Layer: CaseIterable {
         case dependencyInjector
-        case core
+        case mozipCore
         case design
         case domain
         case data
@@ -19,7 +19,7 @@ public extension Project {
         public var layerName: String {
             switch self {
             case .dependencyInjector: return "DIContainer"
-            case .core: return "Core"
+            case .mozipCore: return "MozipCore"
             case .design: return "DesignSystem"
             case .domain: return "DomainLayer"
             case .data: return "DataLayer"

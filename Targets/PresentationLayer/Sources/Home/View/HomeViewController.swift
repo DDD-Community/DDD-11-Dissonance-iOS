@@ -6,7 +6,7 @@
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
-import Core
+import MozipCore
 import DesignSystem
 import DomainLayer
 import UIKit
@@ -196,6 +196,13 @@ private extension HomeViewController {
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
         AppProperties.accessToken == .init() ? owner.coordinator?.pushLoginPage() : owner.coordinator?.pushMyPage()
+      }
+      .disposed(by: disposeBag)
+    
+    navigationBar.searchButtonTapObservable
+      .asSignal(onErrorJustReturn: ())
+      .emit(with: self) { owner, _ in
+        owner.coordinator?.pushPostSearch()
       }
       .disposed(by: disposeBag)
     

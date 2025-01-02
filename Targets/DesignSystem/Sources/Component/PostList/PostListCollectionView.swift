@@ -28,6 +28,10 @@ public final class PostListCollectionView: UIView {
     collectionView.rx.itemSelected.asObservable()
   }
   
+  public var scrollObervable: Observable<Void> {
+    collectionView.rx.didScroll.asObservable()
+  }
+  
   private let dataRelay = BehaviorRelay<[PostSection.Item]>.init(value: [])
   private let disposeBag = DisposeBag()
   
@@ -70,6 +74,10 @@ public final class PostListCollectionView: UIView {
   // MARK: - Methods
   public func setupData(_ data: [PostSection.Item]) {
     self.dataRelay.accept(data)
+  }
+  
+  public func setScrollEnable(_ bool: Bool) {
+    collectionView.isScrollEnabled = bool
   }
   
   private func setupCollectionView() {

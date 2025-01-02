@@ -9,7 +9,7 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.makeProject(
-    name: Project.Layer.core.layerName,
+    name: Project.Layer.mozipCore.layerName,
     product: .staticFramework,
     settings: .settings(base: .init().swiftCompilationMode(.wholemodule)),
     dependencies: [

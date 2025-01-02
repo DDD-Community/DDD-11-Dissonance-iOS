@@ -1,8 +1,8 @@
 //
-//  PostListReactor.swift
+//  PostSearchReactor.swift
 //  PresentationLayer
 //
-//  Created by 이원빈 on 8/22/24.
+//  Created by 이원빈 on 12/21/24.
 //  Copyright © 2024 MOZIP. All rights reserved.
 //
 
@@ -12,21 +12,21 @@ import Foundation
 
 import ReactorKit
 
-final class PostListReactor: Reactor {
+final class PostSearchReactor: Reactor {
 
   // MARK: - Properties
-  private let fetchPostListUseCase: FetchPostListUseCaseType
+  private let searchPostListUseCase: SearchPostListUseCaseType
   var initialState: State = .init()
 
   // MARK: - Initializer
   init(
-    fetchPostListUseCase: FetchPostListUseCaseType
+    searchPostListUseCase: SearchPostListUseCaseType
   ) {
-      self.fetchPostListUseCase = fetchPostListUseCase
+      self.searchPostListUseCase = searchPostListUseCase
   }
 
   enum Action {
-    case fetchPosts(id: Int, order: PostOrder)
+    case searchPosts(keyword: String)
     case tapCell(indexPath: IndexPath)
   }
 
@@ -46,7 +46,7 @@ final class PostListReactor: Reactor {
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
-    case let .fetchPosts(id, order): return fetchPosts(id: id, order: order)
+    case let .searchPosts(keyword):  return searchPosts(from: keyword)
     case let .tapCell(indexPath):    return tapCell(at: indexPath)
     }
   }
@@ -61,17 +61,15 @@ final class PostListReactor: Reactor {
     return newState
   }
   
-  private func fetchPosts(id: Int, order: PostOrder) -> Observable<Mutation> {
-    let fetchPostListMutation: Observable<Mutation> = fetchPostListUseCase
-      .execute(
-        categoryId: id,
-        pageable: .init(page: 0, size: 30, sort: order.rawValue) // FIXME: 추후 페이징처리
-      )
+  private func searchPosts(from keyword: String) -> Observable<Mutation> {
+    let searchPostListMutation: Observable<Mutation> = searchPostListUseCase
+      .execute(keyword: keyword, pageable: .init(page: 0, size: 30, sort: "latest")) // TODO: 추후 페이징 처리
+      .delay(.milliseconds(300), scheduler: MainScheduler.asyncInstance)
       .map { .setPosts(data: $0) }
-      // TODO: .catch { error in ... } 에러처리 필요.
+    
     let sequence: [Observable<Mutation>] = [
       .just(.setLoading(true)),
-      fetchPostListMutation,
+      searchPostListMutation,
       .just(.setLoading(false))
     ]
     return .concat(sequence)
