@@ -36,6 +36,10 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   private let postkind: PostKind
   private let orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
   
+  private var categoryID: Int {
+    Int(PostKind.allCases.firstIndex(of: postkind) ?? .zero) + 1
+  }
+  
   // MARK: UI
   private let scrollView = UIScrollView()
   private let contentView = UIView()
@@ -119,8 +123,8 @@ private extension PostListViewController {
   func bindAction(reactor: PostListReactor) {
     rx.viewWillAppear
       .withUnretained(self)
-      .map { owner, _ in Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1 }
-      .map { Action.fetchPosts(id: $0, order: .latest) }
+      .map { owner, _ in owner.recentSearchParameter() }
+      .map(Action.fetchPosts)
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -172,8 +176,7 @@ private extension PostListViewController {
         .distinctUntilChanged()
         .withUnretained(self)
         .map { owner, order in
-          let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
-          return Action.fetchPosts(id: id, order: order)
+          return Action.fetchPosts(id: owner.categoryID, order: order)
         }
         .bind(to: reactor.action)
         .disposed(by: disposeBag)
@@ -221,6 +224,17 @@ private extension PostListViewController {
   
   private func bind() {
     
+  }
+  
+  private func recentSearchParameter() -> (Int, PostOrder) {
+    let order = orderDropDownMenu.isLatestOrder.value ? PostOrder.latest : PostOrder.deadline
+    
+    if postkind == .공모전 {
+      let selectionId = jobCategoryView.selectionRelay.value.id
+      return (selectionId, order)
+    } else {
+      return (categoryID, order)
+    }
   }
 }
 

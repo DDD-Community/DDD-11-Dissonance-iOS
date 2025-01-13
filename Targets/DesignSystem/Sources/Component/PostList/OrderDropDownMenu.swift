@@ -14,7 +14,7 @@ import RxSwift
 
 public final class OrderDropDownMenu: UIView {
   // MARK: - Properties
-  public let isLatestOrder: PublishRelay<Bool> = .init()
+  public let isLatestOrder: BehaviorRelay<Bool> = .init(value: true)
   private let disposeBag = DisposeBag()
   
   // MARK: - UI
