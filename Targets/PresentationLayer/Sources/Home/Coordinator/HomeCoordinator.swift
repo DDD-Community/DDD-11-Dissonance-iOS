@@ -11,7 +11,7 @@ import DomainLayer
 import UIKit
 
 public protocol HomeCoordinatorType: CoordinatorType {
-  func pushPostList(code: String)
+  func pushPostList(postKind: PostKind)
   func pushLoginPage()
   func pushMyPage()
   func pushPostDetail(id: Int)
@@ -38,10 +38,10 @@ final class HomeCoordinator: HomeCoordinatorType {
 
   func didFinish() {}
 
-  func pushPostList(code: String) {
+  func pushPostList(postKind: PostKind) {
     let coordinator = PostListCoordinator(navigationController: navigationController)
     coordinator.parentCoordinator = self
-    coordinator.start(with: code)
+    coordinator.start(with: postKind)
     self.addChild(coordinator)
   }
   

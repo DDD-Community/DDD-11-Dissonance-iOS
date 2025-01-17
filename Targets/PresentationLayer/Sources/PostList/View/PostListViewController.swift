@@ -17,27 +17,13 @@ import RxCocoa
 
 final class PostListViewController: BaseViewController<PostListReactor>, Coordinatable {
   
-  enum PostKind: String, CaseIterable {
-    case 공모전 = "공모전 📑"
-    case 해커톤 = "해커톤 🏆"
-    case 동아리 = "IT 동아리 💻"
-    
-    var title: String {
-      switch self {
-      case .공모전: "공모전"
-      case .해커톤: "해커톤"
-      case .동아리: "동아리"
-      }
-    }
-  }
-  
   // MARK: Properties
   weak var coordinator: PostListCoordinator?
   private let postkind: PostKind
   private let orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
   
   private var categoryID: Int {
-    Int(PostKind.allCases.firstIndex(of: postkind) ?? .zero) + 1
+    postkind.id
   }
   
   // MARK: UI
@@ -60,8 +46,8 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   }
   
   // MARK: Initializer
-  init(reactor: PostListReactor, code: String) {
-    self.postkind = PostKind.init(rawValue: code) ?? .공모전
+  init(reactor: PostListReactor, postKind: PostKind) {
+    self.postkind = postKind
     
     super.init()
     self.reactor = reactor
@@ -108,7 +94,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   private func setupInitialState() {
     scrollView.alpha = 0
     orderDropDownMenu.alpha = 0
-    navigationBar.setNavigationTitle(postkind.title)
+    navigationBar.setNavigationTitle(postkind.rawValue)
   }
 }
 

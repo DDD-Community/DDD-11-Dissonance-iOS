@@ -11,7 +11,7 @@ import DomainLayer
 import UIKit
 
 protocol PostListCoordinatorType: CoordinatorType {
-  func start(with code: String)
+  func start(with postKind: PostKind)
   func pushPostDetail(id: Int)
 }
 
@@ -32,8 +32,8 @@ final class PostListCoordinator: PostListCoordinatorType {
     // FIXME: ViewController 사이 데이터를 주고받을 경우 고려
   }
   
-  func start(with code: String) {
-    let vc = postListViewController(with: code)
+  func start(with postKind: PostKind) {
+    let vc = postListViewController(with: postKind)
     navigationController.pushViewController(vc, animated: true)
   }
 
@@ -61,12 +61,12 @@ final class PostListCoordinator: PostListCoordinatorType {
 
 // MARK: - Private
 private extension PostListCoordinator {
-  func postListViewController(with code: String) -> PostListViewController {
+  func postListViewController(with postKind: PostKind) -> PostListViewController {
     guard let fetchPostListUseCase = DIContainer.shared.resolve(type: FetchPostListUseCaseType.self) else {
       fatalError()
     }
     let reactor = PostListReactor(fetchPostListUseCase: fetchPostListUseCase)
-    let viewController = PostListViewController(reactor: reactor, code: code)
+    let viewController = PostListViewController(reactor: reactor, postKind: postKind)
     viewController.coordinator = self
     return viewController
   }
