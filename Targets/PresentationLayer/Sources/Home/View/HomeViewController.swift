@@ -15,6 +15,7 @@ import FlexLayout
 import PinLayout
 import ReactorKit
 import RxCocoa
+import FirebaseAnalytics
 
 final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   
@@ -195,6 +196,7 @@ private extension HomeViewController {
     navigationBar.myPageButtonTapObservable
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
+        Analytics.logEvent(GA.마이페이지버튼, parameters: nil)
         AppProperties.accessToken == .init() ? owner.coordinator?.pushLoginPage() : owner.coordinator?.pushMyPage()
       }
       .disposed(by: disposeBag)
@@ -202,6 +204,7 @@ private extension HomeViewController {
     navigationBar.searchButtonTapObservable
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
+        Analytics.logEvent(GA.검색버튼, parameters: nil)
         owner.coordinator?.pushPostSearch()
       }
       .disposed(by: disposeBag)
@@ -209,6 +212,7 @@ private extension HomeViewController {
     bannerView.bannerTapObservable
       .asSignal(onErrorJustReturn: .stub())
       .emit(with: self) { owner, banner in
+        Analytics.logEvent(GA.배너이미지, parameters: nil)
         owner.coordinator?.pushPostDetail(id: banner.infoPostID)
       }
       .disposed(by: disposeBag)
@@ -216,9 +220,14 @@ private extension HomeViewController {
     collectionView.headerTapRelay
       .asSignal()
       .emit(with: self) { owner, indexPath in
-        let list = owner.reactor?.currentState.postHeaderTitles ?? []
-        let code = list[indexPath.section]
-        owner.coordinator?.pushPostList(code: code)
+        let postHeaders = owner.reactor?.currentState.postHeaders ?? []
+        let postKind = postHeaders[indexPath.section]
+        switch postKind {
+        case .공모전: Analytics.logEvent(GA.공모전더보기버튼, parameters: nil)
+        case .해커톤: Analytics.logEvent(GA.해커톤더보기버튼, parameters: nil)
+        case .동아리: Analytics.logEvent(GA.IT동아리더보기버튼, parameters: nil)
+        }
+        owner.coordinator?.pushPostList(postKind: postKind)
       }
       .disposed(by: disposeBag)
     

@@ -8,11 +8,13 @@
 
 import DomainLayer
 import UIKit
+import MozipCore
 
 import RxSwift
 import RxCocoa
 import PinLayout
 import FlexLayout
+import FirebaseAnalytics
 
 public final class JobCategoryView: UIView {
   private enum Metric {
@@ -116,7 +118,16 @@ public final class JobCategoryView: UIView {
       .disposed(by: disposeBag)
     
     Observable.combineLatest(collectionView.rx.itemSelected, dataRelay)
-      .map { (indexPath, dataList) in ContestCategory.init(rawValue: dataList[indexPath.row]) ?? .all }
+      .map { (indexPath, dataList) in
+        let category = ContestCategory.init(rawValue: dataList[indexPath.row]) ?? .all
+        switch category {
+        case .all:     Analytics.logEvent(GA.전체칩, parameters: nil)
+        case .design:  Analytics.logEvent(GA.디자인칩, parameters: nil)
+        case .develop: Analytics.logEvent(GA.개발칩, parameters: nil)
+        case .idea:    Analytics.logEvent(GA.기획아이디어칩, parameters: nil)
+        }
+        return category
+      }
       .bind(to: selectionRelay)
       .disposed(by: disposeBag)
   }

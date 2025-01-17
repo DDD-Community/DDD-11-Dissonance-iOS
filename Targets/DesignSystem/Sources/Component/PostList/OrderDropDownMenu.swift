@@ -7,10 +7,12 @@
 //
 
 import UIKit
+import MozipCore
 
 import FlexLayout
 import RxCocoa
 import RxSwift
+import FirebaseAnalytics
 
 public final class OrderDropDownMenu: UIView {
   // MARK: - Properties
@@ -47,12 +49,18 @@ public final class OrderDropDownMenu: UIView {
     oldestLabel.isUserInteractionEnabled = true
     
     latestLabel.rxGesture.tap
-      .map { _ in return true }
+      .map { _ in
+        Analytics.logEvent(GA.최신순버튼, parameters: nil)
+        return true
+      }
       .bind(to: isLatestOrder)
       .disposed(by: disposeBag)
     
     oldestLabel.rxGesture.tap
-      .map { _ in return false }
+      .map { _ in
+        Analytics.logEvent(GA.마감순버튼, parameters: nil)
+        return false
+      }
       .bind(to: isLatestOrder)
       .disposed(by: disposeBag)
   }

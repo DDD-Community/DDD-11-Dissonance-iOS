@@ -15,6 +15,7 @@ import FlexLayout
 import PinLayout
 import ReactorKit
 import RxCocoa
+import FirebaseAnalytics
 
 final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coordinatable, Alertable {
   
@@ -366,6 +367,7 @@ private extension PostDetailViewController {
     shareButton.rx.tap
       .asSignal()
       .emit(with: self, onNext: { owner, _ in
+        Analytics.logEvent(GA.공유버튼, parameters: nil)
         owner.showActivityController()
       })
       .disposed(by: disposeBag)
@@ -373,6 +375,7 @@ private extension PostDetailViewController {
     showMoreButton.tapObservable
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
+        Analytics.logEvent(GA.지원하기버튼, parameters: nil)
         guard let reactor = owner.reactor else { return }
         owner.coordinator?.pushWebView(urlString: reactor.currentState.post.postUrlString)
       })
