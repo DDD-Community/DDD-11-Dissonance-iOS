@@ -123,7 +123,7 @@ public final class JobCategoryView: UIView {
         switch category {
         case .all:     Analytics.logEvent(GA.전체칩, parameters: nil)
         case .design:  Analytics.logEvent(GA.디자인칩, parameters: nil)
-        case .develop: Analytics.logEvent(GA.개발칩, parameters: nil)
+//        case .develop: Analytics.logEvent(GA.개발칩, parameters: nil)
         case .idea:    Analytics.logEvent(GA.기획아이디어칩, parameters: nil)
         }
         return category
