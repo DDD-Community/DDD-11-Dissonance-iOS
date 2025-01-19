@@ -10,7 +10,6 @@ import MozipCore
 import DomainLayer
 
 import ReactorKit
-import FirebaseAnalytics
 
 final class LoginReactor: Reactor {
 
@@ -53,7 +52,7 @@ final class LoginReactor: Reactor {
   private func didTapKakaoLoginButtonMutation() -> Observable<Mutation> {
     return loginUseCase.tryKakaoLogin()
       .do(onNext: { _ in
-        Analytics.logEvent(GA.카카오버튼, parameters: nil)
+        GA.logEvent(.카카오버튼)
       })
       .map { .setUserToken(userToken: $0) }
   }
@@ -61,7 +60,7 @@ final class LoginReactor: Reactor {
   private func didTapAppleLoginButtonMutation() -> Observable<Mutation> {
     return loginUseCase.tryAppleLogin()
       .do(onNext: { _ in
-        Analytics.logEvent(GA.애플버튼, parameters: nil)
+        GA.logEvent(.애플버튼)
       })
       .map { .setUserToken(userToken: $0) }
   }

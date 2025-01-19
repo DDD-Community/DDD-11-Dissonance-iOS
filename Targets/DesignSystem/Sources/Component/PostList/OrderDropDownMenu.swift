@@ -12,7 +12,6 @@ import MozipCore
 import FlexLayout
 import RxCocoa
 import RxSwift
-import FirebaseAnalytics
 
 public final class OrderDropDownMenu: UIView {
   // MARK: - Properties
@@ -50,7 +49,7 @@ public final class OrderDropDownMenu: UIView {
     
     latestLabel.rxGesture.tap
       .map { _ in
-        Analytics.logEvent(GA.최신순버튼, parameters: nil)
+        GA.logEvent(.최신순버튼)
         return true
       }
       .bind(to: isLatestOrder)
@@ -58,7 +57,7 @@ public final class OrderDropDownMenu: UIView {
     
     oldestLabel.rxGesture.tap
       .map { _ in
-        Analytics.logEvent(GA.마감순버튼, parameters: nil)
+        GA.logEvent(.마감순버튼)
         return false
       }
       .bind(to: isLatestOrder)

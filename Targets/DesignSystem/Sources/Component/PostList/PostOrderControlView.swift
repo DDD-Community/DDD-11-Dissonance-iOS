@@ -14,7 +14,6 @@ import RxSwift
 import RxCocoa
 import PinLayout
 import FlexLayout
-import FirebaseAnalytics
 
 public final class PostOrderControlView: UIView {
   
@@ -84,7 +83,7 @@ public final class PostOrderControlView: UIView {
   private func bind() {
     orderButton.rxGesture.tap
       .bind(with: self) { owner, _ in
-        Analytics.logEvent(GA.정렬버튼, parameters: nil)
+        GA.logEvent(.정렬버튼)
         let currentValue = owner.isOrderButtonTappedRelay.value
         owner.isOrderButtonTappedRelay.accept(!currentValue)
       }
