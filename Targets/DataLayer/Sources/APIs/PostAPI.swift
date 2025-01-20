@@ -35,7 +35,7 @@ extension PostAPI: TargetType {
     
     switch self {
     case .upload:
-      return basePath
+      return adminPath + basePath
     case .edit(let id, _), .delete(let id):
       return adminPath + basePath + "/\(id)"
     case let .fetchPostList(dto):
