@@ -43,13 +43,31 @@ final class LoginReactor: Reactor {
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
-    case .didTapKakaoLoginButton:
-      return loginUseCase.tryKakaoLogin().map { .setUserToken(userToken: $0) }
-    case .didTapAppleLoginButton:
-      return loginUseCase.tryAppleLogin().map { .setUserToken(userToken: $0) }
-    case .fetchUserInfo:
-      return fetchUserInfo()
+    case .didTapKakaoLoginButton: return didTapKakaoLoginButtonMutation()
+    case .didTapAppleLoginButton: return didTapAppleLoginButtonMutation()
+    case .fetchUserInfo:          return fetchUserInfoMutation()
     }
+  }
+  
+  private func didTapKakaoLoginButtonMutation() -> Observable<Mutation> {
+    return loginUseCase.tryKakaoLogin()
+      .do(onNext: { _ in
+        GA.logEvent(.카카오버튼)
+      })
+      .map { .setUserToken(userToken: $0) }
+  }
+  
+  private func didTapAppleLoginButtonMutation() -> Observable<Mutation> {
+    return loginUseCase.tryAppleLogin()
+      .do(onNext: { _ in
+        GA.logEvent(.애플버튼)
+      })
+      .map { .setUserToken(userToken: $0) }
+  }
+  
+  func fetchUserInfoMutation() -> Observable<Mutation> {
+    userUseCase.fetchUserInformation()
+      .flatMap { Observable<Mutation>.just(.setUserInfo(isAdmin: $0.isAdmin, provider: $0.provider)) }
   }
 
   func reduce(state: State, mutation: Mutation) -> State {
@@ -78,10 +96,7 @@ final class LoginReactor: Reactor {
 
 // MARK: - Private Extenion
 private extension LoginReactor {
-  func fetchUserInfo() -> Observable<Mutation> {
-    userUseCase.fetchUserInformation()
-      .flatMap { Observable<Mutation>.just(.setUserInfo(isAdmin: $0.isAdmin, provider: $0.provider)) }
-  }
+  
   
   func saveUserInfo(isAdmin: Bool, provider: String) {
     guard let isAdminData = "\(isAdmin)".data(using: .utf8),

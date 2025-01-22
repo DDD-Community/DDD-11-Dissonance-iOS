@@ -195,6 +195,7 @@ private extension HomeViewController {
     navigationBar.myPageButtonTapObservable
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
+        GA.logEvent(.마이페이지버튼)
         AppProperties.accessToken == .init() ? owner.coordinator?.pushLoginPage() : owner.coordinator?.pushMyPage()
       }
       .disposed(by: disposeBag)
@@ -202,6 +203,7 @@ private extension HomeViewController {
     navigationBar.searchButtonTapObservable
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
+        GA.logEvent(.검색버튼)
         owner.coordinator?.pushPostSearch()
       }
       .disposed(by: disposeBag)
@@ -209,6 +211,7 @@ private extension HomeViewController {
     bannerView.bannerTapObservable
       .asSignal(onErrorJustReturn: .stub())
       .emit(with: self) { owner, banner in
+        GA.logEvent(.배너이미지)
         owner.coordinator?.pushPostDetail(id: banner.infoPostID)
       }
       .disposed(by: disposeBag)
@@ -216,9 +219,14 @@ private extension HomeViewController {
     collectionView.headerTapRelay
       .asSignal()
       .emit(with: self) { owner, indexPath in
-        let list = owner.reactor?.currentState.postHeaderTitles ?? []
-        let code = list[indexPath.section]
-        owner.coordinator?.pushPostList(code: code)
+        let postHeaders = owner.reactor?.currentState.postHeaders ?? []
+        let postKind = postHeaders[indexPath.section]
+        switch postKind {
+        case .contest: GA.logEvent(.공모전더보기버튼)
+        case .hackathon: GA.logEvent(.해커톤더보기버튼)
+        case .club: GA.logEvent(.IT동아리더보기버튼)
+        }
+        owner.coordinator?.pushPostList(postKind: postKind)
       }
       .disposed(by: disposeBag)
     

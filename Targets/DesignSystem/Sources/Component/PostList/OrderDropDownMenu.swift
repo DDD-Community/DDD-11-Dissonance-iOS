@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MozipCore
 
 import FlexLayout
 import RxCocoa
@@ -14,7 +15,7 @@ import RxSwift
 
 public final class OrderDropDownMenu: UIView {
   // MARK: - Properties
-  public let isLatestOrder: PublishRelay<Bool> = .init()
+  public let isLatestOrder: BehaviorRelay<Bool> = .init(value: true)
   private let disposeBag = DisposeBag()
   
   // MARK: - UI
@@ -47,12 +48,18 @@ public final class OrderDropDownMenu: UIView {
     oldestLabel.isUserInteractionEnabled = true
     
     latestLabel.rxGesture.tap
-      .map { _ in return true }
+      .map { _ in
+        GA.logEvent(.최신순버튼)
+        return true
+      }
       .bind(to: isLatestOrder)
       .disposed(by: disposeBag)
     
     oldestLabel.rxGesture.tap
-      .map { _ in return false }
+      .map { _ in
+        GA.logEvent(.마감순버튼)
+        return false
+      }
       .bind(to: isLatestOrder)
       .disposed(by: disposeBag)
   }

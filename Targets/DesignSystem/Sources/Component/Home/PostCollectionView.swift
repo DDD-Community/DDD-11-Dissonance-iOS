@@ -50,7 +50,7 @@ public final class PostCollectionView: UIView {
         ofKind: UICollectionView.elementKindSectionHeader,
         for: indexPath)
       let sectionModel = dataSource.sectionModels[indexPath.section]
-      header.setData(title: sectionModel.header, summary: sectionModel.summary)
+      header.setData(title: sectionModel.kind.sectionTitle, summary: sectionModel.kind.summary)
       header.tapObservable
         .map { indexPath }
         .bind(to: headerTapRelay)

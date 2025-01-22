@@ -13,6 +13,8 @@ let project = Project.makeProject(
     product: .staticFramework,
     settings: .settings(base: .init().swiftCompilationMode(.wholemodule)),
     dependencies: [
-        .external(name: "RxSwift")
+        .external(name: "RxSwift"),
+        .external(name: "FirebaseCore"),
+        .external(name: "FirebaseAnalytics"),
     ]
 )

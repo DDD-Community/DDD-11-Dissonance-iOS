@@ -17,24 +17,14 @@ import RxCocoa
 
 final class PostListViewController: BaseViewController<PostListReactor>, Coordinatable {
   
-  enum PostKind: String, CaseIterable {
-    case 공모전 = "공모전 📑"
-    case 해커톤 = "해커톤 🏆"
-    case 동아리 = "IT 동아리 💻"
-    
-    var title: String {
-      switch self {
-      case .공모전: "공모전"
-      case .해커톤: "해커톤"
-      case .동아리: "동아리"
-      }
-    }
-  }
-  
   // MARK: Properties
   weak var coordinator: PostListCoordinator?
   private let postkind: PostKind
   private let orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
+  
+  private var categoryID: Int {
+    postkind.id
+  }
   
   // MARK: UI
   private let scrollView = UIScrollView()
@@ -56,8 +46,8 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   }
   
   // MARK: Initializer
-  init(reactor: PostListReactor, code: String) {
-    self.postkind = PostKind.init(rawValue: code) ?? .공모전
+  init(reactor: PostListReactor, postKind: PostKind) {
+    self.postkind = postKind
     
     super.init()
     self.reactor = reactor
@@ -104,7 +94,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   private func setupInitialState() {
     scrollView.alpha = 0
     orderDropDownMenu.alpha = 0
-    navigationBar.setNavigationTitle(postkind.title)
+    navigationBar.setNavigationTitle(postkind.navigationTitle)
   }
 }
 
@@ -119,8 +109,8 @@ private extension PostListViewController {
   func bindAction(reactor: PostListReactor) {
     rx.viewWillAppear
       .withUnretained(self)
-      .map { owner, _ in Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1 }
-      .map { Action.fetchPosts(id: $0, order: .latest) }
+      .map { owner, _ in owner.recentSearchParameter() }
+      .map(Action.fetchPosts)
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -149,7 +139,7 @@ private extension PostListViewController {
       }
       .disposed(by: disposeBag)
     
-    if postkind == .공모전 {
+    if postkind == .contest {
       Observable.combineLatest(
         orderRelay,
         jobCategoryView.selectionRelay
@@ -172,8 +162,7 @@ private extension PostListViewController {
         .distinctUntilChanged()
         .withUnretained(self)
         .map { owner, order in
-          let id = Int(PostKind.allCases.firstIndex(of: owner.postkind) ?? .zero) + 1
-          return Action.fetchPosts(id: id, order: order)
+          return Action.fetchPosts(id: owner.categoryID, order: order)
         }
         .bind(to: reactor.action)
         .disposed(by: disposeBag)
@@ -222,13 +211,24 @@ private extension PostListViewController {
   private func bind() {
     
   }
+  
+  private func recentSearchParameter() -> (Int, PostOrder) {
+    let order = orderDropDownMenu.isLatestOrder.value ? PostOrder.latest : PostOrder.deadline
+    
+    if postkind == .contest {
+      let selectionId = jobCategoryView.selectionRelay.value.id
+      return (selectionId, order)
+    } else {
+      return (categoryID, order)
+    }
+  }
 }
 
 // MARK: - Layout
 private extension PostListViewController {
   func setupViewHierarchy() {
     view.addSubview(navigationBar)
-    if postkind == .공모전 {
+    if postkind == .contest {
       view.addSubview(jobCategoryView)
     }
     view.addSubview(postListSkeleton)
@@ -248,7 +248,7 @@ private extension PostListViewController {
   
   func setupViewLayout() {
     navigationBar.pin.top().left().right().sizeToFit(.content)
-    if postkind == .공모전 {
+    if postkind == .contest {
       jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit().marginTop(10)
       postListSkeleton.pin.top(to: jobCategoryView.edge.bottom).left().right().bottom()
       scrollView.pin.left().right().bottom().top(to: jobCategoryView.edge.bottom)

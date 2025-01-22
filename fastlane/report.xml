@@ -5,32 +5,22 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000238">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000176">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: TUIST_VERSION_NUMBER=1.2.1 TUIST_BUILD_NUMBER=1 tuist generate" time="11.267797">
+      <testcase classname="fastlane.lanes" name="1: cd .. &amp;&amp; tuist generate" time="2.096525">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="2: get_certificates" time="2.79547">
+      <testcase classname="fastlane.lanes" name="2: build_app" time="153.774046">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="3: get_provisioning_profile" time="2.279256">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="4: build_app" time="107.784207">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="5: upload_to_testflight" time="226.563599">
+      <testcase classname="fastlane.lanes" name="3: upload_to_testflight" time="181.99775">
         
       </testcase>
     

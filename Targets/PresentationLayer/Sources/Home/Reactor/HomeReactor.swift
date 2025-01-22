@@ -48,8 +48,8 @@ final class HomeReactor: Reactor {
   struct State {
     var isSuccessPostFetch: Bool = false
     var isSuccessBannerFetch: Bool = false
-    var postHeaderTitles: [String] = []
-    var selectedCell: PostCellData? 
+    var postHeaders: [PostKind] = []
+    var selectedCell: PostCellData?
     
     var postSections: [PostSection] = []
     var banners: [BannerCellData] = []
@@ -71,7 +71,7 @@ final class HomeReactor: Reactor {
     switch mutation {
     case let .setPosts(data):
       newState.postSections = data
-      newState.postHeaderTitles = data.map { $0.header }
+      newState.postHeaders = data.map { $0.kind }
       newState.isSuccessPostFetch = true
     case let .setBanners(data):
       newState.banners = data
@@ -102,9 +102,9 @@ final class HomeReactor: Reactor {
     )
     .map { (firstGroup, secondGroup, thirdGroup) in
         .setPosts(data: [
-          firstGroup.toPostSection(header: "공모전 📑", summary: "커리어 성장을 위한 IT 공모전 모음"),
-          secondGroup.toPostSection(header: "해커톤 🏆", summary: "단기간 프로젝트를 경험할 수 있는 해커톤"),
-          thirdGroup.toPostSection(header: "IT 동아리 💻", summary: "사이드 프로젝트 경험을 쌓는 IT 동아리")
+          firstGroup.toPostSection(kind: .contest),
+          secondGroup.toPostSection(kind: .hackathon),
+          thirdGroup.toPostSection(kind: .club)
         ])
     }
     // TODO: .catch { error in ... } 에러처리 필요.

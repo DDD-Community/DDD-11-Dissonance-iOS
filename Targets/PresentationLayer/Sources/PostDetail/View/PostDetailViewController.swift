@@ -366,6 +366,7 @@ private extension PostDetailViewController {
     shareButton.rx.tap
       .asSignal()
       .emit(with: self, onNext: { owner, _ in
+        GA.logEvent(.공유버튼)
         owner.showActivityController()
       })
       .disposed(by: disposeBag)
@@ -373,6 +374,7 @@ private extension PostDetailViewController {
     showMoreButton.tapObservable
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
+        GA.logEvent(.지원하기버튼)
         guard let reactor = owner.reactor else { return }
         owner.coordinator?.pushWebView(urlString: reactor.currentState.post.postUrlString)
       })
