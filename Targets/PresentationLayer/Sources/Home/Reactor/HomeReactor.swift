@@ -102,9 +102,9 @@ final class HomeReactor: Reactor {
     )
     .map { (firstGroup, secondGroup, thirdGroup) in
         .setPosts(data: [
-          firstGroup.toPostSection(kind: .공모전),
-          secondGroup.toPostSection(kind: .해커톤),
-          thirdGroup.toPostSection(kind: .동아리)
+          firstGroup.toPostSection(kind: .contest),
+          secondGroup.toPostSection(kind: .hackathon),
+          thirdGroup.toPostSection(kind: .club)
         ])
     }
     // TODO: .catch { error in ... } 에러처리 필요.

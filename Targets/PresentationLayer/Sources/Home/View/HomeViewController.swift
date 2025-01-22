@@ -222,9 +222,9 @@ private extension HomeViewController {
         let postHeaders = owner.reactor?.currentState.postHeaders ?? []
         let postKind = postHeaders[indexPath.section]
         switch postKind {
-        case .공모전: GA.logEvent(.공모전더보기버튼)
-        case .해커톤: GA.logEvent(.해커톤더보기버튼)
-        case .동아리: GA.logEvent(.IT동아리더보기버튼)
+        case .contest: GA.logEvent(.공모전더보기버튼)
+        case .hackathon: GA.logEvent(.해커톤더보기버튼)
+        case .club: GA.logEvent(.IT동아리더보기버튼)
         }
         owner.coordinator?.pushPostList(postKind: postKind)
       }

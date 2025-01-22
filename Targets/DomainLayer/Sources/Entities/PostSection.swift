@@ -25,7 +25,7 @@ extension PostSection: SectionModelType {
 // MARK: - Stub
 
 public extension PostSection {
-  static func stub(kind: PostKind = .공모전,
+  static func stub(kind: PostKind = .contest,
                    items: [PostCellData] = [.stub(), .stub(), .stub(), .stub(), .stub()]) -> Self {
     .init(kind: kind, items: items)
   }

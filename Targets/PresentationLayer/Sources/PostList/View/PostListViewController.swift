@@ -94,7 +94,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   private func setupInitialState() {
     scrollView.alpha = 0
     orderDropDownMenu.alpha = 0
-    navigationBar.setNavigationTitle(postkind.rawValue)
+    navigationBar.setNavigationTitle(postkind.navigationTitle)
   }
 }
 
@@ -139,7 +139,7 @@ private extension PostListViewController {
       }
       .disposed(by: disposeBag)
     
-    if postkind == .공모전 {
+    if postkind == .contest {
       Observable.combineLatest(
         orderRelay,
         jobCategoryView.selectionRelay
@@ -215,7 +215,7 @@ private extension PostListViewController {
   private func recentSearchParameter() -> (Int, PostOrder) {
     let order = orderDropDownMenu.isLatestOrder.value ? PostOrder.latest : PostOrder.deadline
     
-    if postkind == .공모전 {
+    if postkind == .contest {
       let selectionId = jobCategoryView.selectionRelay.value.id
       return (selectionId, order)
     } else {
@@ -228,7 +228,7 @@ private extension PostListViewController {
 private extension PostListViewController {
   func setupViewHierarchy() {
     view.addSubview(navigationBar)
-    if postkind == .공모전 {
+    if postkind == .contest {
       view.addSubview(jobCategoryView)
     }
     view.addSubview(postListSkeleton)
@@ -248,7 +248,7 @@ private extension PostListViewController {
   
   func setupViewLayout() {
     navigationBar.pin.top().left().right().sizeToFit(.content)
-    if postkind == .공모전 {
+    if postkind == .contest {
       jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit().marginTop(10)
       postListSkeleton.pin.top(to: jobCategoryView.edge.bottom).left().right().bottom()
       scrollView.pin.left().right().bottom().top(to: jobCategoryView.edge.bottom)
