@@ -19,6 +19,7 @@ public final class RecruitJobGroupView: UIView {
   // MARK: - Properties
   private let rootContainer: UIView = .init()
   private let titleLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray800, text: "모집 대상")
+  private let requiredLabel: MozipLabel = .init(style: .heading3, color: MozipColor.primary500, text: " *")
   
   private enum StackViewConstants {
     static let rowHeight: Int = 56
@@ -109,7 +110,12 @@ private extension RecruitJobGroupView {
     
     rootContainer.flex
       .define {
-        $0.addItem(titleLabel)
+        $0.addItem()
+          .direction(.row)
+          .define {
+            $0.addItem(titleLabel)
+            $0.addItem(requiredLabel)
+          }
         $0.addItem(jobGroupStackView).marginTop(12).height(56)
         
         $0.addItem()
