@@ -258,7 +258,7 @@ private extension PostUploadViewController {
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
-    recruitJobView.allValueObservable
+    recruitJobView.jobGroupRelay
       .skip(1)
       .map { Action.inputJobGroup($0) }
       .bind(to: reactor.action)
