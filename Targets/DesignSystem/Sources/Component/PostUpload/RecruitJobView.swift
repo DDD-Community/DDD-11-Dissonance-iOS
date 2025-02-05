@@ -50,14 +50,7 @@ public final class RecruitJobGroupView: UIView {
     return button
   }()
   
-  private let jobGroupRelay: BehaviorRelay<[BehaviorSubject<String>]> = .init(value: [])
-  
-  public var allValueObservable: Observable<[String]> {
-    jobGroupRelay
-      .flatMapLatest {
-        Observable.combineLatest($0)
-      }
-  }
+  public let jobGroupRelay: BehaviorRelay<[String]> = .init(value: [])
   
   public let updatedStackViewSubject: PublishSubject<Void> = .init()
   private let disposeBag: DisposeBag = .init()
@@ -86,17 +79,26 @@ public final class RecruitJobGroupView: UIView {
   // MARK: - Methods
   public func setEditMode() {
     jobGroupStackView.arrangedSubviews.first?.removeFromSuperview()
-    jobGroupRelay.accept([])
+    jobGroupRelay.accept(Array(jobGroupRelay.value.dropFirst()))
   }
   
   public func makeField(value: String = "") {
+    jobGroupRelay.accept(jobGroupRelay.value + [value])
+    
     let textField: MozipTextField = .init(placeHolder: "모집 대상을 입력해주세요. (공백 포함 최대 25자)")
+    textField.tag = jobGroupRelay.value.count - 1
+    jobGroupStackView.addArrangedSubview(textField)
+    
+    textField.rx.text.orEmpty
+      .skip(1)
+      .filter { [weak self] in self?.checkTextCount(textField, text: $0) ?? false }
+      .compactMap { [weak self] text in self?.updateJobGroupArray(tag: textField.tag, text: text) }
+      .bind(to: jobGroupRelay)
+      .disposed(by: disposeBag)
     
     if !value.isEmpty {
       textField.rx.text.onNext(value)
     }
-    jobGroupStackView.addArrangedSubview(textField)
-    jobGroupRelay.accept(jobGroupRelay.value + [BehaviorSubject(value: value)])
   }
 }
 
@@ -148,14 +150,10 @@ private extension RecruitJobGroupView {
   }
   
   func removeLastArrangedSubview() {
-    guard let lastView = jobGroupStackView.arrangedSubviews.last else {
-      return
-    }
+    guard let lastView = jobGroupStackView.arrangedSubviews.last else { return }
     jobGroupStackView.removeArrangedSubview(lastView)
     lastView.removeFromSuperview()
-    var currentSubjects = jobGroupRelay.value
-    currentSubjects.removeLast()
-    jobGroupRelay.accept(currentSubjects)
+    jobGroupRelay.accept(jobGroupRelay.value.dropLast())
   }
   
   func updatejobGroupStackViewHeight() {
@@ -163,5 +161,20 @@ private extension RecruitJobGroupView {
     jobGroupStackView.flex.height(newHeight)
     rootContainer.flex.layout()
     updatedStackViewSubject.onNext(())
+  }
+  
+  func checkTextCount(_ textField: UITextField, text: String) -> Bool {
+    guard text.count > 25 else { return true }
+    
+    textField.text = text.dropLast().map { String($0) }.joined()
+    return false
+  }
+  
+  func updateJobGroupArray(tag: Int, text: String) -> [String] {
+    var jobGroupArray = jobGroupRelay.value
+    guard tag < jobGroupArray.count else { return jobGroupArray }
+    
+    jobGroupArray[tag] = text
+    return jobGroupArray
   }
 }
