@@ -28,11 +28,7 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   private let bannerView = RecommendingBanner()
   private let collectionView = PostCollectionView()
   private let fabButton = FABButton()
-  
-  private let fabSubButton = FABSubButton(
-    iconImage: DesignSystemAsset.registerPost.image,
-    title: "공고 등록"
-  )
+  private let fabSubButton = FABSubButton()
   
   private let fabButtonDimmingView: UIView = {
     let view = UIView()
@@ -230,11 +226,19 @@ private extension HomeViewController {
       }
       .disposed(by: disposeBag)
     
-    fabSubButton.rxGesture.tap
+    fabSubButton.registPostButtonObservable
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self) { owner, _ in
         owner.fabButton.isExpanded.accept(false)
         owner.coordinator?.pushPostRegister()
+      }
+      .disposed(by: disposeBag)
+    
+    fabSubButton.recommendPostButtonObservable
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self) { owner, _ in
+        owner.fabButton.isExpanded.accept(false)
+        owner.coordinator?.pushPostRecommend()
       }
       .disposed(by: disposeBag)
     

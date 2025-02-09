@@ -16,6 +16,7 @@ public protocol HomeCoordinatorType: CoordinatorType {
   func pushMyPage()
   func pushPostDetail(id: Int)
   func pushPostRegister()
+  func pushPostRecommend()
 }
 
 final class HomeCoordinator: HomeCoordinatorType {
@@ -94,6 +95,10 @@ final class HomeCoordinator: HomeCoordinatorType {
     postUploadCoordinator.parentCoordinator = self
     addChild(postUploadCoordinator)
     postUploadCoordinator.start()
+  }
+  
+  func pushPostRecommend() {
+    // TODO: PostRecommend 화면 생성 후 이동
   }
 }
 
