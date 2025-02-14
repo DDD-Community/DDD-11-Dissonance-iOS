@@ -30,6 +30,7 @@ public final class FABSubButton: UIView {
     self.layer.cornerRadius = 8
     self.icon.image = iconImage
     self.title.updateTextKeepingAttributes(title)
+    self.isHidden = true
   }
   
   required init?(coder: NSCoder) {
