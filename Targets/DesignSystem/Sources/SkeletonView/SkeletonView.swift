@@ -16,6 +16,7 @@ final class SkeletonView: UIView {
     
     backgroundColor = MozipColor.gray10
     layer.cornerRadius = 8
+    translatesAutoresizingMaskIntoConstraints = false
   }
   
   required init?(coder: NSCoder) {
