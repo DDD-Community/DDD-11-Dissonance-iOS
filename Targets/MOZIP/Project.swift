@@ -13,7 +13,7 @@ import Foundation
 
 private var infoPlist: [String: Plist.Value] = [
     "CFBundleShortVersionString": "1.2.2",
-    "CFBundleVersion": "2",
+    "CFBundleVersion": "3",
     "CFBundleIconName": "AppIcon",
     "CFBundleDisplayName": "$(PRODUCT_NAME)",
     "UILaunchStoryboardName": "LaunchScreen",
