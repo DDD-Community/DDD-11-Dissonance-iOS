@@ -12,6 +12,7 @@ import UIKit
 
 public protocol PostSearchCoordinatorType: CoordinatorType {
   func start()
+  func startSelectMode(stream: MutableRecommendedPostStream)
   func pushPostDetail(id: Int)
 }
 
@@ -30,6 +31,11 @@ final class PostSearchCoordinator: PostSearchCoordinatorType {
   // MARK: - Methods
   func start() {
     let vc = postSearchViewController()
+    navigationController.pushViewController(vc, animated: true)
+  }
+  
+  func startSelectMode(stream: MutableRecommendedPostStream) { /// 추천공고 선택모드
+    let vc = postSearchViewController(stream: stream)
     navigationController.pushViewController(vc, animated: true)
   }
 
@@ -62,6 +68,17 @@ private extension PostSearchCoordinator {
       fatalError()
     }
     let reactor = PostSearchReactor(searchPostListUseCase: searchPostListUseCase)
+    let viewController = PostSearchViewController(reactor: reactor)
+    viewController.coordinator = self
+    return viewController
+  }
+  
+  func postSearchViewController(stream: MutableRecommendedPostStream) -> PostSearchViewController {
+    guard let searchPostListUseCase = DIContainer.shared.resolve(type: SearchPostListUseCaseType.self) else {
+      fatalError()
+    }
+    let reactor = PostSearchReactor(searchPostListUseCase: searchPostListUseCase,
+                                    mutableRecommendedPostStream: stream)
     let viewController = PostSearchViewController(reactor: reactor)
     viewController.coordinator = self
     return viewController
