@@ -99,6 +99,14 @@ final class HomeCoordinator: HomeCoordinatorType {
   
   func pushPostRecommend() {
     // TODO: PostRecommend 화면 생성 후 이동
+    guard let postRecommendCoordinator = DIContainer.shared.resolve(type: PostRecommendCoordinatorType.self)
+            as? PostRecommendCoordinator else {
+      return
+    }
+    
+    postRecommendCoordinator.parentCoordinator = self
+    addChild(postRecommendCoordinator)
+    postRecommendCoordinator.start()
   }
 }
 
