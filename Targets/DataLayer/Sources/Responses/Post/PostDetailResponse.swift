@@ -18,7 +18,7 @@ public struct PostDetailResponse: Decodable {
   let organization: String
   let recruitmentPeriod: String
   let jobGroups: [String]
-  let activityPeriod: String
+  let activityPeriod: String?
   let content: String
   let postUrlString: String
   let viewCount: Int
@@ -76,7 +76,10 @@ private extension PostDetailResponse {
     }
   }
   
-  func periodComponents(_ period: String) -> (startDate: String, endDate: String) {
+  func periodComponents(_ period: String?) -> (startDate: String, endDate: String) {
+    guard let period = period else {
+      return ("", "")
+    }
     let splitComponents = period.components(separatedBy: " ~ ")
     return (startDate: splitComponents[0], endDate: splitComponents[1])
   }

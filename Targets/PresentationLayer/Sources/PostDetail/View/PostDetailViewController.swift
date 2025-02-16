@@ -52,6 +52,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   private let recruitDateValueLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray700)
   private let recruitJobLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "모집 대상")
   private let tagLabelAreaView: UIView = .init()
+  private let activityDateContainer: UIView = .init()
   private let activityDateLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "활동 기간")
   private let activityDateValueLabel: MozipLabel = .init(style: .body2, color: MozipColor.gray700)
   private let activityContentsLabel: MozipLabel = .init(style: .heading3, color: MozipColor.gray400, text: "활동 내용")
@@ -199,7 +200,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
                     $0.addItem(recruitDateValueLabel).marginLeft(34).grow(1)
                   }
                 
-                $0.addItem()
+                $0.addItem(activityDateContainer)
                   .marginTop(8)
                   .direction(.row)
                   .define {
@@ -240,7 +241,13 @@ private extension PostDetailViewController {
       owner.countView.setupCountLabel(post.viewCount)
       owner.recruitDateValueLabel.text = post.recruitStartDate + " ~ " + post.recruitEndDate
       owner.addTagLabel(post.jobGroups)
-      owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
+      
+      if post.activityStartDate == "" && post.activityEndDate == "" {
+        owner.updateActivityDateVisibility(false)
+      } else {
+        owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
+      }
+      
       owner.activityContentsValueTextView.text = post.activityContents
       owner.updateLayout()
     }
@@ -409,5 +416,10 @@ private extension PostDetailViewController {
       applicationActivities: nil
     )
     self.present(activityVC, animated: true, completion: nil)
+  }
+  
+  func updateActivityDateVisibility(_ isVisible: Bool) {
+    activityDateContainer.flex.display(isVisible ? .flex : .none)
+    rootContainer.flex.layout()
   }
 }
