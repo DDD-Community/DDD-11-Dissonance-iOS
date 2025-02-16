@@ -31,4 +31,11 @@ extension BannerCellData {
           infoPostID: infoPostID,
           bannerImageURL: bannerImageURL)
   }
+  
+  public func toRecommendCellData() -> RecommendCellData {
+    .init(infoID: infoPostID,
+          title: "",
+          subTitle: "부제목",
+          thumbnailURL: bannerImageURL)
+  }
 }
