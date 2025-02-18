@@ -19,6 +19,7 @@ enum PostAPI {
   case fetchPostList(PostListFetchRequestDTO)
   case searchPostList(PostListSearchRequestDTO)
   case fetchBanner
+  case updateBanner(BannerUpdateRequestDTO)
   case fetchPost(id: Int)
   case report(id: Int)
 }
@@ -44,6 +45,8 @@ extension PostAPI: TargetType {
       return basePath + "/search"
     case .fetchBanner:
       return "/featured-posts"
+    case .updateBanner(let dto):
+      return "/featured-posts/\(dto.featuredPostId)"
     case .fetchPost(let id):
       return basePath + "/\(id)"
       
@@ -56,7 +59,7 @@ extension PostAPI: TargetType {
     switch self {
     case .upload:
       return .post
-    case .edit:
+    case .edit, .updateBanner:
       return .put
     case .delete:
       return .delete
@@ -75,7 +78,7 @@ extension PostAPI: TargetType {
     var headers: [String : String] = [:]
     
     switch self {
-    case .upload, .edit:
+    case .upload, .edit, .updateBanner:
       headers["Authorization"] = AppProperties.accessToken
       headers["Content-Type"] = "multipart/form-data"
     case .report, .delete:
@@ -94,6 +97,15 @@ extension PostAPI: TargetType {
     
     if case .edit(_, let post) = self {
       return .uploadMultipart(multipartFormData(post))
+    }
+    
+    if case .updateBanner(let dto) = self {
+      /// multipart + request parameter
+      let requestDTO = BannerRequestDTO(infoPostId: Int64(dto.infoPostId))
+      return .uploadCompositeMultipart(
+        multipartFormData(dto),
+        urlParameters: requestDTO.toDictionary()!
+      )
     }
     
     let requestParam: [String: Any] = parameters ?? [:]
@@ -147,6 +159,13 @@ private extension PostAPI {
     }
     
     multipartFormData.append(.init(provider: .data(jsonPostDTOString.data(using: .utf8)!), name: "infoPostReq"))
+    return multipartFormData
+  }
+  
+  func multipartFormData(_ requestDTO: BannerUpdateRequestDTO) -> [MultipartFormData] { /// 이미지만 올리는 경우
+    var multipartFormData: [MultipartFormData] = []
+    multipartFormData.append(.init(provider: .data(requestDTO.imgFile), name: "imgFile", fileName: "image.jpg", mimeType: "image/jpeg"))
+    
     return multipartFormData
   }
 }

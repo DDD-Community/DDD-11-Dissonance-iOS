@@ -7,6 +7,7 @@
 //
 
 import DomainLayer
+import Foundation
 
 import Moya
 import RxMoya
@@ -75,6 +76,22 @@ public final class PostRepository: PostRepositoryType {
       .map {
         guard let data = $0.data else { return [] }
         return data.toDomain()
+      }
+  }
+  
+  public func updateBanner(requestDTO: BannerUpdateRequestDTO) -> Single<BannerCellData> {
+    provider.rx.request(.updateBanner(requestDTO))
+      .map(APIResponse<BannerCellResponse>.self)
+      .flatMap {
+        guard let data = $0.data else {
+          let nserror = NSError(
+            domain: "run.ddd.MOZIP",
+            code: $0.statusCode,
+            userInfo: [NSLocalizedDescriptionKey: $0.message ?? ""] // FIXME: 에러타입 만들기
+          )
+          return .error(nserror)
+        }
+        return .just(data.toDomain())
       }
   }
   
