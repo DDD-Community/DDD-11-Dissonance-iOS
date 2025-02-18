@@ -24,15 +24,18 @@ final class PostRecommendReactor: Reactor {
   var initialState: State = .init()
   private let recommendedPostStream: MutableRecommendedPostStream
   private let fetchBannerUseCase: FetchBannerUseCaseType
+  private let updateBannerUseCase: UpdateBannerUseCaseType
   private let disposeBag = DisposeBag()
   
   // MARK: - Initializer
   init(
     recommendedPostStream: MutableRecommendedPostStream,
-    fetchBannerUseCase: FetchBannerUseCaseType
+    fetchBannerUseCase: FetchBannerUseCaseType,
+    updateBannerUseCase: UpdateBannerUseCaseType
   ) {
     self.recommendedPostStream = recommendedPostStream
     self.fetchBannerUseCase = fetchBannerUseCase
+    self.updateBannerUseCase = updateBannerUseCase
     bindStream()
   }
   
@@ -44,16 +47,21 @@ final class PostRecommendReactor: Reactor {
     case imageViewDidTap(Int)
     case inputImage(Data)
     case setUploadableTrue
+    case completeButtonDidTap
   }
   
   enum Mutation {
+    case setLoading(Bool)
     case setPosts([RecommendCellData])
     case setUploadableTrue
     case setAlertHistoryDataTrue
+    case setIsUploadComplete
   }
   
   struct State {
     var isUploadable = false
+    var isLoading = false
+    var isUploadComplete = false
     var alertHistoryData = false
     var posts: [RecommendCellData] = []
   }
@@ -92,6 +100,7 @@ final class PostRecommendReactor: Reactor {
     case let .refreshData(data):      refreshDataMutation(with: data)
     case let .inputImage(imageData):  inputImageMutation(with: imageData)
     case let .imageViewDidTap(index): imageViewDidTapMutation(at: index)
+    case .completeButtonDidTap:       completeButtonDidTapMutation()
     }
   }
   
@@ -137,13 +146,47 @@ final class PostRecommendReactor: Reactor {
     recommendedPostStream.setTargetIndex(index)
     return .empty()
   }
+  
+  func completeButtonDidTapMutation() -> Observable<Mutation> {
+    
+    let bannerForUpdate = recommendedPostStream.data.value.filter { $0.isUploadAvailable }
+    var streams: [Observable<Mutation>] = []
+    for banner in bannerForUpdate {
+      guard let imageData = banner.imageData else { continue }
+      
+      let requestDTO = BannerUpdateRequestDTO.init(
+        featuredPostId: banner.featuredPostID,
+        infoPostId: banner.infoID,
+        imgFile: imageData
+      )
+      let requestStream = updateBannerUseCase.execute(requestDTO: requestDTO)
+        .do(onError: {
+          print($0.localizedDescription)
+        })
+        .flatMap { _ in
+          return Observable<Mutation>.empty()
+        }
+      streams.append(requestStream)
+    }
+    
+    let mergedStream: Observable<Mutation> = .merge(streams)
+    
+    return .concat([
+      .just(.setLoading(true)),
+      mergedStream,
+      .just(.setLoading(false)),
+      .just(.setIsUploadComplete)
+    ])
+  }
 
   func reduce(state: State, mutation: Mutation) -> State {
     var newState = state
     switch mutation {
     case let .setPosts(data):        newState.posts = data
+    case let .setLoading(bool):      newState.isLoading = bool
     case .setUploadableTrue:         newState.isUploadable = true
     case .setAlertHistoryDataTrue:   newState.alertHistoryData = true
+    case .setIsUploadComplete:       newState.isUploadComplete = true ; PostRecommendCache.cachedRecommendPost = []
     }
     return newState
   }

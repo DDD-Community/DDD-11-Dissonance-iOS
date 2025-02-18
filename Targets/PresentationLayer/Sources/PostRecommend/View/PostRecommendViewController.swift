@@ -106,10 +106,33 @@ private extension PostRecommendViewController {
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
+    completeButton.rx.tap
+      .map { Action.completeButtonDidTap }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
   }
   
   func bindState(reactor: PostRecommendReactor) {
     
+    reactor.state
+      .map(\.isLoading)
+      .distinctUntilChanged()
+      .asDriver(onErrorJustReturn: false)
+      .drive {
+        $0 ? LoadingIndicator.start(withDimming: true) : LoadingIndicator.stop()
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.isUploadComplete)
+      .distinctUntilChanged()
+      .filter { $0 }
+      .asSignal(onErrorJustReturn: true)
+      .emit(with: self) { owner, _ in
+        owner.coordinator?.didFinish()
+      }
+      .disposed(by: disposeBag)
+      
     reactor.state
       .map(\.posts)
       .distinctUntilChanged()
@@ -157,14 +180,6 @@ private extension PostRecommendViewController {
         print(index)
         owner.reactor?.action.onNext(.imageViewDidTap(index))
         owner.checkPhotoLibraryPermission()
-      }
-      .disposed(by: disposeBag)
-    
-    completeButton.rx.tap
-      .asSignal()
-      .emit(with: self) { owner, _ in
-        print("업로드 고고")
-
       }
       .disposed(by: disposeBag)
   }

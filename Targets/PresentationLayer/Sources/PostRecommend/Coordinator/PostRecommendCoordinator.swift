@@ -63,9 +63,13 @@ private extension PostRecommendCoordinator {
     guard let fetchBannerUseCase = DIContainer.shared.resolve(type: FetchBannerUseCaseType.self) else {
       fatalError()
     }
+    guard let updateBannerUseCase = DIContainer.shared.resolve(type: UpdateBannerUseCaseType.self) else {
+      fatalError()
+    }
     let reactor = PostRecommendReactor(
       recommendedPostStream: mutableRecommendedPostStream,
-      fetchBannerUseCase: fetchBannerUseCase
+      fetchBannerUseCase: fetchBannerUseCase,
+      updateBannerUseCase: updateBannerUseCase
     )
     let viewController = PostRecommendViewController(reactor: reactor)
     viewController.coordinator = self
