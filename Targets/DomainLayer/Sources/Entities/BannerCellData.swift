@@ -33,7 +33,8 @@ extension BannerCellData {
   }
   
   public func toRecommendCellData() -> RecommendCellData {
-    .init(infoID: infoPostID,
+    .init(featuredPostID: featuredPostID,
+          infoID: infoPostID,
           title: "",
           subTitle: "부제목",
           thumbnailURL: bannerImageURL)
