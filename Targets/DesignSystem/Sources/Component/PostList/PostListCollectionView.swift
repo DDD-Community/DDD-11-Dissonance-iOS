@@ -32,7 +32,8 @@ public final class PostListCollectionView: UIView {
     collectionView.rx.didScroll.asObservable()
   }
   
-  private let dataRelay = BehaviorRelay<[PostSection.Item]>.init(value: [])
+  private var dataSource: [PostCellData] = []
+  private var isLoading = true
   private let disposeBag = DisposeBag()
   
   // MARK: - UI
@@ -46,7 +47,6 @@ public final class PostListCollectionView: UIView {
     super.init(frame: .zero)
     setupCollectionView()
     setupViewHierarchy()
-    bind()
   }
   
   required init?(coder: NSCoder) {
@@ -56,9 +56,9 @@ public final class PostListCollectionView: UIView {
   // MARK: - Overrides
   public override func sizeThatFits(_ size: CGSize) -> CGSize {
     let cellSpacing: CGFloat = Metric.minimumLineSpacing
-    let count = dataRelay.value.count
+    let count = isLoading ? 6 : dataSource.count
     let offset = CGFloat(count % 2)
-    let rowCount: CGFloat = (CGFloat(dataRelay.value.count) / 2) + offset
+    let rowCount: CGFloat = (CGFloat(count) / 2) + offset
     
     return CGSize(
       width: Device.width,
@@ -73,7 +73,9 @@ public final class PostListCollectionView: UIView {
   
   // MARK: - Methods
   public func setupData(_ data: [PostSection.Item]) {
-    self.dataRelay.accept(data)
+    dataSource = data
+    isLoading = false
+    collectionView.reloadData()
   }
   
   public func setScrollEnable(_ bool: Bool) {
@@ -86,6 +88,9 @@ public final class PostListCollectionView: UIView {
     collectionView.showsVerticalScrollIndicator = false
     collectionView.isScrollEnabled = false
     collectionView.register(PostCell.self)
+    collectionView.register(PostSkeletonCell.self)
+    collectionView.dataSource = self
+    collectionView.delegate = self
   }
   
   private func configureCollectionViewLayout() -> UICollectionViewLayout {
@@ -108,16 +113,26 @@ public final class PostListCollectionView: UIView {
   private func setupLayout() {
     collectionView.pin.all(pin.safeArea)
   }
+}
+
+extension PostListCollectionView: UICollectionViewDataSource {}
+
+extension PostListCollectionView: UICollectionViewDelegate {
+  public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return isLoading ? 6 : dataSource.count
+  }
   
-  private func bind() {
-    dataRelay
-      .bind(
-        to: collectionView.rx.items(
-          cellIdentifier: PostCell.defaultReuseIdentifier,
-          cellType: PostCell.self)
-      ) { index, item, cell in
-        cell.setData(item)
-      }
-      .disposed(by: disposeBag)
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    cellForItemAt indexPath: IndexPath
+  ) -> UICollectionViewCell {
+    if isLoading {
+      let cell: PostSkeletonCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
+      return cell
+    } else {
+      let cell: PostCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
+      cell.setData(dataSource[indexPath.row])
+      return cell
+    }
   }
 }
