@@ -36,22 +36,22 @@ public struct RecommendCellData: Equatable, Codable {
 public extension RecommendCellData {
   
   static var initialData: [Self] = [
-    .init(featuredPostID: 1, infoID: 0, title: "첫 번째 추천", subTitle: "부제목", thumbnailURL: ""),
-    .init(featuredPostID: 2, infoID: 0, title: "두 번째 추천", subTitle: "부제목", thumbnailURL: ""),
-    .init(featuredPostID: 3, infoID: 0, title: "세 번째 추천", subTitle: "부제목", thumbnailURL: ""),
-    .init(featuredPostID: 4, infoID: 0, title: "네 번째 추천", subTitle: "부제목", thumbnailURL: ""),
-    .init(featuredPostID: 5, infoID: 0, title: "다섯 번째 추천", subTitle: "부제목", thumbnailURL: "")
+    .init(featuredPostID: 1, infoID: 0, title: "첫 번째 추천", subTitle: " ", thumbnailURL: ""),
+    .init(featuredPostID: 2, infoID: 0, title: "두 번째 추천", subTitle: " ", thumbnailURL: ""),
+    .init(featuredPostID: 3, infoID: 0, title: "세 번째 추천", subTitle: " ", thumbnailURL: ""),
+    .init(featuredPostID: 4, infoID: 0, title: "네 번째 추천", subTitle: " ", thumbnailURL: ""),
+    .init(featuredPostID: 5, infoID: 0, title: "다섯 번째 추천", subTitle: " ", thumbnailURL: "")
   ]
   
   var isUploadAvailable: Bool {
     infoID != 0 &&
     subTitle.isEmpty == false &&
-    subTitle != "부제목" &&
+    subTitle != " " &&
     imageData != nil
   }
   
   var isChanged: Bool {
-    (subTitle != "" && subTitle != "부제목") ||
+    (subTitle != " " && subTitle.isEmpty == false) ||
     imageData != nil
   }
 }

@@ -11,11 +11,13 @@ import DomainLayer
 public struct BannerCellResponse: Decodable {
   let featuredPostID: Int
   let infoPostID: Int
+  let infoPostName: String
   let bannerImageURL: String
   
   enum CodingKeys: String, CodingKey {
     case featuredPostID = "featuredPostId"
     case infoPostID = "infoPostId"
+    case infoPostName = "infoPostName"
     case bannerImageURL = "bannerImageUrl"
   }
 }
@@ -26,6 +28,7 @@ public extension BannerCellResponse {
   func toDomain() -> BannerCellData {
     .init(featuredPostID: featuredPostID,
           infoPostID: infoPostID,
+          infoPostName: infoPostName,
           bannerImageURL: bannerImageURL)
   }
 }

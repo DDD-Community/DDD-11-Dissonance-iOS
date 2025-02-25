@@ -12,8 +12,12 @@ import Foundation
 
 import ReactorKit
 import RxSwift
+import RxCocoa
 
 struct PostRecommendCache {
+  @UserDefaultWrapper(key: "fetchedRecommendPost", defaultValue: [RecommendCellData]())
+  static var fetchedRecommendPost: [RecommendCellData]
+  
   @UserDefaultWrapper(key: "cachedRecommendPost", defaultValue: [RecommendCellData]())
   static var cachedRecommendPost: [RecommendCellData]
 }
@@ -25,6 +29,7 @@ final class PostRecommendReactor: Reactor {
   private let recommendedPostStream: MutableRecommendedPostStream
   private let fetchBannerUseCase: FetchBannerUseCaseType
   private let updateBannerUseCase: UpdateBannerUseCaseType
+  private let startUpdateCache: BehaviorRelay<Bool> = .init(value: false)
   private let disposeBag = DisposeBag()
   
   // MARK: - Initializer
@@ -68,18 +73,25 @@ final class PostRecommendReactor: Reactor {
   
   // MARK: - Methods
   func bindStream() {
+    /// data binding용 Stream
     recommendedPostStream.data
       .distinctUntilChanged()
       .observe(on: MainScheduler.asyncInstance)
-      .do(onNext: {
-        guard $0 != RecommendCellData.initialData else {
-          return
-        }
-        PostRecommendCache.cachedRecommendPost = $0
-      })
       .subscribe(with: self) { owner, data in
         owner.action.onNext(.refreshData(data))
         owner.checkUploadable(from: data)
+      }
+      .disposed(by: disposeBag)
+    
+    /// cache update용 Stream
+    recommendedPostStream.data
+      .filter { [weak self] _ in
+        guard let self = self else { return false }
+        return self.startUpdateCache.value
+      }
+      .filter { $0 != PostRecommendCache.fetchedRecommendPost } /// 공고 변경사항이 있는 경우만 필터링
+      .subscribe(with: self) { owner, data in
+        PostRecommendCache.cachedRecommendPost = data
       }
       .disposed(by: disposeBag)
   }
@@ -104,7 +116,8 @@ final class PostRecommendReactor: Reactor {
     }
   }
   
-  func askHistoryIfExistMutation() -> Observable<Mutation> { /// 작성중이던 정보 불러오기
+  /// 작성중이던 정보 있으면 불러올지 말지 선택하는 얼럿 띄우기
+  func askHistoryIfExistMutation() -> Observable<Mutation> {
     for post in PostRecommendCache.cachedRecommendPost where post.isChanged {
       return .just(.setAlertHistoryDataTrue)
     }
@@ -114,19 +127,31 @@ final class PostRecommendReactor: Reactor {
   func loadCacheMutation() -> Observable<Mutation> {
     let cacheData = PostRecommendCache.cachedRecommendPost
     recommendedPostStream.updateAllPost(posts: cacheData)
+    startUpdateCache.accept(true)
     return .empty()
   }
   
   func loadDataMutation() -> Observable<Mutation> {
-    fetchBannerUseCase.execute()
-      .map { $0.map { $0.toRecommendCellData() } }
-      .withUnretained(self)
-      .map { owner, banners in
-        owner.recommendedPostStream.updateAllPost(posts: banners)
-      }
-      .flatMap {
-        return Observable<Mutation>.empty()
-      }
+    PostRecommendCache.cachedRecommendPost = []
+    
+    if PostRecommendCache.fetchedRecommendPost.isEmpty {
+      return fetchBannerUseCase.execute()
+        .map { $0.map { $0.toRecommendCellData() } }
+        .withUnretained(self)
+        .map { owner, banners in
+          owner.recommendedPostStream.updateAllPost(posts: banners)
+          PostRecommendCache.fetchedRecommendPost = owner.recommendedPostStream.data.value
+          owner.startUpdateCache.accept(true)
+        }
+        .flatMap {
+          return Observable<Mutation>.empty()
+        }
+    } else {
+      let fetchedRecommendPost = PostRecommendCache.fetchedRecommendPost
+      recommendedPostStream.updateAllPost(posts: fetchedRecommendPost)
+      startUpdateCache.accept(true)
+      return .empty()
+    }
   }
   
   func setUplodableMutation() -> Observable<Mutation> {
@@ -186,7 +211,10 @@ final class PostRecommendReactor: Reactor {
     case let .setLoading(bool):      newState.isLoading = bool
     case .setUploadableTrue:         newState.isUploadable = true
     case .setAlertHistoryDataTrue:   newState.alertHistoryData = true
-    case .setIsUploadComplete:       newState.isUploadComplete = true ; PostRecommendCache.cachedRecommendPost = []
+    case .setIsUploadComplete:       
+      newState.isUploadComplete = true
+      PostRecommendCache.cachedRecommendPost = []
+      PostRecommendCache.fetchedRecommendPost = []
     }
     return newState
   }
