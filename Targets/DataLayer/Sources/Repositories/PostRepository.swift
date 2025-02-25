@@ -81,7 +81,7 @@ public final class PostRepository: PostRepositoryType {
   
   public func updateBanner(requestDTO: BannerUpdateRequestDTO) -> Single<BannerCellData> {
     provider.rx.request(.updateBanner(requestDTO))
-      .map(APIResponse<BannerCellResponse>.self)
+      .map(APIResponse<BannerUpdateResponse>.self)
       .flatMap {
         guard let data = $0.data else {
           let nserror = NSError(
