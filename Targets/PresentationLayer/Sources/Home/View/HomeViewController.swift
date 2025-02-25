@@ -22,8 +22,12 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   weak var coordinator: HomeCoordinator?
   
   // MARK: UI
-  private let scrollView = UIScrollView()
-  private let contentView = UIView()
+  private let scrollView: UIScrollView = {
+    let scrollView = UIScrollView()
+    scrollView.refreshControl = UIRefreshControl()
+    return scrollView
+  }()
+  
   private let navigationBar = HomeNavigationBar()
   private let bannerView = RecommendingBanner()
   private let collectionView = PostCollectionView()
@@ -33,20 +37,25 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   private let fabButtonDimmingView: UIView = {
     let view = UIView()
     view.backgroundColor = MozipColor.dim
+    view.isHidden = true
     return view
   }()
-  private let homeSkeleton = HomeSkeleton()
   
-  private let recommandingTitleLabel = MozipLabel(
-    style: .heading1,
-    color: MozipColor.gray800,
-    text: "MD Pick 금주의 공고"
-  )
+  private let recommandingTitleLabel: MozipLabel = {
+    let label = MozipLabel(
+      style: .heading1,
+      color: MozipColor.gray800,
+      text: "MD Pick 금주의 공고"
+    )
+    label.showSkeleton()
+    return label
+  }()
   
   private let recommandingIcon: UIImageView = {
     let imageView = UIImageView()
     imageView.image = DesignSystemAsset.pin.image
     imageView.contentMode = .scaleAspectFit
+    imageView.showSkeleton()
     return imageView
   }()
   
@@ -54,19 +63,18 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
     return .darkContent
   }
   
-  // MARK: Initializer
+  // MARK: - Initializer
   init(reactor: HomeReactor) {
     super.init()
     
     self.reactor = reactor
-    setupViewHierarchy()
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  // MARK: Overrides
+  // MARK: - Overrides
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
@@ -76,38 +84,17 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
   override func bind(reactor: HomeReactor) {
     bindAction(reactor: reactor)
     bindState(reactor: reactor)
+    bindView()
   }
   
   override func setupViews() {
     super.setupViews()
     
-    bindView()
-    setupInitialState()
+    setupViewHierarchy()
   }
   
   override func viewDidLayoutSubviews() {
     setupViewLayout()
-  }
-  
-  // MARK: Methods
-  func setupInitialState() {
-    scrollView.alpha = 0
-    scrollView.refreshControl = UIRefreshControl()
-    scrollView.refreshControl?.addTarget(
-      self,
-      action: #selector(pullToRefresh(_:)),
-      for: .valueChanged
-    )
-    fabButtonDimmingView.isHidden = true
-  }
-  
-  @objc private func pullToRefresh(_ sender: UIRefreshControl) {
-    reactor?.action.onNext(.fetchPosts)
-    reactor?.action.onNext(.fetchBanners)
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-      sender.endRefreshing()
-    }
   }
 }
 
@@ -149,10 +136,8 @@ private extension HomeViewController {
       .filter { $0 }
       .asSignal(onErrorJustReturn: true)
       .emit(with: self, onNext: { owner, _ in
-        UIView.animate(withDuration: 0.5) {
-          owner.scrollView.alpha = 1
-        }
-        owner.homeSkeleton.hide()
+        owner.recommandingTitleLabel.hideSkeleton()
+        owner.recommandingIcon.hideSkeleton()
       })
       .disposed(by: disposeBag)
     
@@ -163,7 +148,6 @@ private extension HomeViewController {
       .asSignal(onErrorJustReturn: [])
       .emit(with: self) { owner, postSections in
         owner.collectionView.setupData(postSections)
-        owner.collectionView.pin.sizeToFit()
       }
       .disposed(by: disposeBag)
     
@@ -201,6 +185,13 @@ private extension HomeViewController {
       .emit(with: self) { owner, _ in
         GA.logEvent(.검색버튼)
         owner.coordinator?.pushPostSearch()
+      }
+      .disposed(by: disposeBag)
+    
+    scrollView.refreshControl?.rx.controlEvent(.valueChanged)
+      .asSignal()
+      .emit(with: self) { owner, _ in
+        owner.pullToRefresh()
       }
       .disposed(by: disposeBag)
     
@@ -253,7 +244,6 @@ private extension HomeViewController {
       .drive(with: self) { owner, bool in
         UIView.animate(withDuration: 0.3) {
           owner.fabButtonDimmingView.isHidden = !bool
-          owner.updateFABButtonLayout()
         }
         owner.view.setNeedsLayout()
       }
@@ -263,16 +253,24 @@ private extension HomeViewController {
 
 // MARK: - Layout
 private extension HomeViewController {
+  func pullToRefresh() {
+    reactor?.action.onNext(.fetchPosts)
+    reactor?.action.onNext(.fetchBanners)
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+      self?.scrollView.refreshControl?.endRefreshing()
+    }
+  }
+  
   func setupViewHierarchy() {
     view.addSubview(navigationBar)
-    view.addSubview(homeSkeleton)
     view.addSubview(scrollView)
     view.addSubview(fabButtonDimmingView)
     view.addSubview(fabSubButton)
     view.addSubview(fabButton)
-    scrollView.addSubview(contentView)
+    scrollView.addSubview(rootContainer)
     
-    contentView.flex
+    rootContainer.flex
       .direction(.column)
       .justifyContent(.start)
       .define { flex in
@@ -284,35 +282,33 @@ private extension HomeViewController {
             flex.addItem(recommandingIcon).size(17).marginLeft(8)
           }
         flex.addItem(bannerView).width(Device.width-40).aspectRatio(2).marginTop(24).marginLeft(20).marginRight(20)
-        flex.addItem(collectionView).marginTop(32).grow(1).markDirty()
+        flex.addItem(collectionView).marginTop(32).grow(1)
       }
   }
   
   func setupViewLayout() {
     navigationBar.pin.top().left().right().sizeToFit()
-    homeSkeleton.pin.top(to: navigationBar.edge.bottom).left().right().bottom()
     scrollView.pin.left().right().bottom().top(to: navigationBar.edge.bottom)
     fabButtonDimmingView.pin.all()
-    fabButton.pin.right(21).bottom(51).sizeToFit()
+    fabButton.pin.right(21).bottom(51).size(72)
     updateFABButtonLayout()
-    contentView.pin.top().left().right()
-    contentView.flex.layout(mode: .adjustHeight)
-    scrollView.contentSize = contentView.frame.size
-    collectionView.flex.markDirty()
+    rootContainer.pin.top().left().right()
+    rootContainer.flex.layout(mode: .adjustHeight)
+    scrollView.contentSize = rootContainer.frame.size
   }
   
-  private func updateFABButtonLayout() {
+  func updateFABButtonLayout() {
     if fabButton.isExpanded.value {
       fabSubButton.pin
         .bottom(to: fabButton.edge.top)
         .right()
         .marginRight(20)
         .marginBottom(24)
-      fabSubButton.alpha = 1
+      fabSubButton.isHidden = false
     } else {
       fabSubButton.pin
         .bottomRight(to: fabButton.anchor.topRight)
-      fabSubButton.alpha = 0
+      fabSubButton.isHidden = true
     }
   }
 }

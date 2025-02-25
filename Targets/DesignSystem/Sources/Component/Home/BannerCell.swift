@@ -53,7 +53,7 @@ public final class BannerCell: UICollectionViewCell {
   public func setData(_ data: BannerCellData) {
     bannerImage.kf.setImage(
       with: URL(string: data.bannerImageURL),
-      placeholder: UIImage.image(with: MozipColor.gray300)
+      placeholder: UIImage.image(with: MozipColor.gray10)
     )
     bannerImage.flex.markDirty()
     setNeedsLayout()

@@ -51,4 +51,22 @@ public extension UIView {
       completion?()
     }
   }
+  
+  func showSkeleton() {
+    let skeletonView = SkeletonView()
+    addSubview(skeletonView)
+    
+    NSLayoutConstraint.activate([
+      skeletonView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -2),
+      skeletonView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 2),
+      skeletonView.topAnchor.constraint(equalTo: topAnchor, constant: -2),
+      skeletonView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 2)
+    ])
+  }
+  
+  func hideSkeleton() {
+    for subview in subviews.reversed() where subview is SkeletonView {
+      subview.removeFromSuperview()
+    }
+  }
 }

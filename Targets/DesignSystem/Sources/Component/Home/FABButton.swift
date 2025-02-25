@@ -69,8 +69,6 @@ public final class FABButton: UIView {
         owner.plusIcon.image = bool ?
         DesignSystemAsset.xmark.image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal) :
         DesignSystemAsset.plus.image.withTintColor(MozipColor.white, renderingMode: .alwaysOriginal)
-
-        owner.rootFlexContainer.flex.layout()
       }
       .disposed(by: disposeBag)
   }
@@ -92,7 +90,6 @@ public final class FABButton: UIView {
   private func setupLayer() {
     rootFlexContainer.pin.all()
     rootFlexContainer.flex.layout()
-    pin.size(CGSize(width: 72, height: 72))
   }
   
   private func setupShadow() {
