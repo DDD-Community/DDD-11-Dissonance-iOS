@@ -8,29 +8,57 @@
 
 import UIKit
 
+import RxSwift
+
 public final class FABSubButton: UIView {
+  // MARK: Properties
+  public var registPostButtonObservable: Observable<Void> {
+    registPostButton.rx.tap.asObservable()
+  }
+  
+  public var recommendPostButtonObservable: Observable<Void> {
+    recommendPostButton.rx.tap.asObservable()
+  }
+  
+  // MARK: UI
   private let rootFlexContainer = UIView()
   
-  private let icon: UIImageView = {
+  private let registPostButton = UIButton()
+  
+  private let registPostIcon: UIImageView = {
     let imageView = UIImageView()
     imageView.contentMode = .scaleAspectFit
+    imageView.image = DesignSystemAsset.registerPost.image
     return imageView
   }()
   
-  private let title = MozipLabel(
+  private let registPostTitle = MozipLabel(
     style: .heading3,
-    color: MozipColor.primary700
+    color: MozipColor.primary700,
+    text: "공고 등록"
   )
   
-  public init(iconImage: UIImage, title: String) {
+  private let recommendPostButton = UIButton()
+  
+  private let recommendPostIcon: UIImageView = {
+    let imageView = UIImageView()
+    imageView.contentMode = .scaleAspectFit
+    imageView.image = DesignSystemAsset.pin2.image
+    return imageView
+  }()
+  
+  private let recommendPostTitle = MozipLabel(
+    style: .heading3,
+    color: MozipColor.primary700,
+    text: "추천 공고 관리"
+  )
+  
+  public init() {
     super.init(frame: .zero)
     setupViewHierarchy()
     setupViewLayout()
     self.backgroundColor = .white
     self.layer.cornerRadius = 8
-    self.icon.image = iconImage
-    self.title.updateTextKeepingAttributes(title)
-    self.isHidden = true
   }
   
   required init?(coder: NSCoder) {
@@ -48,17 +76,32 @@ private extension FABSubButton {
   func setupViewHierarchy() {
     addSubview(rootFlexContainer)
     rootFlexContainer.flex
-      .direction(.row)
-      .alignItems(.center)
+      .direction(.column)
+      .alignItems(.start)
       .define { flex in
-        flex.addItem(icon).size(24).marginLeft(16)
-        flex.addItem(title).marginLeft(8)
+        flex.addItem(registPostButton)
+          .direction(.row)
+          .alignItems(.center)
+          .marginTop(20)
+          .define { flex in
+            flex.addItem(registPostIcon).size(24).marginLeft(16)
+            flex.addItem(registPostTitle).marginLeft(8)
+          }
+        
+        flex.addItem(recommendPostButton)
+          .direction(.row)
+          .alignItems(.center)
+          .marginTop(20)
+          .define { flex in
+            flex.addItem(recommendPostIcon).size(24).marginLeft(16)
+            flex.addItem(recommendPostTitle).marginLeft(8)
+          }
       }
   }
   
   func setupViewLayout() {
     rootFlexContainer.pin.all()
     rootFlexContainer.flex.layout()
-    pin.size(CGSize(width: 163, height: 64))
+    pin.size(CGSize(width: 163, height: 108))
   }
 }

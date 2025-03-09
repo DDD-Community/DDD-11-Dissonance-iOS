@@ -41,13 +41,14 @@ public extension UIView {
     return nil
   }
   
-  func showToast(message: String, duration: CGFloat = 2.0) {
+  func showToast(message: String, duration: CGFloat = 2.0, _ completion: (() -> Void)? = nil) {
     guard UIView.toastFlag == false else { return }
     let toast = Toast()
     toast.setMessage(message)
     UIView.toastFlag = true
     toast.showIn(view: self, duration: duration) {
       UIView.toastFlag = false
+      completion?()
     }
   }
   

@@ -31,6 +31,10 @@ public struct PresentationAssembly: DependencyAssemblable {
       PostUploadCoordinator(navigationController: navigationController)
     }
     
+    container.register(type: PostRecommendCoordinatorType.self) { _ in
+      PostRecommendCoordinator(navigationController: navigationController)
+    }
+    
     container.register(type: PostDetailCoordinatorType.self) { _ in
       PostDetailCoordinator(navigationController: navigationController)
     }
