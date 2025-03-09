@@ -442,6 +442,8 @@ private extension PostDetailViewController {
     skeletonableViews.forEach {
       $0.hideSkeleton()
     }
+  }
+  
   func updateActivityDateVisibility(_ isVisible: Bool) {
     activityDateContainer.flex.display(isVisible ? .flex : .none)
     rootContainer.flex.layout()
