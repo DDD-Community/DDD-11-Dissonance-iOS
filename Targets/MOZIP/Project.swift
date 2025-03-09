@@ -12,8 +12,8 @@ import Foundation
 // Fastlane에서 전달된 환경 변수
 
 private var infoPlist: [String: Plist.Value] = [
-    "CFBundleShortVersionString": "1.2.2",
-    "CFBundleVersion": "3",
+    "CFBundleShortVersionString": "1.2.3",
+    "CFBundleVersion": "1",
     "CFBundleIconName": "AppIcon",
     "CFBundleDisplayName": "$(PRODUCT_NAME)",
     "UILaunchStoryboardName": "LaunchScreen",
