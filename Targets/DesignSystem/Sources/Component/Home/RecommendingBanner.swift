@@ -21,11 +21,12 @@ public final class RecommendingBanner: UIView {
   public var bannerTapObservable: Observable<BannerCellData> {
     bannerCollectionView.rx.itemSelected
       .withUnretained(self)
-      .map { owner, indexPath in owner.dataRelay.value[indexPath.row] }
+      .map { owner, indexPath in owner.dataSource[indexPath.row] }
       .asObservable()
   }
   
-  private let dataRelay = BehaviorRelay<[BannerCellData]>.init(value: [])
+  private var dataSource: [BannerCellData] = []
+  private var isLoading = true
   private let disposeBag = DisposeBag()
   
   // MARK: - UI
@@ -52,7 +53,14 @@ public final class RecommendingBanner: UIView {
   // MARK: - Methods
   public func setupData(_ data: [BannerCellData]) {
     let transformedData = transformData(from: data)
-    self.dataRelay.accept(transformedData)
+    dataSource = transformedData
+    
+    if !data.isEmpty {
+      setupPageControl()
+      bannerCollectionView.dataCount = dataSource.count
+    }
+    isLoading = false
+    bannerCollectionView.reloadData()
   }
   
   public func start() {
@@ -72,24 +80,8 @@ public final class RecommendingBanner: UIView {
   }
   
   private func setupCollectionView() {
-
-    dataRelay
-      .bind(
-        to: bannerCollectionView.rx.items(
-          cellIdentifier: BannerCell.defaultReuseIdentifier,
-          cellType: BannerCell.self)
-      ) { index, item, cell in
-        cell.setData(item)
-      }
-      .disposed(by: disposeBag)
-    
-    dataRelay
-      .filter { !$0.isEmpty }
-      .bind(with: self) { owner, value in
-        owner.setupPageControl()
-        owner.bannerCollectionView.dataCount = value.count
-      }
-      .disposed(by: disposeBag)
+    bannerCollectionView.dataSource = self
+    bannerCollectionView.delegate = self
     
     bannerCollectionView.rx.didEndDecelerating
       .withUnretained(self)
@@ -105,7 +97,7 @@ public final class RecommendingBanner: UIView {
   
   private func setupPageControl() {
     pageControl.currentPage = 0
-    pageControl.numberOfPages = dataRelay.value.count - 2
+    pageControl.numberOfPages = dataSource.count - 2
   }
   
   private func setupViewHierarchy() {
@@ -116,5 +108,28 @@ public final class RecommendingBanner: UIView {
   private func setupLayer() {
     bannerCollectionView.pin.all(pin.safeArea)
     pageControl.pin.bottomCenter(20)
+  }
+}
+
+// MARK: - CollectionView
+extension RecommendingBanner: UICollectionViewDelegate {}
+
+extension RecommendingBanner: UICollectionViewDataSource {
+  public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return isLoading ? 1 : dataSource.count
+  }
+  
+  public func collectionView(
+    _ collectionView: UICollectionView, 
+    cellForItemAt indexPath: IndexPath
+  ) -> UICollectionViewCell {
+    if isLoading {
+      let cell: BannerSkeletonCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
+      return cell
+    } else {
+      let cell: BannerCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
+      cell.setData(dataSource[indexPath.row])
+      return cell
+    }
   }
 }
