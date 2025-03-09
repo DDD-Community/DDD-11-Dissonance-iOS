@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class LoadingIndicator {
+public final class LoadingIndicator {
   
   public static func start(withDimming dimming: Bool = false) {
     DispatchQueue.main.async {

@@ -160,7 +160,7 @@ private extension PostRecommendViewController {
       .disposed(by: disposeBag)
   }
   
-  private func bindViews() {
+  func bindViews() {
     navigationBar.backButtonTapObservable
       .bind(with: self) { owner, _ in
         owner.coordinator?.didFinish()
