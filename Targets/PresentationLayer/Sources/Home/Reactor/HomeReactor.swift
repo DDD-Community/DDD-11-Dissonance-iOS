@@ -120,7 +120,11 @@ final class HomeReactor: Reactor {
   }
   
   private func fetchUserInfo() -> Observable<Mutation> {
-    userUseCase.fetchUserInformation()
+    guard AuthManager.load(authInfoType: .accessToken) != nil else {
+      return .empty()
+    }
+    
+    return userUseCase.fetchUserInformation()
       .flatMap { Observable<Mutation>.just(.setUserInfo(isAdmin: $0.isAdmin, provider: $0.provider)) }
   }
   

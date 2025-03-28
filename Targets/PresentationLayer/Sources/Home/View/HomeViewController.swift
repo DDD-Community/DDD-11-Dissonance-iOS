@@ -16,7 +16,7 @@ import PinLayout
 import ReactorKit
 import RxCocoa
 
-final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
+final class HomeViewController: BaseViewController<HomeReactor>, Alertable, Coordinatable {
   
   // MARK: Properties
   weak var coordinator: HomeCoordinator?
@@ -64,6 +64,7 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
     
     self.reactor = reactor
     setupViewHierarchy()
+    addTokenObserver()
   }
   
   required init?(coder: NSCoder) {
@@ -297,7 +298,7 @@ private extension HomeViewController {
     collectionView.flex.markDirty()
   }
   
-  private func updateFABButtonLayout() {
+  func updateFABButtonLayout() {
     if fabButton.isExpanded.value {
       fabSubButton.pin
         .bottom(to: fabButton.edge.top)
@@ -310,5 +311,23 @@ private extension HomeViewController {
         .bottomRight(to: fabButton.anchor.topRight)
       fabSubButton.alpha = 0
     }
+  }
+  
+  func addTokenObserver() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(transitionToLogIn),
+      name: .logout,
+      object: nil
+    )
+  }
+  
+  @objc func transitionToLogIn() {
+    presentAlert(
+      type: .sessionExpiration,
+      rightButtonAction: { [weak self] in
+        self?.coordinator?.pushLoginPage()
+      }
+    )
   }
 }

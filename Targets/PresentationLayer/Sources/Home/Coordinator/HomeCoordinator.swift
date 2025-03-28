@@ -58,8 +58,14 @@ final class HomeCoordinator: HomeCoordinatorType {
       return
     }
     
-    loginCoordinator.parentCoordinator = self
-    addChild(loginCoordinator)
+    var coordinator: CoordinatorType = self
+    while !coordinator.childCoordinators.isEmpty {
+      guard let lastChildCoordinator = coordinator.childCoordinators.last else { break } 
+      coordinator = lastChildCoordinator
+    }
+    
+    loginCoordinator.parentCoordinator = coordinator
+    coordinator.addChild(loginCoordinator)
     loginCoordinator.start()
   }
   
