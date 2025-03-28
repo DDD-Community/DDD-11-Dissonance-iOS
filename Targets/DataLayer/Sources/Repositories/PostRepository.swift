@@ -30,7 +30,7 @@ public final class PostRepository: PostRepositoryType {
   }
   
   public func edit(id: Int, post: Post) -> Single<(isSuccess: Bool, message: String?)> {
-    return provider.rx.request(.edit(id: id, post: post), type: PostEditResponse.self)
+    return provider.rx.request(.edit(id: id, post: post))
       .map(APIResponse<PostEditResponse>.self)
       .map { (isSuccess: $0.isSuccess, message: $0.message) }
   }
