@@ -32,10 +32,6 @@ final class TermsPolicyCoordinator: TermsPolicyCoordinatorType {
     navigationController.pushViewController(termsPolicyViewController, animated: true)
   }
   
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
-  
   func pushWebView(urlString: String) {
     let webViewController: WebViewController = .init(urlString: urlString)
     webViewController.modalPresentationStyle = .fullScreen

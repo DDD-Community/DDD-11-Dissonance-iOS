@@ -37,8 +37,6 @@ final class HomeCoordinator: HomeCoordinatorType {
     navigationController.pushViewController(vc, animated: true)
   }
 
-  func didFinish() {}
-
   func pushPostList(postKind: PostKind) {
     let coordinator = PostListCoordinator(navigationController: navigationController)
     coordinator.parentCoordinator = self

@@ -32,10 +32,6 @@ final class MyPageCoordinator: MyPageCoordinatorType {
     let myPageViewController = myPageViewController()
     navigationController.pushViewController(myPageViewController, animated: true)
   }
-  
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
 
   func pushWebView(urlString: String) {
     let webViewController: WebViewController = .init(urlString: urlString)

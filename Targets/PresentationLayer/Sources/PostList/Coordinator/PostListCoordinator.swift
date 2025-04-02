@@ -37,10 +37,6 @@ final class PostListCoordinator: PostListCoordinatorType {
     navigationController.pushViewController(vc, animated: true)
   }
   
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
-  
   func pushPostDetail(id: Int) {
     guard let postDetailCoordinator = DIContainer.shared.resolve(type: PostDetailCoordinatorType.self)
             as? PostDetailCoordinator else {

@@ -36,10 +36,6 @@ final class PostUploadCoordinator: PostUploadCoordinatorType {
     let postUploadViewController = postUploadViewController(originID: originID, originPost: originPost)
     navigationController.pushViewController(postUploadViewController, animated: true)
   }
-
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
 }
 
 // MARK: - Private
