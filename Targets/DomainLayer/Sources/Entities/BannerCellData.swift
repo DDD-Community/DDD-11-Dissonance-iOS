@@ -10,15 +10,17 @@ import Foundation
 
 public struct BannerCellData: Equatable {
   public let featuredPostID, infoPostID: Int
-  public let bannerImageURL: String
+  public let infoPostName, bannerImageURL: String
   
   public init(
     featuredPostID: Int,
     infoPostID: Int,
+    infoPostName: String,
     bannerImageURL: String
   ) {
     self.featuredPostID = featuredPostID
     self.infoPostID = infoPostID
+    self.infoPostName = infoPostName
     self.bannerImageURL = bannerImageURL
   }
 }
@@ -29,6 +31,15 @@ extension BannerCellData {
                    bannerImageURL: String = "www.naver.com") -> Self {
     .init(featuredPostID: featuredPostID,
           infoPostID: infoPostID,
+          infoPostName: "",
           bannerImageURL: bannerImageURL)
+  }
+  
+  public func toRecommendCellData() -> RecommendCellData {
+    .init(featuredPostID: featuredPostID,
+          infoID: infoPostID,
+          title: "",
+          subTitle: infoPostName,
+          thumbnailURL: bannerImageURL)
   }
 }

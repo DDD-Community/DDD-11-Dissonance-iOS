@@ -157,6 +157,7 @@ private extension BannerCollectionView {
     self.isPagingEnabled = true
     self.showsHorizontalScrollIndicator = false
     self.layer.cornerRadius = Metric.cornerRadius
+    register(BannerSkeletonCell.self)
     register(BannerCell.self)
   }
 }

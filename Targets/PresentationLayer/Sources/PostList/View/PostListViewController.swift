@@ -32,7 +32,6 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   private let jobCategoryView = JobCategoryView()
   private let postOrderControlView = PostOrderControlView()
   private let collectionView = PostListCollectionView()
-  private let postListSkeleton = PostListSkeleton()
   private let orderDropDownMenu = OrderDropDownMenu()
   
   private let navigationBar = MozipNavigationBar(
@@ -72,7 +71,6 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
     super.setupViews()
     setupNavigationBar()
     setupInitialState()
-    bind()
   }
   
   override func viewDidLayoutSubviews() {
@@ -89,7 +87,6 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   }
   
   private func setupInitialState() {
-    scrollView.alpha = 0
     orderDropDownMenu.alpha = 0
     navigationBar.setNavigationTitle(postkind.navigationTitle)
   }
@@ -168,25 +165,9 @@ private extension PostListViewController {
   
   func bindState(reactor: PostListReactor) {
     reactor.state
-      .map { $0.isLoading }
-      .distinctUntilChanged()
-      .take(2)
-      .asSignal(onErrorJustReturn: false)
-      .emit(with: self, onNext: { owner, isLoading in
-        if isLoading {
-          // TODO: 추후 로딩화면 Skeleton 적용
-        } else {
-          UIView.animate(withDuration: 0.5) {
-            owner.scrollView.alpha = 1
-          }
-          owner.postListSkeleton.hide()
-        }
-      })
-      .disposed(by: disposeBag)
-    
-    reactor.state
       .map { $0.posts }
       .distinctUntilChanged()
+      .filter { !$0.isEmpty }
       .asSignal(onErrorJustReturn: [])
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
@@ -203,10 +184,6 @@ private extension PostListViewController {
         owner.coordinator?.pushPostDetail(id: cell.id)
       }
       .disposed(by: disposeBag)
-  }
-  
-  private func bind() {
-    
   }
   
   private func recentSearchParameter() -> (Int, PostOrder) {
@@ -228,7 +205,6 @@ private extension PostListViewController {
     if postkind == .contest {
       view.addSubview(jobCategoryView)
     }
-    view.addSubview(postListSkeleton)
     view.addSubview(scrollView)
     scrollView.addSubview(contentView)
     scrollView.addSubview(orderDropDownMenu)
@@ -247,10 +223,8 @@ private extension PostListViewController {
     navigationBar.pin.top().left().right().sizeToFit(.content)
     if postkind == .contest {
       jobCategoryView.pin.top(to: navigationBar.edge.bottom).left().right().sizeToFit().marginTop(10)
-      postListSkeleton.pin.top(to: jobCategoryView.edge.bottom).left().right().bottom()
       scrollView.pin.left().right().bottom().top(to: jobCategoryView.edge.bottom)
     } else {
-      postListSkeleton.pin.top(to: navigationBar.edge.bottom).left().right().bottom()
       scrollView.pin.left().right().bottom().top(to: navigationBar.edge.bottom)
     }
     contentView.pin.top().left().right()

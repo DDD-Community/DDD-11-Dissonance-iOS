@@ -41,13 +41,32 @@ public extension UIView {
     return nil
   }
   
-  func showToast(message: String, duration: CGFloat = 2.0) {
+  func showToast(message: String, duration: CGFloat = 2.0, _ completion: (() -> Void)? = nil) {
     guard UIView.toastFlag == false else { return }
     let toast = Toast()
     toast.setMessage(message)
     UIView.toastFlag = true
     toast.showIn(view: self, duration: duration) {
       UIView.toastFlag = false
+      completion?()
+    }
+  }
+  
+  func showSkeleton() {
+    let skeletonView = SkeletonView()
+    addSubview(skeletonView)
+    
+    NSLayoutConstraint.activate([
+      skeletonView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -2),
+      skeletonView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 2),
+      skeletonView.topAnchor.constraint(equalTo: topAnchor, constant: -2),
+      skeletonView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 2)
+    ])
+  }
+  
+  func hideSkeleton() {
+    for subview in subviews.reversed() where subview is SkeletonView {
+      subview.removeFromSuperview()
     }
   }
 }

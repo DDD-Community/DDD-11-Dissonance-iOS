@@ -119,6 +119,13 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     return vc
   }()
   
+  private var skeletonableViews: [UIView] {
+    return [
+      imageView, titleLabel, organizationLabel, countView, recruitDateLabel, recruitDateValueLabel, recruitJobLabel, 
+      activityDateLabel, activityDateValueLabel, activityContentsLabel, activityContentsValueTextView
+    ]
+  }
+  
   // MARK: - Initializer
   init(reactor: PostDetailReactor) {
     navigationBar = .init(title: " ", backgroundColor: .white)
@@ -157,6 +164,8 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   
   override func setupViews() {
     super.setupViews()
+    
+    showAllSkeleton()
     view.addSubview(scrollView)
     scrollView.addSubview(rootContainer)
     view.addSubview(bottomShadowView)
@@ -172,7 +181,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
           .marginHorizontal(20)
           .define {
             // 제목
-            $0.addItem(titleLabel).marginTop(24)
+            $0.addItem(titleLabel).width(100).marginTop(24)
             
             // 모집 기관, 조회수
             $0.addItem()
@@ -180,8 +189,8 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
               .justifyContent(.spaceBetween)
               .marginTop(8)
               .define {
-                $0.addItem(organizationLabel).shrink(1)
-                $0.addItem(countView).marginLeft(16)
+                $0.addItem(organizationLabel).width(100).shrink(1)
+                $0.addItem(countView).width(50).marginLeft(16)
               }
             
             $0.addDivider(color: MozipColor.gray50).marginTop(16)
@@ -207,14 +216,14 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
               }
             
             // 모집 대상
-            $0.addItem(recruitJobLabel).marginTop(32)
+            $0.addItem(recruitJobLabel).width(100).marginTop(32)
             $0.addItem(tagLabelAreaView)
               .direction(.row)
               .wrap(.wrap)
               .alignContent(.spaceBetween)
             
             // 활동 내용
-            $0.addItem(activityContentsLabel).marginTop(32)
+            $0.addItem(activityContentsLabel).width(100).marginTop(32)
             $0.addItem(activityContentsValueTextView).marginTop(12).marginBottom(30).cornerRadius(8)
           }
       }
@@ -240,6 +249,7 @@ private extension PostDetailViewController {
       owner.addTagLabel(post.jobGroups)
       owner.activityDateValueLabel.text = post.activityStartDate + " ~ " + post.activityEndDate
       owner.activityContentsValueTextView.text = post.activityContents
+      owner.hideAllSkeleton()
       owner.updateLayout()
     }
   }
@@ -391,7 +401,11 @@ private extension PostDetailViewController {
   }
   
   func updateLayout() {
-    [titleLabel, organizationLabel, activityContentsValueTextView].forEach {
+    [titleLabel, organizationLabel, countView, recruitJobLabel, activityContentsLabel].forEach {
+      $0.flex.width(nil)
+    }
+    
+    [titleLabel, organizationLabel, recruitJobLabel, activityContentsLabel, activityContentsValueTextView].forEach {
       $0.flex.markDirty()
     }
     countView.markDirty()
@@ -407,5 +421,17 @@ private extension PostDetailViewController {
       applicationActivities: nil
     )
     self.present(activityVC, animated: true, completion: nil)
+  }
+  
+  func showAllSkeleton() {
+    skeletonableViews.forEach {
+      $0.showSkeleton()
+    }
+  }
+  
+  func hideAllSkeleton() {
+    skeletonableViews.forEach {
+      $0.hideSkeleton()
+    }
   }
 }

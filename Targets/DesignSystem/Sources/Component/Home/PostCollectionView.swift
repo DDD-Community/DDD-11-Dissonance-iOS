@@ -17,6 +17,7 @@ import RxDataSources
 
 public final class PostCollectionView: UIView {
   
+  // MARK: - Properties
   private enum Metric {
     static let cellWidth: CGFloat = 148
     static let cellHeight: CGFloat = 236
@@ -28,43 +29,63 @@ public final class PostCollectionView: UIView {
     static let zero: CGFloat = 0
   }
   
+  private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
+  
   public var cellTapObservable: Observable<IndexPath> {
     collectionView.rx.itemSelected.asObservable()
   }
   
   public let headerTapRelay: PublishRelay<IndexPath> = .init()
   
-  private let sectionsRelay: BehaviorRelay<[PostSection]> = .init(value: [])
+  private let sectionsRelay: BehaviorRelay<[PostSection]> = .init(value: Array(
+    repeating: .init(original: .stub(), items: Array(repeating: .stub(), count: 3)), 
+    count: 3
+  ))
+  
+  private var isLoading = true
   private let disposeBag = DisposeBag()
   private var headerDisposeBag = DisposeBag()
   
   private lazy var dataSource = RxCollectionViewSectionedReloadDataSource<PostSection>(
-    configureCell: { (dataSource, collectionView, indexPath, item) in
-      let cell: PostCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
-      cell.setData(item)
-      return cell
+    configureCell: { [weak self] (dataSource, collectionView, indexPath, item) in
+      guard let self else { return UICollectionViewCell() }
+      
+      if isLoading {
+        let cell: PostSkeletonCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
+        return cell
+      } else {
+        let cell: PostCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
+        cell.setData(item)
+        return cell
+      }
     },
     configureSupplementaryView: { [weak self] (dataSource, collectionView, kind, indexPath) in
-      guard let self = self else { return UICollectionReusableView() }
-      let header: PostHeader = collectionView.dequeueReusableSupplementaryView(
-        ofKind: UICollectionView.elementKindSectionHeader,
-        for: indexPath)
-      let sectionModel = dataSource.sectionModels[indexPath.section]
-      header.setData(title: sectionModel.kind.sectionTitle, summary: sectionModel.kind.summary)
-      header.tapObservable
-        .map { indexPath }
-        .bind(to: headerTapRelay)
-        .disposed(by: headerDisposeBag)
-      return header
-    })
-  
-  // MARK: - UI
-  private let collectionView: UICollectionView
-  private let flowLayout = UICollectionViewFlowLayout()
+      guard let self else { return UICollectionReusableView() }
+      
+      if isLoading {
+        let header: PostSkeletonHeader = collectionView.dequeueReusableSupplementaryView(
+          ofKind: UICollectionView.elementKindSectionHeader,
+          for: indexPath
+        )
+        return header
+      } else {
+        let header: PostHeader = collectionView.dequeueReusableSupplementaryView(
+          ofKind: UICollectionView.elementKindSectionHeader,
+          for: indexPath
+        )
+        let sectionModel = dataSource.sectionModels[indexPath.section]
+        header.setData(title: sectionModel.kind.sectionTitle, summary: sectionModel.kind.summary)
+        header.tapObservable
+          .map { indexPath }
+          .bind(to: headerTapRelay)
+          .disposed(by: headerDisposeBag)
+        return header
+      }
+    }
+  )
   
   // MARK: - Initializers
   public init() {
-    collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
     super.init(frame: .zero)
     setupCollectionView()
     setupViewHierarchy()
@@ -90,6 +111,8 @@ public final class PostCollectionView: UIView {
   public func setupData(_ data: [PostSection]) {
     headerDisposeBag = DisposeBag()
     sectionsRelay.accept(data)
+    isLoading = false
+    collectionView.reloadData()
   }
   
   private func setupCollectionView() {
@@ -97,9 +120,15 @@ public final class PostCollectionView: UIView {
     collectionView.showsHorizontalScrollIndicator = false
     collectionView.isScrollEnabled = false
     collectionView.register(PostCell.self)
+    collectionView.register(PostSkeletonCell.self)
     collectionView.register(
       PostHeader.self,
-      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader)
+      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
+    )
+    collectionView.register(
+      PostSkeletonHeader.self,
+      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
+    )
     
     sectionsRelay
         .bind(to: collectionView.rx.items(dataSource: dataSource))

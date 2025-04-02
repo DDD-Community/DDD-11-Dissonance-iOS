@@ -15,7 +15,7 @@ import PinLayout
 import ReactorKit
 import RxCocoa
 
-final class PostSearchViewController: BaseViewController<PostSearchReactor>, Coordinatable {
+final class PostSearchViewController: BaseViewController<PostSearchReactor>, Alertable, Coordinatable {
   
   // MARK: Properties
   weak var coordinator: PostSearchCoordinator?
@@ -112,7 +112,7 @@ private extension PostSearchViewController {
       .disposed(by: disposeBag)
     
     searchBar.searchTextObservable
-      .skip(1)
+      .filter { $0?.isEmpty == false }
       .distinctUntilChanged()
       .compactMap { $0 }
       .debounce(.milliseconds(500), scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
@@ -128,6 +128,17 @@ private extension PostSearchViewController {
       .asSignal(onErrorJustReturn: false)
       .emit(with: self) { owner, isLoading in
         isLoading ? owner.activityIndicator.startAnimating() : owner.activityIndicator.stopAnimating()
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.isSelectComplete)
+      .distinctUntilChanged()
+      .asSignal(onErrorJustReturn: true)
+      .emit(with: self) { owner, isComplete in
+        if isComplete {
+          owner.coordinator?.didFinish()
+        }
       }
       .disposed(by: disposeBag)
     
