@@ -39,7 +39,6 @@ final class PostUploadCoordinator: PostUploadCoordinatorType {
 
   func didFinish() {
     navigationController.popViewController(animated: true)
-    parentCoordinator?.removeChild(self)
   }
 }
 

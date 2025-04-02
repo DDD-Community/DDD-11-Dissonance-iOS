@@ -54,10 +54,7 @@ final class PostSearchViewController: BaseViewController<PostSearchReactor>, Coo
     fatalError("init(coder:) has not been implemented")
   }
   
-  // MARK: LifeCycle
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    
+  deinit {
     coordinator?.disappear()
   }
   

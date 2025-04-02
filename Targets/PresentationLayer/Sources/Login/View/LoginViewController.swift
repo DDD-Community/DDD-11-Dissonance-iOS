@@ -90,13 +90,11 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
     fatalError("init(coder:) has not been implemented")
   }
   
-  // MARK: - Methods
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    
+  deinit {
     coordinator?.disappear()
   }
   
+  // MARK: - Methods
   override func viewDidLayoutSubviews() {
     setupLayer()
   }

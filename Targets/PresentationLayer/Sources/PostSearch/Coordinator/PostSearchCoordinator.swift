@@ -32,12 +32,6 @@ final class PostSearchCoordinator: PostSearchCoordinatorType {
     let vc = postSearchViewController()
     navigationController.pushViewController(vc, animated: true)
   }
-
-  func disappear() {
-    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
-      parentCoordinator?.removeChild(self)
-    }
-  }
   
   func didFinish() {
     navigationController.popViewController(animated: true)
