@@ -140,13 +140,11 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     fatalError("init(coder:) has not been implemented")
   }
   
-  // MARK: - LifeCycle
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    
+  deinit {
     coordinator?.disappear()
   }
   
+  // MARK: - LifeCycle
   override func viewDidLayoutSubviews() {
     navigationBar.pin.top().left().right()
     bottomShadowView.pin.bottom().left().right().height(Metric.bottomShadowViewHeightRatio)

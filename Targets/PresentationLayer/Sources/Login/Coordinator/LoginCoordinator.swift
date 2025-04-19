@@ -31,16 +31,6 @@ final class LoginCoordinator: LoginCoordinatorType {
     let loginViewController = loginViewController()
     navigationController.pushViewController(loginViewController, animated: true)
   }
-
-  func disappear() {
-    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
-      parentCoordinator?.removeChild(self)
-    }
-  }
-  
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
   
   func pushWebView(urlString: String) {
     let webViewController: WebViewController = .init(urlString: urlString)

@@ -18,6 +18,7 @@ public enum AlertType {
   case deleteAccount
   case photoPermissionDenied
   case imageSizeOver
+  case sessionExpiration
   case loadCache
   
   var title: String {
@@ -28,6 +29,7 @@ public enum AlertType {
     case .deleteAccount: "정말 탈퇴하시겠습니까?"
     case .photoPermissionDenied: "권한 필요"
     case .imageSizeOver: "이미지 사이즈 초과"
+    case .sessionExpiration: "세션이 만료되었습니다"
     case .loadCache: "이전에 작성중이던 데이터 존재"
     }
   }
@@ -40,6 +42,7 @@ public enum AlertType {
     case .deleteAccount: "탈퇴하기 버튼 선택 시,\n계정은 삭제되며 복구할 수 없습니다."
     case .photoPermissionDenied: "사진첩에 접근할 수 없습니다.\n설정에서 권한을 허용해 주세요."
     case .imageSizeOver: "공고 이미지는 10MB 이하의 사진만\n업로드할 수 있습니다."
+    case .sessionExpiration: "다시 로그인 후 시도해 주세요"
     case .loadCache: "작성중이던 데이터를 불러오시겠습니까?"
     }
   }
@@ -59,6 +62,7 @@ public enum AlertType {
     case .deleteAccount: "탈퇴하기"
     case .photoPermissionDenied: "설정으로 이동"
     case .imageSizeOver: "다시 선택하기"
+    case .sessionExpiration: "로그인하기"
     case .loadCache: "불러오기"
     }
   }

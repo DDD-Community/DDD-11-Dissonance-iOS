@@ -38,18 +38,17 @@ final class TermsPolicyViewController: UIViewController, Coordinatable {
     return button
   }()
   
+  // MARK: - Initializer
+  deinit {
+    coordinator?.disappear()
+  }
+  
   // MARK: - LifeCycle
   override func viewDidLoad() {
     super.viewDidLoad()
     
     setupViews()
     bind()
-  }
-  
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    
-    coordinator?.disappear()
   }
   
   override func viewDidLayoutSubviews() {

@@ -37,16 +37,6 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
     navigationController.pushViewController(postDetailViewController, animated: true)
   }
   
-  func disappear() {
-    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
-      parentCoordinator?.removeChild(self)
-    }
-  }
-  
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
-  
   func pushEditView(id: Int, post: Post) {
     guard let postUploadCoordinator = DIContainer.shared.resolve(type: PostUploadCoordinatorType.self)
             as? PostUploadCoordinator else {

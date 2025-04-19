@@ -16,7 +16,7 @@ import PinLayout
 import ReactorKit
 import RxCocoa
 
-final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
+final class HomeViewController: BaseViewController<HomeReactor>, Alertable, Coordinatable {
   
   // MARK: Properties
   weak var coordinator: HomeCoordinator?
@@ -68,6 +68,7 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
     super.init()
     
     self.reactor = reactor
+    addTokenObserver()
   }
   
   required init?(coder: NSCoder) {
@@ -310,5 +311,23 @@ private extension HomeViewController {
         .bottomRight(to: fabButton.anchor.topRight)
       fabSubButton.isHidden = true
     }
+  }
+  
+  func addTokenObserver() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(transitionToLogIn),
+      name: .logout,
+      object: nil
+    )
+  }
+  
+  @objc func transitionToLogIn() {
+    presentAlert(
+      type: .sessionExpiration,
+      rightButtonAction: { [weak self] in
+        self?.coordinator?.pushLoginPage()
+      }
+    )
   }
 }

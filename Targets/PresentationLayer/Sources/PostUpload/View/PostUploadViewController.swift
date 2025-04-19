@@ -79,6 +79,10 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
     fatalError("init(coder:) has not been implemented")
   }
   
+  deinit {
+    coordinator?.disappear()
+  }
+  
   // MARK: - LifeCycle
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -104,7 +108,6 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
     super.viewDidDisappear(animated)
     
     removeKeyboardNotification()
-    coordinator?.didFinish()
   }
   
   override func viewDidLayoutSubviews() {
