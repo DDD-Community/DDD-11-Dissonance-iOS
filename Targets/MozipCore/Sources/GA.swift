@@ -26,7 +26,7 @@ public struct GA {
     // 홈 화면 - 스크롤 영역
     case 배너이미지 = "banner_image_selected"
     case 공모전더보기버튼 = "contest_more_selected"
-    case 해커톤더보기버튼 = "hackathon_more_selected"
+    case 교육더보기버튼 = "education_more_selected"
     case IT동아리더보기버튼 = "it_club_more_selected"
     
     // 공고 리스트 - 상단 카테고리 칩

@@ -211,7 +211,7 @@ private extension HomeViewController {
         let postKind = postHeaders[indexPath.section]
         switch postKind {
         case .contest: GA.logEvent(.공모전더보기버튼)
-        case .hackathon: GA.logEvent(.해커톤더보기버튼)
+        case .education: GA.logEvent(.교육더보기버튼)
         case .club: GA.logEvent(.IT동아리더보기버튼)
         }
         owner.coordinator?.pushPostList(postKind: postKind)
