@@ -60,7 +60,7 @@ private extension PostCategoryView {
         $0.addDivider().marginHorizontal(16)
         $0.addItem(makeCategoryButton(.contestIT)).height(54)
         $0.addDivider().marginHorizontal(16)
-        $0.addItem(makeCategoryButton(.hackathon)).height(54)
+        $0.addItem(makeCategoryButton(.education)).height(54)
         $0.addDivider().marginHorizontal(16)
         $0.addItem(makeCategoryButton(.club)).height(54)
       }
