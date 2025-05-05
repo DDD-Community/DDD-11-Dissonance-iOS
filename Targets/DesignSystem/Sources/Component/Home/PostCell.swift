@@ -36,6 +36,15 @@ public final class PostCell: UICollectionViewCell {
   private let titleLabel = MozipLabel(style: .body3, color: MozipColor.gray800, numberOfLines: 2)
   private let remainDayTagBackground = UIView()
   private let remainDayTag = MozipLabel(style: .body4, color: MozipColor.gray500)
+  
+  private let bookmarkCountIcon: UIImageView = {
+    let imageView = UIImageView()
+    imageView.image = DesignSystemAsset.bookmarkCountIcon.image
+    imageView.contentMode = .scaleAspectFit
+    return imageView
+  }()
+  private let bookmarkCountLabel = MozipLabel(style: .caption1, color: MozipColor.gray400, text: "349")
+  
   private let viewCountIcon: UIImageView = {
     let imageView = UIImageView()
     imageView.image = DesignSystemAsset.viewCountIcon.image
@@ -87,6 +96,11 @@ public final class PostCell: UICollectionViewCell {
     setRemainDayTag(data.remainTag, mode: data.remainTag == "마감" ? .dark : .light)
     remainDayTag.flex.markDirty()
     
+    bookmarkCountLabel.updateTextKeepingAttributes(String(data.bookmarkCount))
+    bookmarkCountIcon.flex.display(data.bookmarkCount > 0 ? .flex : .none)
+    bookmarkCountLabel.flex.display(data.bookmarkCount > 0 ? .flex : .none)
+    bookmarkCountLabel.flex.markDirty()
+    
     viewCountLabel.updateTextKeepingAttributes(String(data.viewCount))
     viewCountLabel.flex.markDirty()
     
@@ -115,7 +129,9 @@ public final class PostCell: UICollectionViewCell {
                   .marginVertical(2)
               }
             flex.addItem().grow(1)
-            flex.addItem(viewCountIcon).width(12).height(7.5)
+            flex.addItem(bookmarkCountIcon).width(6).height(10)
+            flex.addItem(bookmarkCountLabel).marginLeft(4)
+            flex.addItem(viewCountIcon).width(12).height(7.5).marginLeft(8)
             flex.addItem(viewCountLabel).marginLeft(4)
           }
       }
