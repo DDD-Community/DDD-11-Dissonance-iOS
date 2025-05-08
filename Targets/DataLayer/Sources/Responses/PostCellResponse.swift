@@ -9,7 +9,7 @@
 import DomainLayer
 
 public struct PostCellResponse: Decodable {
-  let id, viewCount: Int
+  let id, viewCount, bookmarkCount: Int
   let imgUrl, title, remainingDays: String
 }
 
@@ -21,7 +21,7 @@ public extension PostCellResponse {
           imageURL: imgUrl,
           title: title,
           remainTag: remainingDays,
-          bookmarkCount: 2, // TODO: bookmarkCount 이런식의 필드가 추가 될 것으로 예상. 여기로 할당해주어야함.
+          bookmarkCount: bookmarkCount,
           viewCount: viewCount)
   }
 }
