@@ -46,4 +46,13 @@ public final class UserRepository: UserRepositoryType {
       .map(APIResponse<String>.self)
       .map { _ in }
   }
+  
+  public func fetchBookmarkList(pageable: Pageable) -> Single<[BookmarkCellData]> { // FIXME: 추후 BookmarkRepository 분리
+    return provider.rx.request(.fetchBookmarkList(pageable))
+      .map(APIResponse<BookmarkListResponse>.self)
+      .map {
+        guard let data = $0.data else { return [] }
+        return data.toDomain()
+      }
+  }
 }

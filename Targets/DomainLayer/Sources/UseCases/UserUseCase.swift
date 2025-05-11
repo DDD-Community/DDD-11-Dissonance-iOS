@@ -15,6 +15,7 @@ public protocol UserUseCaseType {
   
   // MARK: - Methods
   func fetchUserInformation() -> Observable<(isAdmin: Bool, provider: String)>
+  func fetchBookmarkList(pageable: Pageable) -> Observable<[BookmarkCellData]>
 }
 
 final class UserUseCase: UserUseCaseType {
@@ -31,6 +32,11 @@ final class UserUseCase: UserUseCaseType {
   // MARK: - Methods
   func fetchUserInformation() -> Observable<(isAdmin: Bool, provider: String)> {
     return userRepository.fetchInformation()
+      .asObservable()
+  }
+  
+  func fetchBookmarkList(pageable: Pageable) -> Observable<[BookmarkCellData]> {
+    return userRepository.fetchBookmarkList(pageable: pageable)
       .asObservable()
   }
 }
