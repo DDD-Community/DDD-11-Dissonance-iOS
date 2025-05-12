@@ -103,7 +103,7 @@ final class HomeReactor: Reactor {
     .map { (firstGroup, secondGroup, thirdGroup) in
         .setPosts(data: [
           firstGroup.toPostSection(kind: .contest),
-          secondGroup.toPostSection(kind: .hackathon),
+          secondGroup.toPostSection(kind: .education),
           thirdGroup.toPostSection(kind: .club)
         ])
     }
