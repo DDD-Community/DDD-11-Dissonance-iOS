@@ -101,7 +101,7 @@ private extension BookmarkListViewController {
   func bindState(reactor: BookmarkListReactor) {
     reactor.state
       .map { $0.bookmarkList }
-      .filter { $0.isEmpty == false }
+      .filter { !$0.isEmpty }
       .distinctUntilChanged()
       .bind(to: tableView.rx.items(
         cellIdentifier: BookmarkCell.defaultReuseIdentifier,
@@ -112,7 +112,7 @@ private extension BookmarkListViewController {
       .disposed(by: disposeBag)
     
     reactor.state
-      .map { $0.bookmarkList.isEmpty == false }
+      .map { !$0.bookmarkList.isEmpty }
       .distinctUntilChanged()
       .bind(to: emptyLabel.rx.isHidden)
       .disposed(by: disposeBag)

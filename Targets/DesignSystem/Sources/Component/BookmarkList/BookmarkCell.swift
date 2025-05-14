@@ -11,7 +11,6 @@ import DomainLayer
 
 import PinLayout
 import FlexLayout
-import Kingfisher
 
 public final class BookmarkCell: UITableViewCell {
   

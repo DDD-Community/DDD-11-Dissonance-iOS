@@ -43,22 +43,6 @@ final class BookmarkListReactor: Reactor {
     }
   }
   
-  func fetchBookmarkListMutation() -> Observable<Mutation> {
-    let pageableMock = Pageable(page: 0, size: 100, sort: PostOrder.latest.rawValue)
-    
-    let fetchBookmarkListMutation: Observable<Mutation> = userUsecase
-      .fetchBookmarkList(pageable: pageableMock) // FIXME: 페이징 처리 + sort 고정/변동 여부 결정
-      .map {.setBookmarkList($0) }
-    
-    let sequence: [Observable<Mutation>] = [
-      .just(.setLoading(true)),
-      fetchBookmarkListMutation,
-      .just(.setLoading(false))
-    ]
-    
-    return .concat(sequence)
-  }
-  
   func reduce(state: State, mutation: Mutation) -> State {
     var newState = state
     
@@ -74,4 +58,20 @@ final class BookmarkListReactor: Reactor {
 // MARK: - Private Extenion
 private extension BookmarkListReactor {
   
+  // MARK: Mutation
+  func fetchBookmarkListMutation() -> Observable<Mutation> {
+    let pageableMock = Pageable(page: 0, size: 100, sort: PostOrder.latest.rawValue)
+    
+    let fetchBookmarkListMutation: Observable<Mutation> = userUsecase
+      .fetchBookmarkList(pageable: pageableMock) // FIXME: 페이징 처리 + sort 고정/변동 여부 결정
+      .map {.setBookmarkList($0) }
+    
+    let sequence: [Observable<Mutation>] = [
+      .just(.setLoading(true)),
+      fetchBookmarkListMutation,
+      .just(.setLoading(false))
+    ]
+    
+    return .concat(sequence)
+  }
 }

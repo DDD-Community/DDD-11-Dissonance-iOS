@@ -43,7 +43,7 @@ public final class PostCell: UICollectionViewCell {
     imageView.contentMode = .scaleAspectFit
     return imageView
   }()
-  private let bookmarkCountLabel = MozipLabel(style: .caption1, color: MozipColor.gray400, text: "349")
+  private let bookmarkCountLabel = MozipLabel(style: .caption1, color: MozipColor.gray400)
   
   private let viewCountIcon: UIImageView = {
     let imageView = UIImageView()
@@ -51,7 +51,7 @@ public final class PostCell: UICollectionViewCell {
     imageView.contentMode = .scaleAspectFit
     return imageView
   }()
-  private let viewCountLabel = MozipLabel(style: .caption1, color: MozipColor.gray400, text: "349")
+  private let viewCountLabel = MozipLabel(style: .caption1, color: MozipColor.gray400)
   
   // MARK: - Initializers
   public override init(frame: CGRect) {
