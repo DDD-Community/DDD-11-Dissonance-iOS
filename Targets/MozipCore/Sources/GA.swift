@@ -22,6 +22,7 @@ public struct GA {
     // 홈 화면 - 네비게이션바 영역
     case 마이페이지버튼 = "profile_button_selected"
     case 검색버튼 = "search_button_selected"
+    case 북마크버튼 = "bookmark_button_selected"
     
     // 홈 화면 - 스크롤 영역
     case 배너이미지 = "banner_image_selected"

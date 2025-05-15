@@ -17,6 +17,7 @@ public protocol HomeCoordinatorType: CoordinatorType {
   func pushPostDetail(id: Int)
   func pushPostRegister()
   func pushPostRecommend()
+  func pushBookmarkList()
 }
 
 final class HomeCoordinator: HomeCoordinatorType {
@@ -46,6 +47,13 @@ final class HomeCoordinator: HomeCoordinatorType {
   
   func pushPostSearch() {
     let coordinator = PostSearchCoordinator(navigationController: navigationController)
+    coordinator.parentCoordinator = self
+    coordinator.start()
+    self.addChild(coordinator)
+  }
+  
+  func pushBookmarkList() {
+    let coordinator = BookmarkListCoordinator(navigationController: navigationController)
     coordinator.parentCoordinator = self
     coordinator.start()
     self.addChild(coordinator)

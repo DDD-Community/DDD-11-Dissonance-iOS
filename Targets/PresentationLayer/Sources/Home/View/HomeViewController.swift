@@ -189,6 +189,14 @@ private extension HomeViewController {
       }
       .disposed(by: disposeBag)
     
+    navigationBar.bookmarkButtonTapObservable
+      .asSignal(onErrorJustReturn: ())
+      .emit(with: self) { owner, _ in
+        GA.logEvent(.북마크버튼)
+        owner.coordinator?.pushBookmarkList()
+      }
+      .disposed(by: disposeBag)
+    
     scrollView.refreshControl?.rx.controlEvent(.valueChanged)
       .asSignal()
       .emit(with: self) { owner, _ in
