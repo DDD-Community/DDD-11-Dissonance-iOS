@@ -51,11 +51,11 @@ final class BookmarkListCoordinator: BookmarkListCoordinatorType {
 // MARK: - Private
 private extension BookmarkListCoordinator {
   func bookmarkListViewController() -> BookmarkListViewController {
-    guard let userUsecase = DIContainer.shared.resolve(type: UserUseCaseType.self) else {
+    guard let bookmarkUseCase = DIContainer.shared.resolve(type: FetchBookmarkListUseCaseType.self) else {
       fatalError()
     }
     
-    let reactor = BookmarkListReactor(userUsecase: userUsecase)
+    let reactor = BookmarkListReactor(bookmarkUseCase: bookmarkUseCase)
     let viewController = BookmarkListViewController(reactor: reactor)
     viewController.coordinator = self
     return viewController

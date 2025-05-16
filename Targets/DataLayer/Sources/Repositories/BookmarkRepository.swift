@@ -28,4 +28,13 @@ public final class BookmarkRepository: BookmarkRepositoryType {
       .map(APIResponse<BookmarkToggleResponse>.self)
       .map { $0.data?.isBookmarked ?? false}
   }
+  
+  public func fetchBookmarkList(pageable: Pageable) -> Single<[BookmarkCellData]> {
+    return provider.rx.request(.fetchBookmarkList(pageable))
+      .map(APIResponse<BookmarkListResponse>.self)
+      .map {
+        guard let data = $0.data else { return [] }
+        return data.toDomain()
+      }
+  }
 }

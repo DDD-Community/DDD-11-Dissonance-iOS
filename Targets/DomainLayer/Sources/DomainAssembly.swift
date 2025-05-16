@@ -54,5 +54,9 @@ public struct DomainAssembly: DependencyAssemblable {
     container.register(type: BookmarkToggleUseCaseType.self) { container in
       return BookmarkToggleUseCase(bookmarkRepository: container.resolve(type: BookmarkRepositoryType.self)!)
     }
+    
+    container.register(type: FetchBookmarkListUseCaseType.self) { container in
+      return FetchBookmarkListUseCase(bookmarkRepository: container.resolve(type: BookmarkRepositoryType.self)!)
+    }
   }
 }

@@ -6,6 +6,7 @@
 //  Copyright © 2025 MOZIP. All rights reserved.
 //
 
+import DomainLayer
 import MozipCore
 import Foundation
 
@@ -13,6 +14,7 @@ import Moya
 
 enum BookmarkAPI {
   case toggle(id: Int)
+  case fetchBookmarkList(Pageable)
 }
 
 // MARK: - TargetType
@@ -25,13 +27,15 @@ extension BookmarkAPI: TargetType {
     let basePath = "/bookmarks"
     
     switch self {
-    case .toggle(let id): return basePath + "/\(id)" + "/toggle" 
+    case .toggle(let id): return basePath + "/\(id)" + "/toggle"
+    case .fetchBookmarkList: return "/bookmarks"
     }
   }
   
   var method: Moya.Method {
     switch self {
-    case .toggle: .post
+    case .toggle: return .post
+    case .fetchBookmarkList: return .get
     }
   }
   
@@ -61,6 +65,7 @@ extension BookmarkAPI: TargetType {
   private var parameters: [String: Any]? {
     switch self {
     case .toggle: return nil
+    case .fetchBookmarkList(let pageable): return pageable.toDictionary()
     }
   }
 }

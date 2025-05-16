@@ -17,7 +17,6 @@ enum UserAPI {
   case regenerate
   case delete
   case logout
-  case fetchBookmarkList(Pageable) // FIXME: 추후 BookmarkRepository 분리
 }
 
 // MARK: - TargetType
@@ -34,7 +33,6 @@ extension UserAPI: TargetType {
     case .regenerate: return basePath + "/reissue"
     case .delete: return basePath
     case .logout: return basePath + "/logout"
-    case .fetchBookmarkList: return "/bookmarks" // FIXME: 추후 BookmarkRepository 분리
     }
   }
 
@@ -44,7 +42,6 @@ extension UserAPI: TargetType {
     case .regenerate: return .post
     case .delete: return .delete
     case .logout: return .get
-    case .fetchBookmarkList: return .get // FIXME: 추후 BookmarkRepository 분리
     }
   }
 
@@ -75,7 +72,6 @@ extension UserAPI: TargetType {
     switch self {
     case .regenerate: return ["refreshToken": AppProperties.refreshToken]
     case .logout: return ["Authorization": AppProperties.accessToken]
-    case .fetchBookmarkList(let pageable): return pageable.toDictionary() // FIXME: 추후 BookmarkRepository 분리
     default: return nil
     }
   }

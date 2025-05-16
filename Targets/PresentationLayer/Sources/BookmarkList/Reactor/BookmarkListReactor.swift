@@ -15,7 +15,7 @@ final class BookmarkListReactor: Reactor {
   
   // MARK: - Properties
   var initialState: State = .init()
-  private let userUsecase: UserUseCaseType
+  private let bookmarkUseCase: FetchBookmarkListUseCaseType
   
   enum Action {
     case fetchBookmarkList
@@ -32,8 +32,8 @@ final class BookmarkListReactor: Reactor {
   }
   
   // MARK: - Initializer
-  init(userUsecase: UserUseCaseType) {
-    self.userUsecase = userUsecase
+  init(bookmarkUseCase: FetchBookmarkListUseCaseType) {
+    self.bookmarkUseCase = bookmarkUseCase
   }
   
   // MARK: - Methods
@@ -62,7 +62,7 @@ private extension BookmarkListReactor {
   func fetchBookmarkListMutation() -> Observable<Mutation> {
     let pageableMock = Pageable(page: 0, size: 100, sort: PostOrder.latest.rawValue)
     
-    let fetchBookmarkListMutation: Observable<Mutation> = userUsecase
+    let fetchBookmarkListMutation: Observable<Mutation> = bookmarkUseCase
       .fetchBookmarkList(pageable: pageableMock) // FIXME: 페이징 처리 + sort 고정/변동 여부 결정
       .map {.setBookmarkList($0) }
     

@@ -12,4 +12,5 @@ public protocol BookmarkRepositoryType {
 
   // MARK: Methods
   func toggle(id: Int) -> Single<Bool>
+  func fetchBookmarkList(pageable: Pageable) -> Single<[BookmarkCellData]>
 }
