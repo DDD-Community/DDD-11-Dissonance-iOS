@@ -50,5 +50,9 @@ public struct DomainAssembly: DependencyAssemblable {
     container.register(type: MyPageUseCaseType.self) { container in
       return MyPageUseCase(userRepository: container.resolve(type: UserRepositoryType.self)!)
     }
+    
+    container.register(type: BookmarkToggleUseCaseType.self) { container in
+      return BookmarkToggleUseCase(bookmarkRepository: container.resolve(type: BookmarkRepositoryType.self)!)
+    }
   }
 }
