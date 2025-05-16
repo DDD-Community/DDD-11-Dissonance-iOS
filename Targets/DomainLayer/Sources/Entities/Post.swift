@@ -23,6 +23,7 @@ public struct Post: Equatable {
   public var activityEndDate: String = .init()
   public var activityContents: String = .init()
   public var postUrlString: String = .init()
+  public var isBookmarked: Bool = .init()
   public var category: PostUploadCategory? {
     PostUploadCategory(title: categoryTitle)
   }
@@ -40,6 +41,7 @@ public struct Post: Equatable {
   public static func == (lhs: Post, rhs: Post) -> Bool {
     lhs.title == rhs.title &&
     lhs.organization == rhs.organization &&
-    lhs.postUrlString == rhs.postUrlString
+    lhs.postUrlString == rhs.postUrlString &&
+    lhs.isBookmarked == rhs.isBookmarked
   }
 }
