@@ -302,7 +302,14 @@ private extension PostDetailViewController {
     bookmarkButton.rx.tap
       .map { Action.didTapBookmarkButton }
       .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
-      .bind(to: reactor.action)
+      .bind(with: self, onNext: { owner, bookmarkButtonAction in
+        guard AppProperties.accessToken != .init() else {
+          owner.coordinator?.pushLoginPage()
+          return
+        }
+        
+        reactor.action.onNext(bookmarkButtonAction)
+      })
       .disposed(by: disposeBag)
   }
   
