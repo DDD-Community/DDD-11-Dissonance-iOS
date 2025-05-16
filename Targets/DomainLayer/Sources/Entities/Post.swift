@@ -41,7 +41,6 @@ public struct Post: Equatable {
   public static func == (lhs: Post, rhs: Post) -> Bool {
     lhs.title == rhs.title &&
     lhs.organization == rhs.organization &&
-    lhs.postUrlString == rhs.postUrlString &&
-    lhs.isBookmarked == rhs.isBookmarked
+    lhs.postUrlString == rhs.postUrlString
   }
 }

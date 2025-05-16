@@ -24,7 +24,7 @@ public final class BookmarkRepository: BookmarkRepositoryType {
   
   // MARK: - Methods
   public func toggle(id: Int) -> Single<Bool> {
-    return provider.rx.request(.toggle(id: id), type: BookmarkToggleResponse.self)
+    return provider.rx.request(.toggle(id: id))
       .map(APIResponse<BookmarkToggleResponse>.self)
       .map { $0.data?.isBookmarked ?? false}
   }

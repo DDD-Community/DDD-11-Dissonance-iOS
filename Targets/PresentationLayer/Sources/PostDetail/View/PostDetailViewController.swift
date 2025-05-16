@@ -331,6 +331,7 @@ private extension PostDetailViewController {
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, isBookmarked in
         let toastMessage = isBookmarked ? "북마크를 설정하였습니다." : "북마크를 해제하였습니다."
+        owner.bookmarkButton.setBookmarked(isBookmarked)
         owner.view.showToast(message: toastMessage)
       })
       .disposed(by: disposeBag)
