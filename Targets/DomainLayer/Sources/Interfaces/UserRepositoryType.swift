@@ -15,5 +15,4 @@ public protocol UserRepositoryType {
   func fetchInformation() -> Single<(isAdmin: Bool, provider: String)>
   func delete() -> Single<Void>
   func logout() -> Single<Void>
-  func fetchBookmarkList(pageable: Pageable) -> Single<[BookmarkCellData]> // FIXME: 추후 BookmarkRepository 분리
 }

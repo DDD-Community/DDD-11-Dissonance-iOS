@@ -19,5 +19,6 @@ public struct DataAssembly: DependencyAssemblable {
     container.register(type: LoginRepositoryType.self) { _ in LoginRepository() }
     container.register(type: PostRepositoryType.self) { _ in PostRepository() }
     container.register(type: UserRepositoryType.self) { _ in UserRepository() }
+    container.register(type: BookmarkRepositoryType.self) { _ in BookmarkRepository() }
   }
 }

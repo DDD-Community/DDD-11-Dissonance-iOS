@@ -81,7 +81,7 @@ extension PostAPI: TargetType {
     case .upload, .edit, .updateBanner:
       headers["Authorization"] = AppProperties.accessToken
       headers["Content-Type"] = "multipart/form-data"
-    case .report, .delete:
+    case .report, .delete, .fetchPost:
       headers["Authorization"] = AppProperties.accessToken
     default: 
       return headers
