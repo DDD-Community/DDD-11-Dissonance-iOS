@@ -34,16 +34,6 @@ final class PostRecommendCoordinator: PostRecommendCoordinatorType {
     let vc = postRecommendViewController()
     navigationController.pushViewController(vc, animated: true)
   }
-
-  func disappear() {
-    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
-      parentCoordinator?.removeChild(self)
-    }
-  }
-  
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
   
   func pushPostSearch(at index: Int) {
     guard let postSearchCoordinator = DIContainer.shared.resolve(type: PostSearchCoordinatorType.self)

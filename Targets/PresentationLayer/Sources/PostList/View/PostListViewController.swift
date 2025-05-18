@@ -57,10 +57,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
     fatalError("init(coder:) has not been implemented")
   }
   
-  // MARK: LifeCycle
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    
+  deinit {
     coordinator?.disappear()
   }
   
@@ -174,8 +171,8 @@ private extension PostListViewController {
       .asSignal(onErrorJustReturn: [])
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
-        owner.collectionView.pin.sizeToFit()
-        owner.scrollView.contentSize.height = owner.collectionView.sizeThatFits(.zero).height + owner.postOrderControlView.frame.height
+        owner.contentView.flex.layout(mode: .adjustHeight)
+        owner.scrollView.contentSize.height = owner.contentView.frame.size.height
         owner.postOrderControlView.setCount(posts.count)
       }
       .disposed(by: disposeBag)

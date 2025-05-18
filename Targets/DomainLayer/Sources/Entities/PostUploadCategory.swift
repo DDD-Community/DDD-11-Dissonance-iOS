@@ -10,7 +10,7 @@ public enum PostUploadCategory {
   case contestPlan
   case contestDesign
   case contestIT
-  case hackathon
+  case education
   case club
   
   public init?(title: String) {
@@ -18,7 +18,7 @@ public enum PostUploadCategory {
     case "공모전 - 아이디어·기획", "아이디어·기획": self = .contestPlan
     case "공모전 - 디자인", "디자인": self = .contestDesign
     case "공모전 - 개발·IT", "개발·IT": self = .contestIT
-    case "해커톤": self = .hackathon
+    case "교육": self = .education
     case "IT 동아리": self = .club
     default: return nil
     }
@@ -29,7 +29,7 @@ public enum PostUploadCategory {
     case .contestPlan: "공모전 - 아이디어·기획"
     case .contestDesign: "공모전 - 디자인"
     case .contestIT: "공모전 - 개발·IT"
-    case .hackathon: "해커톤"
+    case .education: "교육"
     case .club: "IT 동아리"
     }
   }
@@ -39,7 +39,7 @@ public enum PostUploadCategory {
     case .contestPlan: 4
     case .contestDesign: 5
     case .contestIT: 6
-    case .hackathon: 2
+    case .education: 2
     case .club: 3
     }
   }

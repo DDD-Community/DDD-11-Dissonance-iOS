@@ -58,5 +58,9 @@ public struct PresentationAssembly: DependencyAssemblable {
     container.register(type: TermsPolicyCoordinatorType.self) { _ in
       TermsPolicyCoordinator(navigationController: navigationController)
     }
+    
+    container.register(type: BookmarkListCoordinatorType.self) { _ in
+      BookmarkListCoordinator(navigationController: navigationController)
+    }
   }
 }

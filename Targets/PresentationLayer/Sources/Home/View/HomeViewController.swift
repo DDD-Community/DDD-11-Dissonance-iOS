@@ -16,7 +16,7 @@ import PinLayout
 import ReactorKit
 import RxCocoa
 
-final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
+final class HomeViewController: BaseViewController<HomeReactor>, Alertable, Coordinatable {
   
   // MARK: Properties
   weak var coordinator: HomeCoordinator?
@@ -68,6 +68,7 @@ final class HomeViewController: BaseViewController<HomeReactor>, Coordinatable {
     super.init()
     
     self.reactor = reactor
+    addTokenObserver()
   }
   
   required init?(coder: NSCoder) {
@@ -188,6 +189,14 @@ private extension HomeViewController {
       }
       .disposed(by: disposeBag)
     
+    navigationBar.bookmarkButtonTapObservable
+      .asSignal(onErrorJustReturn: ())
+      .emit(with: self) { owner, _ in
+        GA.logEvent(.북마크버튼)
+        owner.coordinator?.pushBookmarkList()
+      }
+      .disposed(by: disposeBag)
+    
     scrollView.refreshControl?.rx.controlEvent(.valueChanged)
       .asSignal()
       .emit(with: self) { owner, _ in
@@ -210,7 +219,7 @@ private extension HomeViewController {
         let postKind = postHeaders[indexPath.section]
         switch postKind {
         case .contest: GA.logEvent(.공모전더보기버튼)
-        case .hackathon: GA.logEvent(.해커톤더보기버튼)
+        case .education: GA.logEvent(.교육더보기버튼)
         case .club: GA.logEvent(.IT동아리더보기버튼)
         }
         owner.coordinator?.pushPostList(postKind: postKind)
@@ -310,5 +319,23 @@ private extension HomeViewController {
         .bottomRight(to: fabButton.anchor.topRight)
       fabSubButton.isHidden = true
     }
+  }
+  
+  func addTokenObserver() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(transitionToLogIn),
+      name: .logout,
+      object: nil
+    )
+  }
+  
+  @objc func transitionToLogIn() {
+    presentAlert(
+      type: .sessionExpiration,
+      rightButtonAction: { [weak self] in
+        self?.coordinator?.pushLoginPage()
+      }
+    )
   }
 }

@@ -22,6 +22,7 @@ public struct PostDetailResponse: Decodable {
   let content: String
   let postUrlString: String
   let viewCount: Int
+  let isBookmarked: Bool
   
   enum CodingKeys: String, CodingKey {
     case imageURL = "imageUrl"
@@ -34,6 +35,7 @@ public struct PostDetailResponse: Decodable {
     case content
     case postUrlString = "detailUrl"
     case viewCount
+    case isBookmarked
   }
 }
 
@@ -52,6 +54,7 @@ public extension PostDetailResponse {
       (post.activityStartDate, post.activityEndDate) = self.periodComponents(self.activityPeriod)
       post.activityContents = self.content
       post.postUrlString = self.postUrlString
+      post.isBookmarked = self.isBookmarked
       
       completion(post)
     }

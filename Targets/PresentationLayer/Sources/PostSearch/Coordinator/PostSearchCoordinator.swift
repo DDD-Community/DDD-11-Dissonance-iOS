@@ -38,16 +38,6 @@ final class PostSearchCoordinator: PostSearchCoordinatorType {
     let vc = postSearchViewController(stream: stream)
     navigationController.pushViewController(vc, animated: true)
   }
-
-  func disappear() {
-    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
-      parentCoordinator?.removeChild(self)
-    }
-  }
-  
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
   
   func pushPostDetail(id: Int) {
     guard let postDetailCoordinator = DIContainer.shared.resolve(type: PostDetailCoordinatorType.self)

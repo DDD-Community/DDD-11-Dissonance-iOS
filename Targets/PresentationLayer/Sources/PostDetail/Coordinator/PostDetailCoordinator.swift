@@ -37,16 +37,6 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
     navigationController.pushViewController(postDetailViewController, animated: true)
   }
   
-  func disappear() {
-    if childCoordinators.isEmpty && navigationController.presentedViewController == nil {
-      parentCoordinator?.removeChild(self)
-    }
-  }
-  
-  func didFinish() {
-    navigationController.popViewController(animated: true)
-  }
-  
   func pushEditView(id: Int, post: Post) {
     guard let postUploadCoordinator = DIContainer.shared.resolve(type: PostUploadCoordinatorType.self)
             as? PostUploadCoordinator else {
@@ -82,11 +72,11 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
 // MARK: - Private
 private extension PostDetailCoordinator {
   func postDetailViewController(postID: Int) -> PostDetailViewController {
-    guard let postDetailUseCase = DIContainer.shared.resolve(type: PostDetailUseCaseType.self) else {
-      fatalError()
-    }
+    guard let postDetailUseCase = DIContainer.shared.resolve(type: PostDetailUseCaseType.self),
+          let bookmarkToggleUseCase = DIContainer.shared.resolve(type: BookmarkToggleUseCaseType.self)
+    else { fatalError() }
     
-    let reactor = PostDetailReactor(postID: postID, postDetailUseCase: postDetailUseCase)
+    let reactor = PostDetailReactor(postID: postID, postDetailUseCase: postDetailUseCase, bookmarkUseCase: bookmarkToggleUseCase)
     let viewController = PostDetailViewController(reactor: reactor)
     viewController.coordinator = self
     return viewController

@@ -103,7 +103,7 @@ final class HomeReactor: Reactor {
     .map { (firstGroup, secondGroup, thirdGroup) in
         .setPosts(data: [
           firstGroup.toPostSection(kind: .contest),
-          secondGroup.toPostSection(kind: .hackathon),
+          secondGroup.toPostSection(kind: .education),
           thirdGroup.toPostSection(kind: .club)
         ])
     }
@@ -120,7 +120,11 @@ final class HomeReactor: Reactor {
   }
   
   private func fetchUserInfo() -> Observable<Mutation> {
-    userUseCase.fetchUserInformation()
+    guard AuthManager.load(authInfoType: .accessToken) != nil else {
+      return .empty()
+    }
+    
+    return userUseCase.fetchUserInformation()
       .flatMap { Observable<Mutation>.just(.setUserInfo(isAdmin: $0.isAdmin, provider: $0.provider)) }
   }
   

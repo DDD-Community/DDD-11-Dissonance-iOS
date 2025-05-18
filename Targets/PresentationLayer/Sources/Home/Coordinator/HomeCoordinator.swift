@@ -17,6 +17,7 @@ public protocol HomeCoordinatorType: CoordinatorType {
   func pushPostDetail(id: Int)
   func pushPostRegister()
   func pushPostRecommend()
+  func pushBookmarkList()
 }
 
 final class HomeCoordinator: HomeCoordinatorType {
@@ -37,8 +38,6 @@ final class HomeCoordinator: HomeCoordinatorType {
     navigationController.pushViewController(vc, animated: true)
   }
 
-  func didFinish() {}
-
   func pushPostList(postKind: PostKind) {
     let coordinator = PostListCoordinator(navigationController: navigationController)
     coordinator.parentCoordinator = self
@@ -53,14 +52,27 @@ final class HomeCoordinator: HomeCoordinatorType {
     self.addChild(coordinator)
   }
   
+  func pushBookmarkList() {
+    let coordinator = BookmarkListCoordinator(navigationController: navigationController)
+    coordinator.parentCoordinator = self
+    coordinator.start()
+    self.addChild(coordinator)
+  }
+  
   func pushLoginPage() {
     guard let loginCoordinator = DIContainer.shared.resolve(type: LoginCoordinatorType.self)
             as? LoginCoordinator else {
       return
     }
     
-    loginCoordinator.parentCoordinator = self
-    addChild(loginCoordinator)
+    var coordinator: CoordinatorType = self
+    while !coordinator.childCoordinators.isEmpty {
+      guard let lastChildCoordinator = coordinator.childCoordinators.last else { break } 
+      coordinator = lastChildCoordinator
+    }
+    
+    loginCoordinator.parentCoordinator = coordinator
+    coordinator.addChild(loginCoordinator)
     loginCoordinator.start()
   }
   

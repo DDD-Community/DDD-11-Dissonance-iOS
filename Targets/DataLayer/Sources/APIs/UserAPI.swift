@@ -7,6 +7,7 @@
 //
 
 import MozipCore
+import DomainLayer
 import Foundation
 
 import Moya

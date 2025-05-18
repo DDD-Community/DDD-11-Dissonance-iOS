@@ -21,6 +21,10 @@ public final class HomeNavigationBar: UIView {
     static let one: CGFloat = 1
   }
   
+  public var bookmarkButtonTapObservable: Observable<Void> {
+    bookmarkButton.rx.tap.asObservable()
+  }
+  
   public var myPageButtonTapObservable: Observable<Void> {
     mypageButton.rx.tap.asObservable()
   }
@@ -50,6 +54,13 @@ public final class HomeNavigationBar: UIView {
   private let mypageButton: UIButton = {
     let button = UIButton()
     let image = DesignSystemAsset.personEmpty.image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal)
+    button.setImage(image, for: .normal)
+    return button
+  }()
+  
+  private let bookmarkButton: UIButton = {
+    let button = UIButton()
+    let image = DesignSystemAsset.bookmark.image.withTintColor(MozipColor.primary500, renderingMode: .alwaysOriginal)
     button.setImage(image, for: .normal)
     return button
   }()
@@ -91,7 +102,8 @@ public final class HomeNavigationBar: UIView {
         flex.addItem(logoImageView)
         flex.addItem().grow(Metric.one)
         flex.addItem(searchButton).size(24).marginRight(24).alignSelf(.center)
-        flex.addItem(mypageButton)
+        flex.addItem(mypageButton).marginRight(24)
+        flex.addItem(bookmarkButton).size(24).alignSelf(.center)
       }
   }
   

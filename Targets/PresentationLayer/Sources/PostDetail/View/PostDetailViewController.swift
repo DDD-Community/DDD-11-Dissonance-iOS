@@ -24,8 +24,11 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   private var postURL: String?
   
   private enum Metric {
-    static let bottomShadowViewHeightRatio: Percent = 12.7%
-    static let showMoreButtonHeightRatio: Percent = 57.4%
+    static let bottomShadowViewHeightPercent: Percent = 12.7%
+    static let bottomShadowViewHorizontalPadding: CGFloat = 23
+    static let bookmarkButtonTopPadding: CGFloat = 11
+    static let applyButtonLeftPadding: CGFloat = 16
+    static let applyButtonHeightRatio: CGFloat = 0.574
   }
   
   private let scrollView: UIScrollView = {
@@ -69,7 +72,13 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     return textView
   }()
   private let bottomShadowView: BottomShadowView = .init()
-  private let showMoreButton: RectangleButton = .init(title: "지원하기", fontStyle: .heading1, titleColor: .white, backgroundColor: MozipColor.primary500)
+  private let bookmarkButton: BookmarkButton = .init()
+  private let applyButton: RectangleButton = .init(
+    title: "지원하기",
+    fontStyle: .heading1,
+    titleColor: .white,
+    backgroundColor: MozipColor.primary500
+  )
   
   private var alertController: UIAlertController {
     let alertController: UIAlertController = .init()
@@ -141,17 +150,21 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     fatalError("init(coder:) has not been implemented")
   }
   
-  // MARK: - LifeCycle
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    
+  deinit {
     coordinator?.disappear()
   }
   
+  // MARK: - LifeCycle
   override func viewDidLayoutSubviews() {
     navigationBar.pin.top().left().right()
-    bottomShadowView.pin.bottom().left().right().height(Metric.bottomShadowViewHeightRatio)
-    showMoreButton.pin.top(12).horizontally(23).height(Metric.showMoreButtonHeightRatio)
+    bottomShadowView.pin.bottom().left().right().height(Metric.bottomShadowViewHeightPercent)
+    
+    let bookmarkButtonSize = bottomShadowView.frame.height * Metric.applyButtonHeightRatio
+    bookmarkButton.pin.top(Metric.bookmarkButtonTopPadding).height(bookmarkButtonSize).width(bookmarkButtonSize)
+      .left(Metric.bottomShadowViewHorizontalPadding)
+    applyButton.pin.top(to: bookmarkButton.edge.top).height(bookmarkButtonSize)
+      .left(to: bookmarkButton.edge.right).marginLeft(Metric.applyButtonLeftPadding)
+      .right(Metric.bottomShadowViewHorizontalPadding)
     
     scrollView.pin.top(to: navigationBar.edge.bottom).left().right().bottom(to: bottomShadowView.edge.top)
     rootContainer.pin.top().left().right()
@@ -172,7 +185,8 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     view.addSubview(scrollView)
     scrollView.addSubview(rootContainer)
     view.addSubview(bottomShadowView)
-    bottomShadowView.addSubview(showMoreButton)
+    bottomShadowView.addSubview(bookmarkButton)
+    bottomShadowView.addSubview(applyButton)
     view.addSubview(navigationBar)
     
     rootContainer.flex
@@ -258,6 +272,7 @@ private extension PostDetailViewController {
       }
       
       owner.activityContentsValueTextView.text = post.activityContents
+      owner.bookmarkButton.setBookmarked(post.isBookmarked)
       owner.hideAllSkeleton()
       owner.updateLayout()
     }
@@ -290,6 +305,19 @@ private extension PostDetailViewController {
         owner.presentAlert(type: .report, rightButtonAction: { owner.reactor?.action.onNext(.didTapReportButton) })
       })
       .disposed(by: disposeBag)
+    
+    bookmarkButton.rx.tap
+      .map { Action.didTapBookmarkButton }
+      .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+      .bind(with: self, onNext: { owner, bookmarkButtonAction in
+        guard AppProperties.accessToken != .init() else {
+          owner.coordinator?.pushLoginPage()
+          return
+        }
+        
+        reactor.action.onNext(bookmarkButtonAction)
+      })
+      .disposed(by: disposeBag)
   }
   
   func bindState(reactor: PostDetailReactor) {
@@ -299,6 +327,20 @@ private extension PostDetailViewController {
       .distinctUntilChanged()
       .asSignal(onErrorSignalWith: .empty())
       .emit(to: postBinder)
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.post }
+      .filter { !$0.title.isEmpty }
+      .map { $0.isBookmarked }
+      .distinctUntilChanged()
+      .skip(1)
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, isBookmarked in
+        let toastMessage = isBookmarked ? "북마크를 설정하였습니다." : "북마크를 해제하였습니다."
+        owner.bookmarkButton.setBookmarked(isBookmarked)
+        owner.view.showToast(message: toastMessage)
+      })
       .disposed(by: disposeBag)
     
     reactor.state
@@ -388,7 +430,7 @@ private extension PostDetailViewController {
       })
       .disposed(by: disposeBag)
     
-    showMoreButton.tapObservable
+    applyButton.tapObservable
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
         GA.logEvent(.지원하기버튼)

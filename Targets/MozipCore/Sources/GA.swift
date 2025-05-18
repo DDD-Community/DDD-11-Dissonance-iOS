@@ -22,11 +22,12 @@ public struct GA {
     // 홈 화면 - 네비게이션바 영역
     case 마이페이지버튼 = "profile_button_selected"
     case 검색버튼 = "search_button_selected"
+    case 북마크버튼 = "bookmark_button_selected"
     
     // 홈 화면 - 스크롤 영역
     case 배너이미지 = "banner_image_selected"
     case 공모전더보기버튼 = "contest_more_selected"
-    case 해커톤더보기버튼 = "hackathon_more_selected"
+    case 교육더보기버튼 = "education_more_selected"
     case IT동아리더보기버튼 = "it_club_more_selected"
     
     // 공고 리스트 - 상단 카테고리 칩

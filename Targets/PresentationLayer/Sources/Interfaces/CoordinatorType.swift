@@ -23,7 +23,6 @@ public protocol CoordinatorType: AnyObject {
 
   // MARK: - Methods
   func start()
-  func didFinish()
 }
 
 // MARK: - Default Implementation
@@ -37,5 +36,13 @@ public extension CoordinatorType {
       childCoordinators.remove(at: idx)
       break
     }
+  }
+  
+  func didFinish() {
+    navigationController.popViewController(animated: true)
+  }
+  
+  func disappear() {
+    parentCoordinator?.removeChild(self)
   }
 }

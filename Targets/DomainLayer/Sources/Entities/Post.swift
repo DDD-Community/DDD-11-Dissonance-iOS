@@ -23,6 +23,7 @@ public struct Post: Equatable {
   public var activityEndDate: String = .init()
   public var activityContents: String = .init()
   public var postUrlString: String = .init()
+  public var isBookmarked: Bool = .init()
   public var category: PostUploadCategory? {
     PostUploadCategory(title: categoryTitle)
   }
