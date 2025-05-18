@@ -28,7 +28,7 @@ extension BookmarkAPI: TargetType {
     
     switch self {
     case .toggle(let id): return basePath + "/\(id)" + "/toggle"
-    case .fetchBookmarkList: return "/bookmarks"
+    case .fetchBookmarkList: return basePath
     }
   }
   
