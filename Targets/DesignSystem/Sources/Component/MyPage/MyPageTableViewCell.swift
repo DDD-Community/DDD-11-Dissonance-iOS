@@ -69,7 +69,7 @@ public final class MyPageTableViewCell: UITableViewCell {
     }
     
     titleLabel.updateTextKeepingAttributes("버전 정보")
-    versionLabel.updateTextKeepingAttributes("\(version).\(build)")
+    versionLabel.updateTextKeepingAttributes("v\(version)(\(build))")
     versionLabel.isHidden = false
   }
 }
