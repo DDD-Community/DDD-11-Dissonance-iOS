@@ -193,7 +193,7 @@ private extension HomeViewController {
       .asSignal(onErrorJustReturn: ())
       .emit(with: self) { owner, _ in
         GA.logEvent(.북마크버튼)
-        owner.coordinator?.pushBookmarkList()
+        AppProperties.accessToken == .init() ? owner.coordinator?.pushLoginPage() : owner.coordinator?.pushBookmarkList()
       }
       .disposed(by: disposeBag)
     
