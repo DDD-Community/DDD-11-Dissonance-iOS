@@ -122,6 +122,7 @@ public final class JobCategoryView: UIView {
         switch category {
         case .all:     GA.logEvent(.전체칩)
         case .design:  GA.logEvent(.디자인칩)
+        case .develop: GA.logEvent(.개발칩)
         case .idea:    GA.logEvent(.기획아이디어칩)
         }
         return category
