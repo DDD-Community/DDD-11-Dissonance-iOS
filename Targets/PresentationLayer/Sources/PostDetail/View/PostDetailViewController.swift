@@ -79,35 +79,7 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     titleColor: .white,
     backgroundColor: MozipColor.primary500
   )
-  
-  private var alertController: UIAlertController {
-    let alertController: UIAlertController = .init()
-    
-    let actions: [UIAlertAction] = [
-      .makeAction(type: .postEdit, action: { [weak self] in 
-        let originID = self?.reactor?.postID ?? .init()
-        let originPost = self?.reactor?.currentState.post ?? .init()
-        self?.coordinator?.pushEditView(id: originID, post: originPost) 
-      }),
-      
-        .makeAction(type: .postDelete, action: { [weak self] in
-          self?.presentAlert(type: .deletePost, rightButtonAction: { [weak self] in
-            self?.reactor?.action.onNext(.didTapDeleteButton)
-          })
-        }),
-      
-        .makeAction(type: .postReport, action: { [weak self] in
-          self?.reportActionSheetSubject.onNext(())
-        }),
-      
-        .makeAction(type: .cancel)
-    ]
-    
-    actions.forEach {
-      alertController.addAction($0)
-    }
-    return alertController
-  }
+  private var alertController: UIAlertController { makeAlertController() }
   
   private let shareButton: UIButton = {
     let button: UIButton = .init()
@@ -489,5 +461,39 @@ private extension PostDetailViewController {
   func updateActivityDateVisibility(_ isVisible: Bool) {
     activityDateContainer.flex.display(isVisible ? .flex : .none)
     rootContainer.flex.layout()
+  }
+
+  func makeAlertController() -> UIAlertController {
+    let alertController: UIAlertController = .init()
+    
+    var actions: [UIAlertAction] = [
+      .makeAction(type: .postReport, action: { [weak self] in
+        self?.reportActionSheetSubject.onNext(())
+      }),
+      .makeAction(type: .cancel)
+    ]
+    
+    if AppProperties.isAdmin {
+      let adminActions: [UIAlertAction] = [
+        .makeAction(type: .postEdit, action: { [weak self] in 
+          let originID = self?.reactor?.postID ?? .init()
+          let originPost = self?.reactor?.currentState.post ?? .init()
+          self?.coordinator?.pushEditView(id: originID, post: originPost) 
+        }),
+        .makeAction(type: .postDelete, action: { [weak self] in
+          self?.presentAlert(type: .deletePost, rightButtonAction: { [weak self] in
+            self?.reactor?.action.onNext(.didTapDeleteButton)
+          })
+        })
+      ]
+      
+      actions = adminActions + actions
+    }
+    
+    actions.forEach {
+      alertController.addAction($0)
+    }
+    
+    return alertController
   }
 }
