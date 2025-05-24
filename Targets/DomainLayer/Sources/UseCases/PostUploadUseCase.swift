@@ -44,6 +44,6 @@ final class PostUploadUseCase: PostUploadUseCaseType {
       .map { (isSuccess, message) -> MozipNetworkResult in
         isSuccess ? .success : .error(message: message)
       }
-      .catchAndReturnNetworkError()
+      .catchAndReturnNetworkError() // FIXME: 구체적인 에러 파악 필요
   }
 }
