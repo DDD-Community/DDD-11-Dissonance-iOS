@@ -58,7 +58,7 @@ public struct Post: Equatable {
   
   private func translateToRequestFormat(for dateValue: String) -> String {
     guard !dateValue.isEmpty else { return "" }
-    let date = DateFormatter.yyyyMMdd_ResponseFormat.date(from: dateValue) ?? .init()
-    return DateFormatter.yyyyMMdd_RequestFormat.string(from: date)
+    let date = DateFormatter.yyyyMMddResponseFormat.date(from: dateValue) ?? .init()
+    return DateFormatter.yyyyMMddRequestFormat.string(from: date)
   }
 }
