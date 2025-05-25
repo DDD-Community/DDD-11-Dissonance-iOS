@@ -33,7 +33,9 @@ final class PostUploadCoordinator: PostUploadCoordinatorType {
   }
   
   func startEdit(originID: Int, originPost: Post) {
-    let postUploadViewController = postUploadViewController(originID: originID, originPost: originPost)
+    var mappedOriginPost = originPost
+    mappedOriginPost.mapDateValuesToRequestFormat()
+    let postUploadViewController = postUploadViewController(originID: originID, originPost: mappedOriginPost)
     navigationController.pushViewController(postUploadViewController, animated: true)
   }
 }
