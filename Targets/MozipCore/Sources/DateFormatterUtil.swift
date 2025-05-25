@@ -12,7 +12,7 @@ final public class DateFormatterUtil {
   private static var cachedFormatters: [String: DateFormatter] = [:]
   private static let lock = NSLock()
   
-  static public func formatter(
+  public static func formatter(
     format: String,
     locale: Locale = .current,
     timeZone: TimeZone = .current
@@ -36,12 +36,6 @@ final public class DateFormatterUtil {
     cachedFormatters[format] = formatter
     return formatter
   }
-}
-
-// MARK: - 자주쓰이는 포맷 미리 정의
-public extension DateFormatter {
-  static let yyyyMMdd_ResponseFormat = DateFormatterUtil.formatter(format: "yyyy.MM.dd")
-  static let yyyyMMdd_RequestFormat = DateFormatterUtil.formatter(format: "yyyy년 MM월 dd일")
 }
 
 /*
