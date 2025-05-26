@@ -20,17 +20,39 @@ platform :ios do
   desc "앱을 빌드 후 Testflight에 업로드합니다"
 
   lane :beta do
-    sh("cd .. && tuist generate")
+    
 
     # 아래 명령에 오류가 있어 주석처리 
-        # get_certificates
-        # get_provisioning_profile
+    # get_certificates
+    # get_provisioning_profile
+    
+    # 최신 빌드 번호 받아오기 (App Store Connect에서)
+    latest_build_number = latest_testflight_build_number(
+      app_identifier: "run.ddd.MOZIP"
+    )
+    
+    new_build_number = latest_build_number + 1
+
+    project_file_path = "../Targets/Mozip/Project.swift"
+
+    version_number = sh("grep 'CFBundleShortVersionString' #{project_file_path} | sed -E 's/.*\"([0-9\\.]+)\".*/\\1/'").strip
+
+    # Project.swift 파일 내 buildNumber를 찾아서 숫자를 바꿔주는 작업. 아래 코드 형태가 바뀌면 작동 안됨.
+    sh("sed -i '' 's/static let buildNumber = \".*\"/static let buildNumber = \"#{new_build_number}\"/' #{project_file_path}")
+
+    sh("cd .. && tuist generate")
 
     build_app(
       scheme: "MOZIP",  
       configuration: "Release"
     )
     upload_to_testflight
+
+    # Git 커밋 및 푸시
+    commit_message = "release: v#{version_number} (#{new_build_number}) 버전 배포"
+    sh("cd .. && git add .")
+    sh("cd .. && git commit -m '#{commit_message}'")
+    #sh("cd .. && git push")
   end
 end
 

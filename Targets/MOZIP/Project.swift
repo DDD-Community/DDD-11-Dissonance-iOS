@@ -11,9 +11,13 @@ import Foundation
 
 // Fastlane에서 전달된 환경 변수
 
+enum Const {
+  static let buildNumber = "5"
+}
+
 private var infoPlist: [String: Plist.Value] = [
     "CFBundleShortVersionString": "1.2.3",
-    "CFBundleVersion": "4",
+    "CFBundleVersion": "\(Const.buildNumber)",
     "CFBundleIconName": "AppIcon",
     "CFBundleDisplayName": "$(PRODUCT_NAME)",
     "UILaunchStoryboardName": "LaunchScreen",
