@@ -32,7 +32,7 @@ IT 동아리, 공모전, 해커톤 등 흩어져 있는 IT 관련 활동 공고�
 ### 🗃️ 프레임워크
 - UI: UIKit
 - 암호화: Security
-- 애플로그인: AuthenticationServices
+- 애플로그인: AuthenticationServices  
 
 ### 🗂️ 외부 의존성
 ![기술스택](https://hackmd.io/_uploads/BkgX4LiKA.png)
