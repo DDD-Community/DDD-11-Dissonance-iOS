@@ -1,0 +1,29 @@
+name: Deploy to TestFlight on Release Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - release
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.6.10' # 프로젝트에 맞게 조정
+
+      - name: Install Bundler & Fastlane
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Run Fastlane Beta Lane
+        run: bundle exec fastlane beta
