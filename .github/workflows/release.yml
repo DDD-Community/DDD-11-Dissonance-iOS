@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Bundler & Fastlane
         run: |
-          gem install bundler
+          gem install bundler -v 2.4.22
           bundle install
 
       - name: Run Fastlane Beta Lane
