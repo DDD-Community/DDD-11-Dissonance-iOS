@@ -5,22 +5,37 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000203">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000186">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: cd .. &amp;&amp; tuist generate" time="1.706772">
+      <testcase classname="fastlane.lanes" name="1: latest_testflight_build_number" time="3.041645">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="2: build_app" time="63.282729">
+      <testcase classname="fastlane.lanes" name="2: grep &apos;CFBundleShortVersionString&apos; ../Targets/Mozip/Project.swift | sed -E &apos;s/.*&quot;([0-9\.]+)&quot;.*/\1/&apos;" time="0.02191">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="3: upload_to_testflight" time="186.157451">
+      <testcase classname="fastlane.lanes" name="3: sed -i &apos;&apos; &apos;s/static let buildNumber = &quot;.*&quot;/static let buildNumber = &quot;5&quot;/&apos; ../Targets/Mozip/Project.swift" time="0.010073">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: cd .. &amp;&amp; tuist generate" time="1.598151">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="5: cd .. &amp;&amp; git add ." time="0.02793">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="6: cd .. &amp;&amp; git commit -m &apos;release: v1.2.3 (5) 버전 배포&apos;" time="0.041894">
         
       </testcase>
     
