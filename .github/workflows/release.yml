@@ -10,6 +10,10 @@ jobs:
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: macos-latest
+    
+    env:
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
 
     steps:
       - name: Checkout repository
