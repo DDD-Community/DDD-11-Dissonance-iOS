@@ -81,8 +81,7 @@ public final class PostHeader: UICollectionReusableView {
           .height(22)
           .marginTop(36)
           .define { flex in
-            flex.addItem(sectionTitle).marginLeft(20)
-            flex.addItem().grow(1)
+            flex.addItem(sectionTitle).marginLeft(20).grow(1)
             
             flex.addItem(showMoreButton)
               .direction(.row)
