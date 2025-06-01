@@ -8,7 +8,7 @@ on:
   workflow_dispatch: # 테스트를 위해 수동 실행 가능 추후 제거 예정
 jobs:
   deploy:
-    if: github.event.pull_request.merged == true
+    if: (github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch' # 테스트용 조건
     runs-on: macos-latest
     
     env:
