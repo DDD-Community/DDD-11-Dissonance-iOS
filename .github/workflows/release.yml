@@ -34,7 +34,8 @@ jobs:
       - uses: jdx/mise-action@v2
       - name: Install Tuist
         run: |
-          mise install tuist --version ${{ matrix.tuist }}
+          mise install tuist@${{ matrix.tuist }}
+          mise use tuist@${{ matrix.tuist }}
       - name: Install Tuist Dependencies
         run: |
           tuist install
