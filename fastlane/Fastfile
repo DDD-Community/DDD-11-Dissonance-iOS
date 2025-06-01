@@ -20,6 +20,11 @@ platform :ios do
   desc "앱을 빌드 후 Testflight에 업로드합니다"
 
   lane :beta do
+    match(
+      git_branch: "release",
+      type: "appstore",
+      readonly: false,
+    )
     
     # 2FA 인증방식 대신 아래방식을 사용 
     app_store_connect_api_key(
