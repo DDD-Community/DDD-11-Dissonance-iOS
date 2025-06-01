@@ -40,6 +40,13 @@ platform :ios do
     # Project.swift 파일 내 buildNumber를 찾아서 숫자를 바꿔주는 작업. 아래 코드 형태가 바뀌면 작동 안됨.
     sh("sed -i '' 's/static let buildNumber = \".*\"/static let buildNumber = \"#{new_build_number}\"/' #{project_file_path}")
 
+    # fastlane match 파일 추가 후 적용됨
+    sync_code_signing(
+      type: "appstore",
+      app_identifier: 'run.ddd.MOZIP',
+      readonly: true
+    )
+
     sh("cd .. && tuist generate")
 
     build_app(

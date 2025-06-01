@@ -54,7 +54,12 @@ let project = Project.makeProject(
     name: "MOZIP",
     product: .app,
     settings: .settings(
-        base: .init().swiftCompilationMode(.wholemodule).automaticCodeSigning(devTeam: "SWPBG3YXG5"),
+        base: [
+          "CODE_SIGN_STYLE": "Manual",
+          "DEVELOPMENT_TEAM": "SWPBG3YXG5",
+          "PROVISIONING_PROFILE_SPECIFIER": "match Development run.ddd.MOZIP",
+          "CODE_SIGN_IDENTITY": "Apple Development",
+        ],
         configurations: [
             .debug(name: "Debug", xcconfig: .relativeToCurrentFile("Config/Debug.xcconfig")),
             .release(name: "Release", xcconfig: .relativeToCurrentFile("Config/Release.xcconfig"))
