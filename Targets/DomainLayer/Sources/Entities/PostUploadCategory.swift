@@ -15,9 +15,9 @@ public enum PostUploadCategory {
   
   public init?(title: String) {
     switch title {
-    case "공모전 - 아이디어·기획", "아이디어·기획": self = .contestPlan
-    case "공모전 - 디자인", "디자인": self = .contestDesign
-    case "공모전 - 개발·IT", "개발·IT": self = .contestIT
+    case "기획·아이디어": self = .contestPlan
+    case "디자인": self = .contestDesign
+    case "개발": self = .contestIT
     case "교육": self = .education
     case "IT 동아리": self = .club
     default: return nil
@@ -26,9 +26,9 @@ public enum PostUploadCategory {
   
   public var title: String {
     switch self {
-    case .contestPlan: "공모전 - 아이디어·기획"
-    case .contestDesign: "공모전 - 디자인"
-    case .contestIT: "공모전 - 개발·IT"
+    case .contestPlan: "기획·아이디어"
+    case .contestDesign: "디자인"
+    case .contestIT: "개발"
     case .education: "교육"
     case .club: "IT 동아리"
     }
