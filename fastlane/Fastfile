@@ -21,6 +21,12 @@ platform :ios do
 
   lane :beta do
     
+    # 2FA 인증방식 대신 아래방식을 사용 
+    app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
+    )
 
     # 아래 명령에 오류가 있어 주석처리 
     # get_certificates
@@ -47,12 +53,6 @@ platform :ios do
     #  readonly: true
     #)
     
-    # 2FA 인증방식 대신 아래방식을 사용 
-    app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
-      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
-      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
-    )
 
     sh("cd .. && tuist generate")
 
