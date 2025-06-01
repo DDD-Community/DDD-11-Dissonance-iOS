@@ -20,10 +20,21 @@ platform :ios do
   desc "앱을 빌드 후 Testflight에 업로드합니다"
 
   lane :beta do
+    create_keychain(
+      name: ENV["KEYCHAIN_NAME"],
+      password: ENV["KEYCHAIN_PASSWORD"],
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
     match(
-      git_branch: "release",
       type: "appstore",
-      readonly: false,
+      force_for_new_devices: true,
+      readonly: true,
+      team_id: ENV["TEAM_ID"],
+      keychain_name: ENV["KEYCHAIN_NAME"],
+      keychain_password: ENV["KEYCHAIN_PASSWORD"]
     )
     
     # 2FA 인증방식 대신 아래방식을 사용 
