@@ -13,7 +13,7 @@ jobs:
     
     env:
       APPLE_ID: ${{ secrets.APPLE_ID }}
-      FASTLANE_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+      FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
 
     steps:
       - name: Checkout repository
