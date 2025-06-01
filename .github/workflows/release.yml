@@ -10,7 +10,9 @@ jobs:
   deploy:
     if: (github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch' # 테스트용 조건
     runs-on: macos-latest
-    
+    strategy:
+      matrix:
+        tuist: ['4.9.0']
     env:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
@@ -28,7 +30,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.6.10' # 프로젝트에 맞게 조정
-
+          bundler-cache: true
+      - name: Install Tuist
+        run: |
+          mise install tuist --version ${{ matrix.tuist }}
+      - name: Install Tuist Dependencies
+        run: |
+          tuist install
       - name: Install Bundler & Fastlane
         run: |
           gem install bundler -v 2.4.22
