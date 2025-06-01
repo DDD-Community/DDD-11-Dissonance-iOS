@@ -98,3 +98,4 @@ TUQ46M4Y57.certSigningRequest
 TUQ46M4Y57.p12
 AppStore_run.ddd.MOZIP.mobileprovision
 Targets/MOZIP/Resources/GoogleService-Info.plist
+*.p8
