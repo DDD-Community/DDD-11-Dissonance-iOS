@@ -65,8 +65,7 @@ let project = Project.makeProject(
                     "PROVISIONING_PROFILE_SPECIFIER": "match Development run.ddd.MOZIP",
                     "CODE_SIGN_IDENTITY": "Apple Development"
                 ],
-                xcconfig: .relativeToCurrentFile("Config/Debug.xcconfig"),
-                
+                xcconfig: .relativeToCurrentFile("Config/Debug.xcconfig")
             ),
             .release(
                 name: "Release",
@@ -74,8 +73,7 @@ let project = Project.makeProject(
                     "PROVISIONING_PROFILE_SPECIFIER": "match AppStore run.ddd.MOZIP",
                     "CODE_SIGN_IDENTITY": "Apple Distribution"
                 ],
-                xcconfig: .relativeToCurrentFile("Config/Release.xcconfig"),
-                
+                xcconfig: .relativeToCurrentFile("Config/Release.xcconfig")
             )
         ]
     ),
