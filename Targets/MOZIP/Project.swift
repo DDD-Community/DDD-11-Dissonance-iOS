@@ -56,13 +56,27 @@ let project = Project.makeProject(
     settings: .settings(
         base: [
           "CODE_SIGN_STYLE": "Manual",
-          "DEVELOPMENT_TEAM": "SWPBG3YXG5",
-          "PROVISIONING_PROFILE_SPECIFIER": "match Development run.ddd.MOZIP",
-          "CODE_SIGN_IDENTITY": "Apple Development",
+          "DEVELOPMENT_TEAM": "SWPBG3YXG5"
         ],
         configurations: [
-            .debug(name: "Debug", xcconfig: .relativeToCurrentFile("Config/Debug.xcconfig")),
-            .release(name: "Release", xcconfig: .relativeToCurrentFile("Config/Release.xcconfig"))
+            .debug(
+                name: "Debug",
+                settings: [
+                    "PROVISIONING_PROFILE_SPECIFIER": "match Development run.ddd.MOZIP",
+                    "CODE_SIGN_IDENTITY": "Apple Development"
+                ],
+                xcconfig: .relativeToCurrentFile("Config/Debug.xcconfig"),
+                
+            ),
+            .release(
+                name: "Release",
+                settings: [
+                    "PROVISIONING_PROFILE_SPECIFIER": "match AppStore run.ddd.MOZIP",
+                    "CODE_SIGN_IDENTITY": "Apple Distribution"
+                ],
+                xcconfig: .relativeToCurrentFile("Config/Release.xcconfig"),
+                
+            )
         ]
     ),
     dependencies: [
