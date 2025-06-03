@@ -43,10 +43,6 @@ platform :ios do
       issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
       key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
     )
-
-    # 아래 명령에 오류가 있어 주석처리 
-    # get_certificates
-    # get_provisioning_profile
     
     # 최신 빌드 번호 받아오기 (App Store Connect에서)
     latest_build_number = latest_testflight_build_number(
@@ -62,20 +58,13 @@ platform :ios do
     # Project.swift 파일 내 buildNumber를 찾아서 숫자를 바꿔주는 작업. 아래 코드 형태가 바뀌면 작동 안됨.
     sh("sed -i '' 's/static let buildNumber = \".*\"/static let buildNumber = \"#{new_build_number}\"/' #{project_file_path}")
 
-    # fastlane match 파일 추가 후 적용됨
-    #sync_code_signing(
-    #  type: "appstore",
-    #  app_identifier: 'run.ddd.MOZIP',
-    #  readonly: true
-    #)
-    
-
     sh("cd .. && tuist generate")
 
     build_app(
       scheme: "MOZIP",  
       configuration: "Release"
     )
+
     upload_to_testflight
 
     # Git 커밋 및 푸시
@@ -84,13 +73,4 @@ platform :ios do
     sh("cd .. && git commit -m '#{commit_message}'")
     sh("cd .. && git push")
   end
-end
-
-
-# 테스트
-# tuist menifest 파일에서 환경변수를 사용하기 위해선, TUIST_ 접두어를 붙여주어야 가능하다..!
-
-lane :test do
-  sh("pwd")
-  sh("cd .. && tuist generate")
 end
