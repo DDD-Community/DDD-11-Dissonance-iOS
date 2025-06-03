@@ -1,0 +1,17 @@
+current directory: /Users/runner/work/DDD-11-Dissonance-iOS/DDD-11-Dissonance-iOS/vendor/bundle/ruby/2.6.0/gems/sysrandom-1.0.5/ext/sysrandom
+/Users/runner/hostedtoolcache/Ruby/2.6.10/arm64/bin/ruby -I /Users/runner/hostedtoolcache/Ruby/2.6.10/arm64/lib/ruby/2.6.0 -r ./siteconf20250603-4151-p23vua.rb extconf.rb
+creating Makefile
+
+current directory: /Users/runner/work/DDD-11-Dissonance-iOS/DDD-11-Dissonance-iOS/vendor/bundle/ruby/2.6.0/gems/sysrandom-1.0.5/ext/sysrandom
+make "DESTDIR=" clean
+
+current directory: /Users/runner/work/DDD-11-Dissonance-iOS/DDD-11-Dissonance-iOS/vendor/bundle/ruby/2.6.0/gems/sysrandom-1.0.5/ext/sysrandom
+make "DESTDIR="
+compiling randombytes_sysrandom.c
+compiling sysrandom_ext.c
+linking shared-object sysrandom_ext.bundle
+ld: warning: -multiply_defined is obsolete
+
+current directory: /Users/runner/work/DDD-11-Dissonance-iOS/DDD-11-Dissonance-iOS/vendor/bundle/ruby/2.6.0/gems/sysrandom-1.0.5/ext/sysrandom
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 sysrandom_ext.bundle ./.gem.20250603-4151-1hzhtgj
