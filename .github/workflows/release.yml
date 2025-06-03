@@ -5,14 +5,47 @@ on:
     types: [closed]
     branches:
       - release
-  workflow_dispatch: # 테스트를 위해 수동 실행 가능 추후 제거 예정
 jobs:
   deploy:
-    if: (github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch' # 테스트용 조건
+    if: (github.event.pull_request.merged == true)
     runs-on: macos-15
-    strategy:
-      matrix:
-        tuist: ['4.9.0']
+    
+    steps:
+      - name: Select Xcode 16.3
+        run: sudo xcode-select -s /Applications/Xcode_16.3.app
+        
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.6.10' # 프로젝트에 맞게 조정
+          bundler-cache: true
+      - uses: jdx/mise-action@v2
+      
+      - name: Install Tuist
+        run: |
+          mise install tuist@4.9.0
+          mise use tuist@4.9.0
+          
+      - name: Install Tuist Dependencies
+        run: |
+          tuist install
+          
+      - name: Install Bundler & Fastlane
+        run: |
+          gem install bundler -v 2.4.22
+          bundle install
+
+      - name: Run Fastlane Beta Lane
+        run: bundle exec fastlane beta
+    
     env:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
@@ -22,32 +55,3 @@ jobs:
       APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
       APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
       APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
-    steps:
-      - name: Select Xcode 16.3
-        run: sudo xcode-select -s /Applications/Xcode_16.3.app
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.6.10' # 프로젝트에 맞게 조정
-          bundler-cache: true
-      - uses: jdx/mise-action@v2
-      - name: Install Tuist
-        run: |
-          mise install tuist@${{ matrix.tuist }}
-          mise use tuist@${{ matrix.tuist }}
-      - name: Install Tuist Dependencies
-        run: |
-          tuist install
-      - name: Install Bundler & Fastlane
-        run: |
-          gem install bundler -v 2.4.22
-          bundle install
-
-      - name: Run Fastlane Beta Lane
-        run: bundle exec fastlane beta
