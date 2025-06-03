@@ -80,7 +80,7 @@ platform :ios do
 
     # Git 커밋 및 푸시
     commit_message = "release: v#{version_number} (#{new_build_number}) 버전 배포"
-    sh("cd .. && git add .")
+    sh("cd .. && git add Targets/MOZIP/Project.swift")
     sh("cd .. && git commit -m '#{commit_message}'")
     sh("cd .. && git push")
   end
