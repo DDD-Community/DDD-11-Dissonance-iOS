@@ -75,7 +75,10 @@ let project = Project.makeProject(
                 ],
                 xcconfig: .relativeToCurrentFile("Config/Release.xcconfig")
             )
-        ]
+        ],
+        defaultSettings: .recommended(excluding: [
+          "CODE_SIGN_IDENTITY"
+        ])
     ),
     dependencies: [
         .project(target: Project.Layer.presentation.layerName, path: .relativeToRoot("Targets/\(Project.Layer.presentation.layerName)")),
