@@ -172,6 +172,7 @@ private extension PostUploadViewController {
     return .init(self) { owner, uploadResult in
       switch uploadResult {
       case .success:
+        owner.coordinator?.completedEdit(post: owner.reactor?.post ?? .init())
         owner.coordinator?.didFinish()
         
         if owner.reactor?.originID != nil {
@@ -323,7 +324,7 @@ private extension PostUploadViewController {
       .map { $0.isLoading }
       .distinctUntilChanged()
       .bind(with: self, onNext: { owner, isLoading in
-        // TODO: 서버 통신 시간 동안의 액션 추가 예정
+        isLoading ? LoadingIndicator.start(withDimming: true) : LoadingIndicator.stop()
       })
       .disposed(by: disposeBag)
     

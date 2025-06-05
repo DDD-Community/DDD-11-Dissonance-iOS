@@ -25,6 +25,7 @@ final class PostDetailReactor: Reactor {
     case didTapImageView
     case dismissImageViewController
     case didTapBookmarkButton
+    case updatePost(Post)
   }
   
   enum Mutation {
@@ -66,6 +67,7 @@ final class PostDetailReactor: Reactor {
     case .didTapImageView: return .just(.setIsPresentFullImage(true))
     case .dismissImageViewController: return .just(.setIsPresentFullImage(false))
     case .didTapBookmarkButton: return toggleBookmark()
+    case .updatePost(let post): return .just(.setPost(post))
     }
   }
   

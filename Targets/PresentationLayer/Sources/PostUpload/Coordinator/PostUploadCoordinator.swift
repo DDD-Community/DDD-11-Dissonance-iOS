@@ -10,8 +10,11 @@ import DIContainer
 import DomainLayer
 import UIKit
 
+import RxSwift
+
 protocol PostUploadCoordinatorType: CoordinatorType {
   func startEdit(originID: Int, originPost: Post)
+  func completedEdit(post: Post)
 }
 
 final class PostUploadCoordinator: PostUploadCoordinatorType {
@@ -20,6 +23,11 @@ final class PostUploadCoordinator: PostUploadCoordinatorType {
   weak var parentCoordinator: CoordinatorType?
   var childCoordinators: [CoordinatorType] = []
   var navigationController: UINavigationController
+  
+  private let postEditSubject = PublishSubject<Post>()
+  var postEditObservable: Observable<Post> {
+    postEditSubject.asObservable()
+  }
 
   // MARK: - Initialize
   init(navigationController: UINavigationController) {
@@ -37,6 +45,12 @@ final class PostUploadCoordinator: PostUploadCoordinatorType {
     mappedOriginPost.mapDateValuesToRequestFormat()
     let postUploadViewController = postUploadViewController(originID: originID, originPost: mappedOriginPost)
     navigationController.pushViewController(postUploadViewController, animated: true)
+  }
+  
+  func completedEdit(post: Post) {
+    var mappedPost = post
+    mappedPost.mapDateValuesToResponseFormat()
+    postEditSubject.onNext(mappedPost)
   }
 }
 

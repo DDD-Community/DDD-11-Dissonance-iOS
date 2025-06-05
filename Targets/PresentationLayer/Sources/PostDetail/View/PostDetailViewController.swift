@@ -115,7 +115,6 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     super.init()
     
     self.reactor = reactor
-    bind()
   }
   
   required init?(coder: NSCoder) {
@@ -127,6 +126,12 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
   }
   
   // MARK: - LifeCycle
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    bind()
+  }
+  
   override func viewDidLayoutSubviews() {
     navigationBar.pin.top().left().right()
     bottomShadowView.pin.bottom().left().right().height(Metric.bottomShadowViewHeightPercent)
@@ -380,6 +385,14 @@ private extension PostDetailViewController {
   }
   
   func bind() {
+    coordinator?.childCompletedObservable
+      .filter { [weak self] in self?.reactor?.currentState.post != $0 }
+      .bind(with: self, onNext: { owner, post in
+        owner.reactor?.action.onNext(.updatePost(post))
+        owner.postBinder.onNext(post)
+      })
+      .disposed(by: disposeBag)
+    
     navigationBar.backButtonTapObservable
       .asSignal(onErrorSignalWith: .empty())
       .emit(with: self, onNext: { owner, _ in
@@ -413,6 +426,8 @@ private extension PostDetailViewController {
   }
   
   func addTagLabel(_ jobGroups: [String]) {
+    tagLabelAreaView.subviews.forEach { $0.removeFromSuperview() }
+    
     for jobGroup in jobGroups {
       let tagLabel: TagLabel = .init()
       tagLabel.text = "\(jobGroup)"
