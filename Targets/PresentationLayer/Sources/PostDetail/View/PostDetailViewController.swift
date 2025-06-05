@@ -351,16 +351,6 @@ private extension PostDetailViewController {
       .disposed(by: disposeBag)
     
     reactor.state
-      .map { $0.isLoading }
-      .distinctUntilChanged()
-      .filter { $0 }
-      .asSignal(onErrorSignalWith: .empty())
-      .emit(with: self, onNext: { owner, _ in
-        // TODO: 스켈레톤 적용
-      })
-      .disposed(by: disposeBag)
-    
-    reactor.state
       .map(\.isPresentFullImage)
       .distinctUntilChanged()
       .asSignal(onErrorJustReturn: false)
