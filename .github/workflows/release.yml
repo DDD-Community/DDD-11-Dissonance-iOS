@@ -29,11 +29,27 @@ jobs:
           bundler-cache: true
       - uses: jdx/mise-action@v2
       
+      - name: Create GoogleService-Info.plist
+        env:
+          GOOGLE_SERVICE_INFO_PLIST_CONTENT: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_CONTENT }}
+        run: |
+          PLIST_PATH="Targets/MOZIP/Resources/GoogleService-Info.plist"
+          
+          # 경로의 디렉토리가 존재하지 않으면 생성합니다.
+          mkdir -p "$(dirname "${PLIST_PATH}")"
+          
+          # Secret에서 파일을 생성합니다.
+          echo "$GOOGLE_SERVICE_INFO_PLIST_CONTENT" > "${PLIST_PATH}"
+          
+          # 파일이 잘 생성되었는지 확인 (디버깅용)
+          ls -l "${PLIST_PATH}"
+          cat "${PLIST_PATH}" | head -n 5 # 파일 내용 일부 확인
+
       - name: Install Tuist
         run: |
           mise install tuist@4.9.0
           mise use tuist@4.9.0
-          
+          tuist generate --clean
       - name: Install Tuist Dependencies
         run: |
           tuist install
