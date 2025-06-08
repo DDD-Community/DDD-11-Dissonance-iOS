@@ -168,6 +168,7 @@ private extension PostListViewController {
       }
       .withUnretained(self)
       .map { owner, args in
+        owner.scrollView.setContentOffset(.zero, animated: true)
         let (order, category) = args
         let id = category.id
         return Action.fetchPosts(id: id, order: order)
@@ -206,6 +207,15 @@ private extension PostListViewController {
       .asSignal(onErrorJustReturn: .stub())
       .emit(with: self) { owner, cell in
         owner.coordinator?.pushPostDetail(id: cell.id)
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isLoading }
+      .distinctUntilChanged()
+      .asSignal(onErrorJustReturn: false)
+      .emit { isLoading in
+        isLoading ? LoadingIndicator.start(withDimming: false) : LoadingIndicator.stop()
       }
       .disposed(by: disposeBag)
   }
