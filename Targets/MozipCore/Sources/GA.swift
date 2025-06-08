@@ -46,7 +46,7 @@ public struct GA {
     
     // 홈 화면 - 네비게이션바 영역
     case 마이페이지버튼 = "profile_button_selected"
-    case 검색버튼 = "search_button_selected"
+    case 검색버튼 = "search_post_button_selected"
     case 북마크버튼 = "bookmark_button_selected"
     
     // 홈 화면 - 스크롤 영역
@@ -54,6 +54,12 @@ public struct GA {
     case 공모전더보기버튼 = "contest_more_selected"
     case 교육더보기버튼 = "education_more_selected"
     case IT동아리더보기버튼 = "it_club_more_selected"
+    
+    // 검색 화면
+//    case 검색인풋필드 = "search_post_input_field_selected" // FIXME: 검색 플로우 변경 필요
+    
+    // 북마크 화면
+    case 북마크_공고클릭 = "bookmark_post_list_selected"
     
     // 공고 리스트 - 상단 카테고리 칩
     case 전체칩 = "contest_all_chip_selected"
@@ -69,5 +75,7 @@ public struct GA {
     // 공고 상세
     case 지원하기버튼 = "apply_button_selected"
     case 공유버튼 = "share_button_selected"
+    case 북마크등록 = "bookmark_on_button_selected"
+    case 북마크해제 = "bookmark_off_button_selected"
   }
 }

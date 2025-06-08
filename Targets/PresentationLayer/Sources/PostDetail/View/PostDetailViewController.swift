@@ -317,6 +317,7 @@ private extension PostDetailViewController {
         let toastMessage = isBookmarked ? "북마크를 설정하였습니다." : "북마크를 해제하였습니다."
         owner.bookmarkButton.setBookmarked(isBookmarked)
         owner.view.showToast(message: toastMessage)
+        GA.logEvent(isBookmarked ? .북마크등록 : .북마크해제)
       })
       .disposed(by: disposeBag)
     

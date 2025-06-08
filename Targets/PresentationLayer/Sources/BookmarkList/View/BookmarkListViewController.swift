@@ -56,6 +56,11 @@ final class BookmarkListViewController: BaseViewController<BookmarkListReactor>,
   }
   
   // MARK: - LifeCycle
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.북마크화면, screenClass: self)
+  }
+  
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     navigationBar.pin.top().left().right()
@@ -144,6 +149,7 @@ private extension BookmarkListViewController {
     
     tableView.rx.modelSelected(BookmarkCellData.self)
       .subscribe(with: self) { owner, model in
+        GA.logEvent(.북마크_공고클릭)
         owner.coordinator?.pushPostDetail(id: model.id)
       }
       .disposed(by: disposeBag)
