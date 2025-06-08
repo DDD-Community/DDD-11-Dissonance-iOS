@@ -42,7 +42,7 @@ public final class PostRepository: PostRepositoryType {
       .map { (isSuccess: $0.isSuccess, message: $0.message) }
   }
 
-  public func fetchPostList(categoryId: Int, pageable: Pageable) -> Single<[PostCellData]> {
+  public func fetchPostList(categoryId: Int, pageable: Pageable) -> Single<PostPage> {
     let postListFetchRequestDTO = PostListFetchRequestDTO(
       categoryID: categoryId,
       pageable: pageable
@@ -51,12 +51,12 @@ public final class PostRepository: PostRepositoryType {
     return provider.rx.request(.fetchPostList(postListFetchRequestDTO))
       .map(APIResponse<PostCellListResponse>.self)
       .map {
-        guard let data = $0.data else { return [] }
+        guard let data = $0.data else { return .empty }
         return data.toDomain()
       }
   }
   
-  public func searchPostList(keyword: String, pageable: Pageable) -> Single<[PostCellData]> {
+  public func searchPostList(keyword: String, pageable: Pageable) -> Single<PostPage> {
     let postListSearchRequestDTO = PostListSearchRequestDTO(
       keyword: keyword,
       pageable: pageable
@@ -65,7 +65,7 @@ public final class PostRepository: PostRepositoryType {
     return provider.rx.request(.searchPostList(postListSearchRequestDTO))
       .map(APIResponse<PostCellListResponse>.self)
       .map {
-        guard let data = $0.data else { return [] }
+        guard let data = $0.data else { return .empty }
         return data.toDomain()
       }
   }
