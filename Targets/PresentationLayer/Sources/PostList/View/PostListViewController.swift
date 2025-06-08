@@ -21,6 +21,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   weak var coordinator: PostListCoordinator?
   private let postkind: PostKind
   private let orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
+  private let pageBottomRelay: PublishRelay<Void> = .init()
   
   private var categoryID: Int {
     postkind.id
@@ -131,6 +132,28 @@ private extension PostListViewController {
         owner.postOrderControlView.setOrder(order)
         owner.postOrderControlView.isOrderButtonTappedRelay.accept(false)
       }
+      .disposed(by: disposeBag)
+    
+    scrollView.rx.contentOffset
+      .skip(1)
+      .withUnretained(self)
+      .throttle(.milliseconds(500),latest: false, scheduler: MainScheduler.instance)
+      .subscribe(onNext: { owner, offset in
+        let scrollView = owner.scrollView
+        let contentHeight = scrollView.contentSize.height
+        let scrollViewHeight = scrollView.frame.size.height
+        let yOffset = offset.y
+        if yOffset + scrollViewHeight >= contentHeight - 100 {
+          owner.pageBottomRelay.accept(())
+        }
+      })
+      .disposed(by: disposeBag)
+    
+    pageBottomRelay
+      .withUnretained(self)
+      .map { owner, _ in owner.recentSearchParameter() }
+      .map(Action.fetchNextPage)
+      .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
     if postkind == .contest {
