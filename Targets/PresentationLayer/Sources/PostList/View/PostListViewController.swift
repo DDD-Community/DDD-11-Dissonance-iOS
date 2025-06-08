@@ -171,6 +171,7 @@ private extension PostListViewController {
       .asSignal(onErrorJustReturn: [])
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
+        owner.collectionView.flex.markDirty()
         owner.contentView.flex.layout(mode: .adjustHeight)
         owner.scrollView.contentSize.height = owner.contentView.frame.size.height
         owner.postOrderControlView.setCount(posts.count)
