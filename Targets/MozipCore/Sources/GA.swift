@@ -9,6 +9,31 @@
 import FirebaseAnalytics
 
 public struct GA {
+  public static func logScreenView(_ screen: Screen, screenClass: AnyObject) {
+    Analytics.logEvent(
+      AnalyticsEventScreenView,
+      parameters: [
+        AnalyticsParameterScreenName: screen.rawValue,
+        AnalyticsParameterScreenClass: NSStringFromClass(type(of: screenClass))
+      ]
+    )
+  }
+  
+  public enum Screen: String {
+    case 로그인화면 = "login_screen_view"
+    case 홈화면 = "home_screen_view"
+    case 마이페이지화면 = "mypage_screen_view"
+    case 이용약관화면 = "terms_policy_screen_view"
+    case 검색화면 = "search_post_screen_view"
+    case 북마크화면 = "bookmark_post_screen_view"
+    case 공고리스트화면_공모전 = "contest_post_list_screen_view"
+    case 공고리스트화면_교육 = "education_post_list_screen_view"
+    case 공고리스트화면_동아리 = "it_club_post_list_screen_view"
+    case 공고상세화면 = "post_detail_screen_view"
+    case 공고이미지화면 = "image_screen_view"
+    case 공고업로드화면 = "post_upload_screen_view"
+    case 웹뷰화면 = "web_screen_view"
+  }
   
   public static func logEvent(_ event: Event) {
     Analytics.logEvent(event.rawValue, parameters: nil)

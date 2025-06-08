@@ -144,6 +144,11 @@ final class PostDetailViewController: BaseViewController<PostDetailReactor>, Coo
     scrollView.contentSize = rootContainer.frame.size
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.공고상세화면, screenClass: self)
+  }
+  
   // MARK: - Methods
   override func bind(reactor: PostDetailReactor) {
     bindAction(reactor: reactor)

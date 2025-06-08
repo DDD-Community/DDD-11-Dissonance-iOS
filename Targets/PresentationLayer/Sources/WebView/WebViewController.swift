@@ -7,6 +7,7 @@
 //
 
 import DesignSystem
+import MozipCore
 import UIKit
 import WebKit
 
@@ -89,6 +90,11 @@ final class WebViewController: UIViewController {
     
     webView.pin.all()
     stackView.pin.left().right().bottom().height(8%)
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.웹뷰화면, screenClass: self)
   }
 }
 

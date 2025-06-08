@@ -58,6 +58,12 @@ final class TermsPolicyViewController: UIViewController, Coordinatable {
     termsOfUseButton.pin.top(to: navigationBar.edge.bottom).marginTop(4).left().marginLeft(20).height(46).sizeToFit(.height)
     privacyPolicyButton.pin.top(to: termsOfUseButton.edge.bottom).left().marginLeft(20).height(46).sizeToFit(.height)
   }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.이용약관화면, screenClass: self)
+  }
+  
 }
 
 // MARK: - Private Extenion
