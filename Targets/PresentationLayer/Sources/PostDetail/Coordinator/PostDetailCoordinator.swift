@@ -10,6 +10,8 @@ import DIContainer
 import DomainLayer
 import UIKit
 
+import RxSwift
+
 protocol PostDetailCoordinatorType: CoordinatorType {
   func start(postID: Int)
   func pushWebView(urlString: String)
@@ -23,6 +25,12 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
   weak var parentCoordinator: CoordinatorType?
   var childCoordinators: [CoordinatorType] = []
   var navigationController: UINavigationController
+  
+  private let disposeBag = DisposeBag()
+  private let childCompletedSubject = PublishSubject<Post>()
+  var childCompletedObservable: Observable<Post> {
+    childCompletedSubject.asObservable()
+  }
 
   // MARK: - Initialize
   init(navigationController: UINavigationController) {
@@ -46,6 +54,9 @@ final class PostDetailCoordinator: PostDetailCoordinatorType {
     postUploadCoordinator.parentCoordinator = self
     addChild(postUploadCoordinator)
     postUploadCoordinator.startEdit(originID: id, originPost: post)
+    postUploadCoordinator.postEditObservable
+      .bind(to: childCompletedSubject)
+      .disposed(by: disposeBag)
   }
 
   func pushWebView(urlString: String) {

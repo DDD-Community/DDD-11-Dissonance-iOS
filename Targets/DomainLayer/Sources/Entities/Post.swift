@@ -50,15 +50,22 @@ public struct Post: Equatable {
     activityEndDate = translateToRequestFormat(for: activityEndDate)
   }
   
-  public static func == (lhs: Post, rhs: Post) -> Bool {
-    lhs.title == rhs.title &&
-    lhs.organization == rhs.organization &&
-    lhs.postUrlString == rhs.postUrlString
+  public mutating func mapDateValuesToResponseFormat() {
+    recruitStartDate = translateToResponseFormat(for: recruitStartDate)
+    recruitEndDate = translateToResponseFormat(for: recruitEndDate)
+    activityStartDate = translateToResponseFormat(for: activityStartDate)
+    activityEndDate = translateToResponseFormat(for: activityEndDate)
   }
   
   private func translateToRequestFormat(for dateValue: String) -> String {
     guard !dateValue.isEmpty else { return "" }
     let date = DateFormatter.yyyyMMddResponseFormat.date(from: dateValue) ?? .init()
     return DateFormatter.yyyyMMddRequestFormat.string(from: date)
+  }
+  
+  private func translateToResponseFormat(for dateValue: String) -> String {
+    guard !dateValue.isEmpty else { return "" }
+    let date = DateFormatter.yyyyMMddRequestFormat.date(from: dateValue) ?? .init()
+    return DateFormatter.yyyyMMddResponseFormat.string(from: date)
   }
 }
