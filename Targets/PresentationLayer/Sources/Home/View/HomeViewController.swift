@@ -272,12 +272,12 @@ private extension HomeViewController {
   }
   
   func setupViewHierarchy() {
-    view.addSubview(navigationBar)
     view.addSubview(scrollView)
     view.addSubview(fabButtonDimmingView)
     view.addSubview(fabSubButton)
     view.addSubview(fabButton)
     scrollView.addSubview(rootContainer)
+    view.addSubview(navigationBar)
     
     rootContainer.flex
       .direction(.column)
