@@ -42,7 +42,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   )
   
   override var preferredStatusBarStyle: UIStatusBarStyle {
-    return .lightContent
+    return .darkContent
   }
   
   // MARK: Initializer
@@ -235,13 +235,13 @@ private extension PostListViewController {
 // MARK: - Layout
 private extension PostListViewController {
   func setupViewHierarchy() {
-    view.addSubview(navigationBar)
-    if postkind == .contest {
-      view.addSubview(jobCategoryView)
-    }
     view.addSubview(scrollView)
     scrollView.addSubview(contentView)
     scrollView.addSubview(orderDropDownMenu)
+    if postkind == .contest {
+      view.addSubview(jobCategoryView)
+    }
+    view.addSubview(navigationBar)
     
     contentView.flex
       .direction(.column)
@@ -266,6 +266,7 @@ private extension PostListViewController {
     scrollView.contentSize = contentView.frame.size
     collectionView.flex.markDirty()
     navigationBar.layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 4, blur: 8, spread: 0)
+    jobCategoryView.layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 4, blur: 8, spread: 0)
     updateOrderMenuLayout(postOrderControlView.isOrderButtonTappedRelay.value)
   }
   
