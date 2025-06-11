@@ -186,6 +186,14 @@ private extension PostUploadViewController {
     }
   }
   
+  var completionButtonBinder: Binder<Bool> {
+    return .init(self) { owner, isEnable in
+      let color = isEnable ? MozipColor.primary500 : MozipColor.gray200
+      owner.completionButton.backgroundColor = color
+      owner.isEnableComplete = isEnable
+    }
+  }
+  
   // MARK: Methods
   func setupOriginPost() {
     guard let originPost = reactor?.post, !originPost.title.isEmpty else { return }
@@ -313,11 +321,7 @@ private extension PostUploadViewController {
     reactor.state
       .map { $0.isEnableComplete }
       .distinctUntilChanged()
-      .bind(with: self, onNext: { owner, isEnable in
-        let color = isEnable ? MozipColor.primary500 : MozipColor.gray200
-        owner.completionButton.backgroundColor = color
-        owner.isEnableComplete = isEnable
-      })
+      .bind(to: completionButtonBinder)
       .disposed(by: disposeBag)
     
     reactor.state
