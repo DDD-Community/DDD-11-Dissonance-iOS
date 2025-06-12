@@ -103,7 +103,7 @@ private extension PostListViewController {
   func bindAction(reactor: PostListReactor) {
     rx.viewWillAppear
       .withUnretained(self)
-      .map { owner, _ in owner.recentSearchParameter() }
+      .map { owner, _ in owner.currentSearchParameter(isFirstPage: true) }
       .map(Action.fetchPosts)
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
@@ -140,8 +140,8 @@ private extension PostListViewController {
       .map { owner, offset in owner.shouldLoadNextPage(at: offset.y) }
       .filter { $0 }
       .withUnretained(self)
-      .map { owner, _ in owner.recentSearchParameter() }
-      .map(Action.fetchNextPage)
+      .map { owner, _ in owner.currentSearchParameter() }
+      .map(Action.fetchPosts)
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -160,7 +160,7 @@ private extension PostListViewController {
         owner.scrollView.setContentOffset(.zero, animated: true)
         let (order, category) = args
         let id = category.id
-        return Action.fetchPosts(id: id, order: order)
+        return Action.fetchPosts(id: id, order: order, isFirst: true)
       }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
@@ -169,7 +169,7 @@ private extension PostListViewController {
         .distinctUntilChanged()
         .withUnretained(self)
         .map { owner, order in
-          return Action.fetchPosts(id: owner.categoryID, order: order)
+          return Action.fetchPosts(id: owner.categoryID, order: order, isFirst: true)
         }
         .bind(to: reactor.action)
         .disposed(by: disposeBag)
@@ -209,14 +209,14 @@ private extension PostListViewController {
       .disposed(by: disposeBag)
   }
   
-  private func recentSearchParameter() -> (Int, PostOrder) {
+  private func currentSearchParameter(isFirstPage: Bool = false) -> (Int, PostOrder, Bool) {
     let order = orderDropDownMenu.isLatestOrder.value ? PostOrder.latest : PostOrder.deadline
     
     if postkind == .contest {
       let selectionId = jobCategoryView.selectionRelay.value.id
-      return (selectionId, order)
+      return (selectionId, order, isFirstPage)
     } else {
-      return (categoryID, order)
+      return (categoryID, order, isFirstPage)
     }
   }
   
