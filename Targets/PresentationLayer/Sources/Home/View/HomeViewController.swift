@@ -82,6 +82,11 @@ final class HomeViewController: BaseViewController<HomeReactor>, Alertable, Coor
     fabButton.isHidden = !AppProperties.isAdmin
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.홈화면, screenClass: self)
+  }
+  
   override func bind(reactor: HomeReactor) {
     bindAction(reactor: reactor)
     bindState(reactor: reactor)

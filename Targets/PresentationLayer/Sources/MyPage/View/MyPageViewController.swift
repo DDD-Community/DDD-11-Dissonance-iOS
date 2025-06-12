@@ -107,6 +107,11 @@ final class MyPageViewController: BaseViewController<MyPageReactor>, Coordinatab
     setupLayoutConstraints()
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.마이페이지화면, screenClass: self)
+  }
+  
   // MARK: - Methods
   override func bind(reactor: MyPageReactor) {
     bindAction(reactor: reactor)

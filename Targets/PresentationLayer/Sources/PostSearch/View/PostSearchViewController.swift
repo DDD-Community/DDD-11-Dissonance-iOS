@@ -9,6 +9,7 @@
 import UIKit
 import DesignSystem
 import DomainLayer
+import MozipCore
 
 import FlexLayout
 import PinLayout
@@ -74,6 +75,12 @@ final class PostSearchViewController: BaseViewController<PostSearchReactor>, Ale
   override func viewDidLayoutSubviews() {
     setupViewLayout()
   }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.검색화면, screenClass: self)
+  }
+  
   
   // MARK: Methods
   private func setupSearchBar() {

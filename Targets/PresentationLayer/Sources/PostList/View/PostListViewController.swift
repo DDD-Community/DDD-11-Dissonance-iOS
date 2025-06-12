@@ -9,6 +9,7 @@
 import UIKit
 import DesignSystem
 import DomainLayer
+import MozipCore
 
 import FlexLayout
 import PinLayout
@@ -75,6 +76,11 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   
   override func viewDidLayoutSubviews() {
     setupViewLayout()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.공고리스트화면_공모전, screenClass: self) // FIXME: 경우에 따라 변경 필요
   }
   
   // MARK: Methods
