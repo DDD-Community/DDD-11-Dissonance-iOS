@@ -21,7 +21,6 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   weak var coordinator: PostListCoordinator?
   private let postkind: PostKind
   private let orderRelay: BehaviorRelay<PostOrder> = .init(value: .latest)
-  private let pageBottomRelay: PublishRelay<Void> = .init()
   
   private var categoryID: Int {
     postkind.id
@@ -138,18 +137,8 @@ private extension PostListViewController {
       .skip(1)
       .withUnretained(self)
       .throttle(.milliseconds(500),latest: false, scheduler: MainScheduler.instance)
-      .subscribe(onNext: { owner, offset in
-        let scrollView = owner.scrollView
-        let contentHeight = scrollView.contentSize.height
-        let scrollViewHeight = scrollView.frame.size.height
-        let yOffset = offset.y
-        if yOffset + scrollViewHeight >= contentHeight - 100 {
-          owner.pageBottomRelay.accept(())
-        }
-      })
-      .disposed(by: disposeBag)
-    
-    pageBottomRelay
+      .map { owner, offset in owner.shouldLoadNextPage(at: offset.y) }
+      .filter { $0 }
       .withUnretained(self)
       .map { owner, _ in owner.recentSearchParameter() }
       .map(Action.fetchNextPage)
@@ -229,6 +218,12 @@ private extension PostListViewController {
     } else {
       return (categoryID, order)
     }
+  }
+  
+  private func shouldLoadNextPage(at yOffset: CGFloat) -> Bool {
+    let contentHeight = scrollView.contentSize.height
+    let scrollViewHeight = scrollView.frame.size.height
+    return yOffset + scrollViewHeight >= contentHeight - 100
   }
 }
 
