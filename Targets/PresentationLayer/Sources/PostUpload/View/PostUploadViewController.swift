@@ -232,73 +232,35 @@ private extension PostUploadViewController {
     }
     
     activityContentsTextView.textView.rx.text.onNext(originPost.activityContents)
-    reactor?.action.onNext(.inputImage(originPost.imageData))
     
     DispatchQueue.main.async {
-      self.imageUploadView.applyImage(UIImage(data: originPost.imageData) ?? .init())
+      self.imageUploadView.applyImage(data: originPost.imageData)
     }
   }
   
   func bindAction(reactor: PostUploadReactor) {
-    titleTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputTitle($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
+    let textObservables = [
+      titleTextFieldView.textObservable.skip(1).startWith(reactor.post.title), 
+      categoryTextFieldView.textObservable.skip(1).startWith(reactor.post.categoryTitle),
+      organizationTextFieldView.textObservable.skip(1).startWith(reactor.post.organization), 
+      recruitStartTextFieldView.textObservable.skip(1).startWith(reactor.post.recruitStartDate),
+      recruitEndTextFieldView.textObservable.skip(1).startWith(reactor.post.recruitEndDate), 
+      activityStartTextFieldView.textObservable.skip(1).startWith(reactor.post.activityStartDate),
+      activityEndTextFieldView.textObservable.skip(1).startWith(reactor.post.activityEndDate), 
+      activityContentsTextView.textObservable.skip(1).startWith(reactor.post.activityContents),
+      postUrlTextFieldView.textObservable.skip(1).startWith(reactor.post.postUrlString)
+    ]
     
-    categoryTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputCategory($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    organizationTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputOrganization($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    recruitStartTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputRecruitStartDate($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    recruitEndTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputRecruitEndDate($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    recruitJobView.jobGroupRelay
-      .skip(1)
-      .map { Action.inputJobGroup($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    activityStartTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputActivityStartDate($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    activityEndTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputActivityEndDate($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    activityContentsTextView.textObservable
-      .skip(1)
-      .map { Action.inputActivityContents($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    postUrlTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputPostUrlString($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
+    Observable.combineLatest(
+      imageUploadView.imageDataObservable,
+      Observable.combineLatest(textObservables),
+      recruitJobView.jobGroupRelay
+    )
+    .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
+    .map(createPost)
+    .map(Action.updatePost)
+    .bind(to: reactor.action)
+    .disposed(by: disposeBag)
     
     completionButton.rx.tap
       .withUnretained(self)
@@ -400,6 +362,24 @@ private extension PostUploadViewController {
     rootContainer.flex.layout(mode: .adjustHeight)
     scrollView.contentSize = rootContainer.frame.size
     categoryView.pin.below(of: categoryTextFieldView).marginTop(12).horizontally(20).height(274)
+  }
+  
+  func createPost(imageData: Data, textStream: [String], jobGroupStream: [String]) -> Post {
+    guard textStream.count == 9, let reactor else { return .init() }
+    
+    return reactor.post.updated(
+      imageData: imageData,
+      title: textStream[0],
+      categoryTitle: textStream[1],
+      organization: textStream[2],
+      recruitStartDate: textStream[3],
+      recruitEndDate: textStream[4],
+      jobGroups: jobGroupStream,
+      activityStartDate: textStream[5],
+      activityEndDate: textStream[6],
+      activityContents: textStream[7],
+      postUrlString: textStream[8]
+    )
   }
 }
   
@@ -548,10 +528,8 @@ extension PostUploadViewController: PHPickerViewControllerDelegate {
         return
       }
       
-      self.reactor?.action.onNext(.inputImage(imageData))
-      
       DispatchQueue.main.async {
-        self.imageUploadView.applyImage(image)
+        self.imageUploadView.applyImage(data: imageData)
       }
     }
   }
