@@ -300,7 +300,7 @@ private extension PostDetailViewController {
   func bindState(reactor: PostDetailReactor) {
     reactor.state
       .map { $0.post }
-      .filter { !$0.title.isEmpty }
+      .filter { $0.hasContents }
       .distinctUntilChanged()
       .asSignal(onErrorSignalWith: .empty())
       .emit(to: postBinder)
@@ -308,7 +308,7 @@ private extension PostDetailViewController {
     
     reactor.state
       .map { $0.post }
-      .filter { !$0.title.isEmpty }
+      .filter { $0.hasContents }
       .map { $0.isBookmarked }
       .distinctUntilChanged()
       .skip(1)

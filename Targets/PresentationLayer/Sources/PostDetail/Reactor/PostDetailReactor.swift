@@ -84,7 +84,7 @@ final class PostDetailReactor: Reactor {
     case .setFetchError(let isError): newState.isFetchError = isError
     case .setReportState(let isSuccess): newState.isSuccessReport = isSuccess
     case let .setReportError(isError, message): newState.isErrorReport = (isError: isError, message: message)
-    case .setBookmarkState(let isBookmarked): newState.post.isBookmarked = isBookmarked
+    case .setBookmarkState(let isBookmarked): newState.post = state.post.updated(isBookmarked: isBookmarked)
     }
     
     return newState
