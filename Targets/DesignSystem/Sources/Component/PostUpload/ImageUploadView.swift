@@ -39,6 +39,12 @@ public final class ImageUploadView: UIView {
     uploadButton.rx.tap.asObservable()
   }
   
+  private let imageDataSubject = PublishSubject<Data>()
+
+  public var imageDataObservable: Observable<Data> {
+      imageDataSubject.asObservable()
+  }
+  
   // MARK: - Initializer
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -61,8 +67,8 @@ public final class ImageUploadView: UIView {
     uploadButton.layer.cornerRadius = uploadButton.bounds.height * 0.5
   }
   
-  public func applyImage(_ image: UIImage) {
-    imageView.image = image
+  public func applyImage(data: Data) {
+    imageView.image = UIImage(data: data)
     descriptionLabel.removeFromSuperview()
     uploadButton.setTitle("수정", for: .normal)
     uploadButton.setTitleColor(MozipColor.gray10, for: .normal)
@@ -70,6 +76,7 @@ public final class ImageUploadView: UIView {
     uploadButton.flex.marginTop(0).width(19.4%)
     rootContainer.backgroundColor = MozipColor.gray900.withAlphaComponent(0.2)
     rootContainer.flex.layout()
+    imageDataSubject.onNext(data)
   }
 }
 
