@@ -30,7 +30,7 @@ public struct Post: Equatable {
   }
   
   public var hasContents: Bool {
-    guard !imageData.isEmpty, !jobGroups.isEmpty else { return false }
+    guard !imageData.isEmpty, !jobGroups.contains("") else { return false }
     return ![title, categoryTitle, organization, recruitEndDate, activityContents, postUrlString].contains("")
   }
   
