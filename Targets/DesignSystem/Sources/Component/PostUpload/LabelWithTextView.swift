@@ -19,12 +19,17 @@ public final class LabelWithTextView: UIView {
   private let label: MozipLabel = .init(style: .heading3, color: MozipColor.gray800)
   private let requiredLabel: MozipLabel = .init(style: .heading3, color: MozipColor.primary500, text: "*")
   public let textView: MozipTextView = .init()
+  private let placeHolder: String
+  
   public var textObservable: Observable<String> {
-    textView.rx.text.orEmpty.asObservable()
+    textView.rx.text.orEmpty
+      .withUnretained(self)
+      .map { owner, text in text == owner.placeHolder ? .init() : text }
   }
   
   // MARK: - Initializer
   public init(title: String, placeHolder: String, isRequired: Bool = false) {
+    self.placeHolder = placeHolder
     super.init(frame: .zero)
     
     label.updateTextKeepingAttributes(title)
