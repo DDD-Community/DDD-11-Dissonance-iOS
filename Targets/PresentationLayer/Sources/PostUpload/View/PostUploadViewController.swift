@@ -21,7 +21,6 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
   // MARK: - Properties
   weak var coordinator: PostUploadCoordinator?
   private let navigationBar: MozipNavigationBar
-  private var isEnableComplete: Bool = false
   private var originalCenter: CGPoint?
 
   private let scrollView: UIScrollView = {
@@ -190,13 +189,12 @@ private extension PostUploadViewController {
     return .init(self) { owner, isEnable in
       let color = isEnable ? MozipColor.primary500 : MozipColor.gray200
       owner.completionButton.backgroundColor = color
-      owner.isEnableComplete = isEnable
     }
   }
   
   // MARK: Methods
   func setupOriginPost() {
-    guard let originPost = reactor?.post, !originPost.title.isEmpty else { return }
+    guard let originPost = reactor?.post, originPost.hasContents else { return }
     
     let originPostValues = [
       originPost.title,
@@ -263,17 +261,8 @@ private extension PostUploadViewController {
     .disposed(by: disposeBag)
     
     completionButton.rx.tap
-      .withUnretained(self)
-      .filter { owner, _ in !owner.isEnableComplete }
-      .asSignal(onErrorSignalWith: .empty())
-      .emit { (owner, _) in
-        owner.view.showToast(message: "모든 항목을 입력해 주세요.")
-      }
-      .disposed(by: disposeBag)
-    
-    completionButton.rx.tap
-      .withUnretained(self)
-      .filter { owner, _ in owner.isEnableComplete }
+      .withLatestFrom(reactor.state)
+      .filter { $0.isEnableComplete }
       .map { _ in Action.didTapCompletionButton }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
@@ -354,6 +343,16 @@ private extension PostUploadViewController {
       .asSignal(onErrorJustReturn: ())
       .emit(with: self, onNext: { owner, _ in
         owner.updateLayout()
+      })
+      .disposed(by: disposeBag)
+    
+    guard let reactor else { return }
+    completionButton.rx.tap
+      .withLatestFrom(reactor.state)
+      .filter { !$0.isEnableComplete }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        owner.view.showToast(message: "모든 항목을 입력해 주세요.")
       })
       .disposed(by: disposeBag)
   }
@@ -503,33 +502,25 @@ private extension PostUploadViewController {
 extension PostUploadViewController: PHPickerViewControllerDelegate {
   internal func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
     picker.dismiss(animated: true)
-    
-    guard let provider = results.first?.itemProvider,
-          provider.canLoadObject(ofClass: UIImage.self) else {
-      return
-    }
+    guard let provider = results.first?.itemProvider, provider.canLoadObject(ofClass: UIImage.self) else { return }
     
     provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
-      guard let self = self,
-            let image = image as? UIImage,
-            let imageData = image.jpegData(compressionQuality: 0.5) else {
-        return
-      }
+      guard let self, let image = image as? UIImage, let imageData = image.jpegData(compressionQuality: 0.5) else { return }
       
-      guard imageData.count < 10 * 1024 * 1024 else {
-        DispatchQueue.main.async { [weak self] in
-          self?.presentAlert(type: .imageSizeOver, rightButtonAction: {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-              guard let self else { return }
-              present(phPicker, animated: true)
-            }
-          })
+      if imageData.count < 10 * 1024 * 1024 {
+        DispatchQueue.main.async {
+          self.imageUploadView.applyImage(data: imageData)
         }
         return
       }
       
-      DispatchQueue.main.async {
-        self.imageUploadView.applyImage(data: imageData)
+      DispatchQueue.main.async { [weak self] in
+        self?.presentAlert(type: .imageSizeOver, rightButtonAction: {
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self else { return }
+            present(phPicker, animated: true)
+          }
+        })
       }
     }
   }
