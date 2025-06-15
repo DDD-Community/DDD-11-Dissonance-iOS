@@ -12,7 +12,7 @@ import Foundation
 // Fastlane에서 전달된 환경 변수
 
 enum Const {
-  static let buildNumber = "10"
+  static let buildNumber = "11"
 }
 
 private var infoPlist: [String: Plist.Value] = [
