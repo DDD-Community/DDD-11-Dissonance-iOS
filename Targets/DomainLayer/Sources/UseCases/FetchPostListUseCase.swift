@@ -11,11 +11,11 @@ import RxSwift
 public protocol FetchPostListUseCaseType {
   var postRepository: PostRepositoryType { get }
   
-  func execute(categoryId: Int, pageable: Pageable) -> Observable<[PostCellData]>
+  func execute(categoryId: Int, pageable: Pageable) -> Observable<PostPage>
 }
 
 extension FetchPostListUseCaseType {
-  func execute(categoryId: Int, pageable: Pageable) -> Observable<[PostCellData]> {
+  func execute(categoryId: Int, pageable: Pageable) -> Observable<PostPage> {
     postRepository.fetchPostList(categoryId: categoryId, pageable: pageable)
       .asObservable()
       .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))

@@ -11,11 +11,11 @@ import RxSwift
 public protocol SearchPostListUseCaseType {
   var postRepository: PostRepositoryType { get }
   
-  func execute(keyword: String, pageable: Pageable) -> Observable<[PostCellData]>
+  func execute(keyword: String, pageable: Pageable) -> Observable<PostPage>
 }
 
 extension SearchPostListUseCaseType {
-  func execute(keyword: String, pageable: Pageable) -> Observable<[PostCellData]> {
+  func execute(keyword: String, pageable: Pageable) -> Observable<PostPage> {
     postRepository.searchPostList(keyword: keyword, pageable: pageable)
       .asObservable()
       .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))

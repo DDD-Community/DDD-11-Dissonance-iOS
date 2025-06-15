@@ -82,6 +82,11 @@ final class HomeViewController: BaseViewController<HomeReactor>, Alertable, Coor
     fabButton.isHidden = !AppProperties.isAdmin
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.홈화면, screenClass: self)
+  }
+  
   override func bind(reactor: HomeReactor) {
     bindAction(reactor: reactor)
     bindState(reactor: reactor)
@@ -272,12 +277,12 @@ private extension HomeViewController {
   }
   
   func setupViewHierarchy() {
-    view.addSubview(navigationBar)
     view.addSubview(scrollView)
     view.addSubview(fabButtonDimmingView)
     view.addSubview(fabSubButton)
     view.addSubview(fabButton)
     scrollView.addSubview(rootContainer)
+    view.addSubview(navigationBar)
     
     rootContainer.flex
       .direction(.column)

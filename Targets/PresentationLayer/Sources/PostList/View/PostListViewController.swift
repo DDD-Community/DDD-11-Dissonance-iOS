@@ -9,6 +9,7 @@
 import UIKit
 import DesignSystem
 import DomainLayer
+import MozipCore
 
 import FlexLayout
 import PinLayout
@@ -41,7 +42,7 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
   )
   
   override var preferredStatusBarStyle: UIStatusBarStyle {
-    return .lightContent
+    return .darkContent
   }
   
   // MARK: Initializer
@@ -77,6 +78,11 @@ final class PostListViewController: BaseViewController<PostListReactor>, Coordin
     setupViewLayout()
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.공고리스트화면_공모전, screenClass: self) // FIXME: 경우에 따라 변경 필요
+  }
+  
   // MARK: Methods
   private func setupNavigationBar() {
     navigationBar.backButtonTapObservable
@@ -103,7 +109,7 @@ private extension PostListViewController {
   func bindAction(reactor: PostListReactor) {
     rx.viewWillAppear
       .withUnretained(self)
-      .map { owner, _ in owner.recentSearchParameter() }
+      .map { owner, _ in owner.currentSearchParameter(isFirstPage: true) }
       .map(Action.fetchPosts)
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
@@ -133,6 +139,18 @@ private extension PostListViewController {
       }
       .disposed(by: disposeBag)
     
+    scrollView.rx.contentOffset
+      .skip(1)
+      .withUnretained(self)
+      .throttle(.milliseconds(500),latest: false, scheduler: MainScheduler.instance)
+      .map { owner, offset in owner.shouldLoadNextPage(at: offset.y) }
+      .filter { $0 }
+      .withUnretained(self)
+      .map { owner, _ in owner.currentSearchParameter() }
+      .map(Action.fetchPosts)
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
     if postkind == .contest {
       Observable.combineLatest(
         orderRelay,
@@ -145,9 +163,10 @@ private extension PostListViewController {
       }
       .withUnretained(self)
       .map { owner, args in
+        owner.scrollView.setContentOffset(.zero, animated: true)
         let (order, category) = args
         let id = category.id
-        return Action.fetchPosts(id: id, order: order)
+        return Action.fetchPosts(id: id, order: order, isFirst: true)
       }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
@@ -156,7 +175,7 @@ private extension PostListViewController {
         .distinctUntilChanged()
         .withUnretained(self)
         .map { owner, order in
-          return Action.fetchPosts(id: owner.categoryID, order: order)
+          return Action.fetchPosts(id: owner.categoryID, order: order, isFirst: true)
         }
         .bind(to: reactor.action)
         .disposed(by: disposeBag)
@@ -171,6 +190,7 @@ private extension PostListViewController {
       .asSignal(onErrorJustReturn: [])
       .emit(with: self) { owner, posts in
         owner.collectionView.setupData(posts)
+        owner.collectionView.flex.markDirty()
         owner.contentView.flex.layout(mode: .adjustHeight)
         owner.scrollView.contentSize.height = owner.contentView.frame.size.height
         owner.postOrderControlView.setCount(posts.count)
@@ -184,30 +204,45 @@ private extension PostListViewController {
         owner.coordinator?.pushPostDetail(id: cell.id)
       }
       .disposed(by: disposeBag)
+    
+    reactor.state
+      .map { $0.isLoading }
+      .distinctUntilChanged()
+      .asSignal(onErrorJustReturn: false)
+      .emit { isLoading in
+        isLoading ? LoadingIndicator.start(withDimming: false) : LoadingIndicator.stop()
+      }
+      .disposed(by: disposeBag)
   }
   
-  private func recentSearchParameter() -> (Int, PostOrder) {
+  private func currentSearchParameter(isFirstPage: Bool = false) -> (Int, PostOrder, Bool) {
     let order = orderDropDownMenu.isLatestOrder.value ? PostOrder.latest : PostOrder.deadline
     
     if postkind == .contest {
       let selectionId = jobCategoryView.selectionRelay.value.id
-      return (selectionId, order)
+      return (selectionId, order, isFirstPage)
     } else {
-      return (categoryID, order)
+      return (categoryID, order, isFirstPage)
     }
+  }
+  
+  private func shouldLoadNextPage(at yOffset: CGFloat) -> Bool {
+    let contentHeight = scrollView.contentSize.height
+    let scrollViewHeight = scrollView.frame.size.height
+    return yOffset + scrollViewHeight >= contentHeight - 100
   }
 }
 
 // MARK: - Layout
 private extension PostListViewController {
   func setupViewHierarchy() {
-    view.addSubview(navigationBar)
-    if postkind == .contest {
-      view.addSubview(jobCategoryView)
-    }
     view.addSubview(scrollView)
     scrollView.addSubview(contentView)
     scrollView.addSubview(orderDropDownMenu)
+    if postkind == .contest {
+      view.addSubview(jobCategoryView)
+    }
+    view.addSubview(navigationBar)
     
     contentView.flex
       .direction(.column)
@@ -232,6 +267,7 @@ private extension PostListViewController {
     scrollView.contentSize = contentView.frame.size
     collectionView.flex.markDirty()
     navigationBar.layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 4, blur: 8, spread: 0)
+    jobCategoryView.layer.applyShadow(color: .black, alpha: 0.04, x: 0, y: 4, blur: 8, spread: 0)
     updateOrderMenuLayout(postOrderControlView.isOrderButtonTappedRelay.value)
   }
   

@@ -99,6 +99,11 @@ final class LoginViewController: BaseViewController<LoginReactor>, Coordinatable
     setupLayer()
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.로그인화면, screenClass: self)
+  }
+  
   override func bind(reactor: LoginReactor) {
     bindAction(reactor: reactor)
     bindState(reactor: reactor)

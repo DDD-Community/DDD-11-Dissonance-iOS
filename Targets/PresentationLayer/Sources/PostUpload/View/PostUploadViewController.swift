@@ -8,6 +8,7 @@
 
 import DesignSystem
 import DomainLayer
+import MozipCore
 import PhotosUI
 import UIKit
 
@@ -102,6 +103,11 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
     super.viewWillAppear(animated)
     
     registerKeyboardNotification()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.공고업로드화면, screenClass: self)
   }
   
   override func viewDidDisappear(_ animated: Bool) {

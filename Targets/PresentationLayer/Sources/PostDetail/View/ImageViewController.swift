@@ -8,6 +8,7 @@
 
 import UIKit
 import DesignSystem
+import MozipCore
 
 import RxSwift
 import RxCocoa
@@ -62,6 +63,11 @@ final class ImageViewController: UIViewController {
     navigationBar.pin.top().left().right()
     scrollView.pin.top(to: navigationBar.edge.bottom).left().right().bottom(view.safeAreaInsets.bottom)
     imageView.pin.all()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    GA.logScreenView(.공고이미지화면, screenClass: self)
   }
   
   override func viewDidDisappear(_ animated: Bool) {

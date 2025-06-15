@@ -11,12 +11,16 @@ import DomainLayer
 import Foundation
 
 import ReactorKit
+import RxCocoa
 
 final class PostListReactor: Reactor {
 
   // MARK: - Properties
-  private let fetchPostListUseCase: FetchPostListUseCaseType
   var initialState: State = .init()
+  
+  private let fetchPostListUseCase: FetchPostListUseCaseType
+  private var page = 1
+  private var isLastPage = false
 
   // MARK: - Initializer
   init(
@@ -26,7 +30,7 @@ final class PostListReactor: Reactor {
   }
 
   enum Action {
-    case fetchPosts(id: Int, order: PostOrder)
+    case fetchPosts(id: Int, order: PostOrder, isFirst: Bool)
     case tapCell(indexPath: IndexPath)
   }
 
@@ -39,35 +43,43 @@ final class PostListReactor: Reactor {
   struct State {
     var isLoading: Bool = false
     var selectedCell: PostCellData?
-    
     var posts: [PostCellData] = []
   }
 
   // MARK: - Methods
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
-    case let .fetchPosts(id, order): return fetchPosts(id: id, order: order)
-    case let .tapCell(indexPath):    return tapCell(at: indexPath)
+    case let .fetchPosts(id, order, isFirst): return fetchPostsMutation(id: id, order: order, isFirst: isFirst)
+    case let .tapCell(indexPath):             return tapCell(at: indexPath)
     }
   }
 
   func reduce(state: State, mutation: Mutation) -> State {
     var newState = state
     switch mutation {
-    case let .setLoading(bool):      newState.isLoading = bool
-    case let .setPosts(data):        newState.posts = data
-    case let .setSelectedCell(data): newState.selectedCell = data
+    case let .setLoading(bool):          newState.isLoading = bool
+    case let .setPosts(data):            newState.posts = data
+    case let .setSelectedCell(data):     newState.selectedCell = data
     }
     return newState
   }
   
-  private func fetchPosts(id: Int, order: PostOrder) -> Observable<Mutation> {
+  private func fetchPostsMutation(id: Int, order: PostOrder, isFirst: Bool) -> Observable<Mutation> {
+    if isFirst { isLastPage = false }
+    guard isLastPage == false else { return .empty() }
+    page = isFirst ? 0 : page + 1
+    
     let fetchPostListMutation: Observable<Mutation> = fetchPostListUseCase
       .execute(
         categoryId: id,
-        pageable: .init(page: 0, size: 30, sort: order.rawValue) // FIXME: 추후 페이징처리
+        pageable: .init(page: Int32(page), size: 10, sort: order.rawValue)
       )
-      .map { .setPosts(data: $0) }
+      .withUnretained(self)
+      .flatMap { owner, res -> Observable<Mutation> in
+        owner.isLastPage = res.last
+        let data = isFirst ? res.posts : owner.currentState.posts + res.posts
+        return Observable.just(.setPosts(data: data))
+      }
       // TODO: .catch { error in ... } 에러처리 필요.
     let sequence: [Observable<Mutation>] = [
       .just(.setLoading(true)),
