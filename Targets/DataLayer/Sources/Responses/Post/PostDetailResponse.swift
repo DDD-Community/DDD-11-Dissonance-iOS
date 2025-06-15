@@ -41,21 +41,25 @@ public struct PostDetailResponse: Decodable {
 
 public extension PostDetailResponse {
   func toPost(completion: @escaping (Post) -> Void) {
-    var post: Post = .init()
-    
     postImageData { imageData in
-      post.imageData = imageData
-      post.title = self.title
-      post.categoryTitle = self.category
-      post.organization = self.organization
-      post.viewCount = self.viewCount
-      (post.recruitStartDate, post.recruitEndDate) = self.periodComponents(self.recruitmentPeriod)
-      post.jobGroups = self.jobGroups
-      (post.activityStartDate, post.activityEndDate) = self.periodComponents(self.activityPeriod)
-      post.activityContents = self.content
-      post.postUrlString = self.postUrlString
-      post.isBookmarked = self.isBookmarked
+      let (postRecruitStartDate, postRecruitEndDate) = periodComponents(recruitmentPeriod)
+      let (postActivityStartDate, postActivityEndDate) = periodComponents(activityPeriod)
       
+      let post = Post(
+        imageData: imageData,
+        title: title,
+        categoryTitle: category,
+        organization: organization,
+        viewCount: viewCount,
+        recruitStartDate: postRecruitStartDate,
+        recruitEndDate: postRecruitEndDate,
+        jobGroups: jobGroups,
+        activityStartDate: postActivityStartDate,
+        activityEndDate: postActivityEndDate,
+        activityContents: content,
+        postUrlString: postUrlString,
+        isBookmarked: isBookmarked 
+      )
       completion(post)
     }
   }

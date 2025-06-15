@@ -22,7 +22,6 @@ final class PostUploadViewController: BaseViewController<PostUploadReactor>, Ale
   // MARK: - Properties
   weak var coordinator: PostUploadCoordinator?
   private let navigationBar: MozipNavigationBar
-  private var isEnableComplete: Bool = false
   private var originalCenter: CGPoint?
 
   private let scrollView: UIScrollView = {
@@ -192,9 +191,16 @@ private extension PostUploadViewController {
     }
   }
   
+  var completionButtonBinder: Binder<Bool> {
+    return .init(self) { owner, isEnable in
+      let color = isEnable ? MozipColor.primary500 : MozipColor.gray200
+      owner.completionButton.backgroundColor = color
+    }
+  }
+  
   // MARK: Methods
   func setupOriginPost() {
-    guard let originPost = reactor?.post, !originPost.title.isEmpty else { return }
+    guard let originPost = reactor?.post, originPost.hasContents else { return }
     
     let originPostValues = [
       originPost.title,
@@ -230,86 +236,39 @@ private extension PostUploadViewController {
     }
     
     activityContentsTextView.textView.rx.text.onNext(originPost.activityContents)
-    reactor?.action.onNext(.inputImage(originPost.imageData))
     
     DispatchQueue.main.async {
-      self.imageUploadView.applyImage(UIImage(data: originPost.imageData) ?? .init())
+      self.imageUploadView.applyImage(data: originPost.imageData)
     }
   }
   
   func bindAction(reactor: PostUploadReactor) {
-    titleTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputTitle($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
+    let textObservables = [
+      titleTextFieldView.textObservable.skip(1).startWith(reactor.post.title), 
+      categoryTextFieldView.textObservable.skip(1).startWith(reactor.post.categoryTitle),
+      organizationTextFieldView.textObservable.skip(1).startWith(reactor.post.organization), 
+      recruitStartTextFieldView.textObservable.skip(1).startWith(reactor.post.recruitStartDate),
+      recruitEndTextFieldView.textObservable.skip(1).startWith(reactor.post.recruitEndDate), 
+      activityStartTextFieldView.textObservable.skip(1).startWith(reactor.post.activityStartDate),
+      activityEndTextFieldView.textObservable.skip(1).startWith(reactor.post.activityEndDate), 
+      activityContentsTextView.textObservable.skip(1).startWith(reactor.post.activityContents),
+      postUrlTextFieldView.textObservable.skip(1).startWith(reactor.post.postUrlString)
+    ]
     
-    categoryTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputCategory($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    organizationTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputOrganization($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    recruitStartTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputRecruitStartDate($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    recruitEndTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputRecruitEndDate($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    recruitJobView.jobGroupRelay
-      .skip(1)
-      .map { Action.inputJobGroup($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    activityStartTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputActivityStartDate($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    activityEndTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputActivityEndDate($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    activityContentsTextView.textObservable
-      .skip(1)
-      .map { Action.inputActivityContents($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
-    
-    postUrlTextFieldView.textObservable
-      .skip(1)
-      .map { Action.inputPostUrlString($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
+    Observable.combineLatest(
+      imageUploadView.imageDataObservable,
+      Observable.combineLatest(textObservables),
+      recruitJobView.jobGroupRelay
+    )
+    .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
+    .map(createPost)
+    .map(Action.updatePost)
+    .bind(to: reactor.action)
+    .disposed(by: disposeBag)
     
     completionButton.rx.tap
-      .withUnretained(self)
-      .filter { owner, _ in !owner.isEnableComplete }
-      .asSignal(onErrorSignalWith: .empty())
-      .emit { (owner, _) in
-        owner.view.showToast(message: "모든 항목을 입력해 주세요.")
-      }
-      .disposed(by: disposeBag)
-    
-    completionButton.rx.tap
-      .withUnretained(self)
-      .filter { owner, _ in owner.isEnableComplete }
+      .withLatestFrom(reactor.state)
+      .filter { $0.isEnableComplete }
       .map { _ in Action.didTapCompletionButton }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
@@ -319,11 +278,7 @@ private extension PostUploadViewController {
     reactor.state
       .map { $0.isEnableComplete }
       .distinctUntilChanged()
-      .bind(with: self, onNext: { owner, isEnable in
-        let color = isEnable ? MozipColor.primary500 : MozipColor.gray200
-        owner.completionButton.backgroundColor = color
-        owner.isEnableComplete = isEnable
-      })
+      .bind(to: completionButtonBinder)
       .disposed(by: disposeBag)
     
     reactor.state
@@ -396,12 +351,40 @@ private extension PostUploadViewController {
         owner.updateLayout()
       })
       .disposed(by: disposeBag)
+    
+    guard let reactor else { return }
+    completionButton.rx.tap
+      .withLatestFrom(reactor.state)
+      .filter { !$0.isEnableComplete }
+      .asSignal(onErrorSignalWith: .empty())
+      .emit(with: self, onNext: { owner, _ in
+        owner.view.showToast(message: "모든 항목을 입력해 주세요.")
+      })
+      .disposed(by: disposeBag)
   }
   
   func updateLayout() {
     rootContainer.flex.layout(mode: .adjustHeight)
     scrollView.contentSize = rootContainer.frame.size
     categoryView.pin.below(of: categoryTextFieldView).marginTop(12).horizontally(20).height(274)
+  }
+  
+  func createPost(imageData: Data, textStream: [String], jobGroupStream: [String]) -> Post {
+    guard textStream.count == 9, let reactor else { return .init() }
+    
+    return reactor.post.updated(
+      imageData: imageData,
+      title: textStream[0],
+      categoryTitle: textStream[1],
+      organization: textStream[2],
+      recruitStartDate: textStream[3],
+      recruitEndDate: textStream[4],
+      jobGroups: jobGroupStream,
+      activityStartDate: textStream[5],
+      activityEndDate: textStream[6],
+      activityContents: textStream[7],
+      postUrlString: textStream[8]
+    )
   }
 }
   
@@ -525,35 +508,25 @@ private extension PostUploadViewController {
 extension PostUploadViewController: PHPickerViewControllerDelegate {
   internal func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
     picker.dismiss(animated: true)
-    
-    guard let provider = results.first?.itemProvider,
-          provider.canLoadObject(ofClass: UIImage.self) else {
-      return
-    }
+    guard let provider = results.first?.itemProvider, provider.canLoadObject(ofClass: UIImage.self) else { return }
     
     provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
-      guard let self = self,
-            let image = image as? UIImage,
-            let imageData = image.jpegData(compressionQuality: 0.5) else {
-        return
-      }
+      guard let self, let image = image as? UIImage, let imageData = image.jpegData(compressionQuality: 0.5) else { return }
       
-      guard imageData.count < 10 * 1024 * 1024 else {
-        DispatchQueue.main.async { [weak self] in
-          self?.presentAlert(type: .imageSizeOver, rightButtonAction: {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-              guard let self else { return }
-              present(phPicker, animated: true)
-            }
-          })
+      if imageData.count < 10 * 1024 * 1024 {
+        DispatchQueue.main.async {
+          self.imageUploadView.applyImage(data: imageData)
         }
         return
       }
       
-      self.reactor?.action.onNext(.inputImage(imageData))
-      
-      DispatchQueue.main.async {
-        self.imageUploadView.applyImage(image)
+      DispatchQueue.main.async { [weak self] in
+        self?.presentAlert(type: .imageSizeOver, rightButtonAction: {
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self else { return }
+            present(phPicker, animated: true)
+          }
+        })
       }
     }
   }
