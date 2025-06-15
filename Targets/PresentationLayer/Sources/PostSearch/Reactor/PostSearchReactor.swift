@@ -72,7 +72,7 @@ final class PostSearchReactor: Reactor {
     let searchPostListMutation: Observable<Mutation> = searchPostListUseCase
       .execute(keyword: keyword, pageable: .init(page: 0, size: 30, sort: "latest")) // TODO: 추후 페이징 처리
       .delay(.milliseconds(300), scheduler: MainScheduler.asyncInstance)
-      .map { .setPosts(data: $0) }
+      .map { .setPosts(data: $0.posts) }
     
     let sequence: [Observable<Mutation>] = [
       .just(.setLoading(true)),
