@@ -62,10 +62,7 @@ final class PostRecommendViewController: BaseViewController<PostRecommendReactor
     fatalError("init(coder:) has not been implemented")
   }
   
-  // MARK: LifeCycle
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    
+  deinit {
     coordinator?.disappear()
   }
   

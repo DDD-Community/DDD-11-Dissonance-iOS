@@ -36,24 +36,19 @@ final class PostRecommendCoordinator: PostRecommendCoordinatorType {
   }
   
   func pushPostSearch(at index: Int) {
-    guard let postSearchCoordinator = DIContainer.shared.resolve(type: PostSearchCoordinatorType.self)
-    as? PostSearchCoordinator else {
-        return
-    }
-    postSearchCoordinator.parentCoordinator = self
-    addChild(postSearchCoordinator)
+    let coordinator = PostSearchCoordinator(navigationController: navigationController)
+    coordinator.parentCoordinator = self
     mutableRecommendedPostStream.setTargetIndex(index)
-    postSearchCoordinator.startSelectMode(stream: mutableRecommendedPostStream)
+    coordinator.startSelectMode(stream: mutableRecommendedPostStream)
+    self.addChild(coordinator)
   }
 }
 
 // MARK: - Private
 private extension PostRecommendCoordinator {
   func postRecommendViewController() -> PostRecommendViewController {
-    guard let fetchBannerUseCase = DIContainer.shared.resolve(type: FetchBannerUseCaseType.self) else {
-      fatalError()
-    }
-    guard let updateBannerUseCase = DIContainer.shared.resolve(type: UpdateBannerUseCaseType.self) else {
+    guard let fetchBannerUseCase = DIContainer.shared.resolve(type: FetchBannerUseCaseType.self),
+          let updateBannerUseCase = DIContainer.shared.resolve(type: UpdateBannerUseCaseType.self) else {
       fatalError()
     }
     let reactor = PostRecommendReactor(
